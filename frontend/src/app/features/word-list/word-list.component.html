@@ -1,0 +1,147 @@
+<div class="container page-content">
+  <div class="page-header">
+    <h1>Kho từ vựng</h1>
+    <p>{{ totalElements() }} từ đang hiển thị</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar" *ngIf="stats()">
+    <div class="stat-item total">
+      <span class="stat-num">{{ stats()!.total }}</span>
+      <span class="stat-label">Tổng từ</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item beginner" (click)="setDifficulty('BEGINNER')" [class.active]="selectedDifficulty === 'BEGINNER'">
+      <span class="stat-num">{{ stats()!.BEGINNER }}</span>
+      <span class="stat-label">Cơ bản</span>
+    </div>
+    <div class="stat-item intermediate" (click)="setDifficulty('INTERMEDIATE')" [class.active]="selectedDifficulty === 'INTERMEDIATE'">
+      <span class="stat-num">{{ stats()!.INTERMEDIATE }}</span>
+      <span class="stat-label">Trung cấp</span>
+    </div>
+    <div class="stat-item advanced" (click)="setDifficulty('ADVANCED')" [class.active]="selectedDifficulty === 'ADVANCED'">
+      <span class="stat-num">{{ stats()!.ADVANCED }}</span>
+      <span class="stat-label">Nâng cao</span>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters card">
+    <!-- Search -->
+    <div class="search-row">
+      <input
+        type="text"
+        class="form-control search-input"
+        placeholder="Tìm kiếm từ vựng..."
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="search()"
+      />
+      <button class="btn-search" (click)="search()">Tìm</button>
+      <button class="btn-clear" *ngIf="searchTerm || selectedDifficulty || selectedLetter" (click)="clearFilters()">
+        ✕ Xóa bộ lọc
+      </button>
+    </div>
+
+    <!-- Level filter -->
+    <div class="filter-row">
+      <span class="filter-label">Cấp độ:</span>
+      <div class="difficulty-filters">
+        <button class="filter-btn" [class.active]="selectedDifficulty === ''" (click)="setDifficulty('')">Tất cả</button>
+        <button class="filter-btn beginner" [class.active]="selectedDifficulty === 'BEGINNER'" (click)="setDifficulty('BEGINNER')">Cơ bản</button>
+        <button class="filter-btn intermediate" [class.active]="selectedDifficulty === 'INTERMEDIATE'" (click)="setDifficulty('INTERMEDIATE')">Trung cấp</button>
+        <button class="filter-btn advanced" [class.active]="selectedDifficulty === 'ADVANCED'" (click)="setDifficulty('ADVANCED')">Nâng cao</button>
+      </div>
+    </div>
+
+    <!-- A-Z filter -->
+    <div class="filter-row">
+      <span class="filter-label">Chữ cái:</span>
+      <div class="az-filters">
+        <button
+          class="az-btn"
+          [class.active]="selectedLetter === ''"
+          (click)="setLetter('')">Tất cả</button>
+        <button
+          *ngFor="let l of alphabet"
+          class="az-btn"
+          [class.active]="selectedLetter === l"
+          (click)="setLetter(l)">{{ l }}</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-overlay" *ngIf="loading()">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Word list -->
+  <div class="word-list" *ngIf="!loading()">
+    <div class="empty-state" *ngIf="words().length === 0">
+      <p>Không tìm thấy từ nào phù hợp.</p>
+      <button class="btn-clear" (click)="clearFilters()">Xóa bộ lọc</button>
+    </div>
+
+    <div *ngFor="let word of words()" class="word-card card" (click)="toggleExpand(word.id)">
+      <div class="word-header">
+        <div class="word-main">
+          <span class="word-text" (click)="filterByWord(word.word, $event)">{{ word.word }}</span>
+          <span class="word-pron">{{ word.pronunciation }}</span>
+          <span class="badge" [ngClass]="getDifficultyClass(word.difficulty)">{{ word.difficulty }}</span>
+        </div>
+        <div class="word-right">
+          <span class="meaning-preview">{{ word.meaningVi }}</span>
+          <span class="badge" *ngIf="getStatus(word.id)" [ngClass]="getStatusClass(getStatus(word.id))">
+            {{ getStatusLabel(getStatus(word.id)) }}
+          </span>
+          <span class="expand-icon">{{ expandedWordId === word.id ? '▲' : '▼' }}</span>
+        </div>
+      </div>
+
+      <div class="word-detail" *ngIf="expandedWordId === word.id">
+        <div class="detail-row" *ngIf="word.partOfSpeech">
+          <span class="detail-label">Loại từ:</span>
+          <span class="detail-val">{{ word.partOfSpeech }}</span>
+        </div>
+        <div class="detail-row" *ngIf="word.category">
+          <span class="detail-label">Chủ đề:</span>
+          <span class="detail-val">{{ word.category }}</span>
+        </div>
+        <div class="detail-row" *ngIf="word.exampleSentence">
+          <span class="detail-label">Ví dụ:</span>
+          <div>
+            <p class="ex-en">{{ word.exampleSentence }}</p>
+            <p class="ex-vi">{{ word.exampleTranslation }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-wrapper" *ngIf="totalPages() > 0">
+    <div class="page-size-selector">
+      <label>Hiển thị:</label>
+      <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+        <option *ngFor="let s of pageSizeOptions" [value]="s">{{ s }}</option>
+      </select>
+      <span>từ / trang</span>
+    </div>
+
+    <div class="pagination" *ngIf="totalPages() > 1">
+      <button class="page-btn" (click)="setPage(currentPage() - 1)" [disabled]="currentPage() === 0">←</button>
+      <ng-container *ngFor="let p of pages">
+        <span *ngIf="p === -1" class="page-ellipsis">…</span>
+        <button
+          *ngIf="p !== -1"
+          class="page-btn"
+          [class.active]="p === currentPage()"
+          (click)="setPage(p)">{{ p + 1 }}</button>
+      </ng-container>
+      <button class="page-btn" (click)="setPage(currentPage() + 1)" [disabled]="currentPage() === totalPages() - 1">→</button>
+    </div>
+
+    <div class="page-info">
+      Trang {{ currentPage() + 1 }} / {{ totalPages() }}
+    </div>
+  </div>
+</div>

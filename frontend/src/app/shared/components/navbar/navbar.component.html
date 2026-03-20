@@ -1,0 +1,37 @@
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a routerLink="/dashboard" class="logo">
+      <span class="logo-icon">📚</span>
+      <span class="logo-text">VocabDaily</span>
+    </a>
+
+    <ul class="nav-links">
+      <li>
+        <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+          Dashboard
+        </a>
+      </li>
+      <li>
+        <a routerLink="/study" routerLinkActive="active">
+          Học từ
+        </a>
+      </li>
+      <li>
+        <a routerLink="/review" routerLinkActive="active" class="nav-review">
+          Ôn tập
+          <span class="review-badge" *ngIf="reviewCount() > 0">{{ reviewCount() }}</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/words" routerLinkActive="active">
+          Từ vựng
+        </a>
+      </li>
+    </ul>
+
+    <div class="nav-user">
+      <span class="username">{{ authService.currentUser()?.displayName }}</span>
+      <button class="btn btn-sm btn-outline" (click)="logout()">Đăng xuất</button>
+    </div>
+  </div>
+</nav>

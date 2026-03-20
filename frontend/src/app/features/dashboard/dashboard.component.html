@@ -1,0 +1,99 @@
+<div class="container page-content" *ngIf="!loading(); else loadingTpl">
+  <div class="page-header" *ngIf="dashboard() as d">
+    <h1>Xin chào, {{ d.displayName }} 👋</h1>
+    <p>Hôm nay bạn đã sẵn sàng học từ vựng chưa?</p>
+  </div>
+
+  <div class="dashboard-grid" *ngIf="dashboard() as d">
+    <!-- Streak Card -->
+    <div class="card streak-card">
+      <div class="streak-icon">🔥</div>
+      <div class="streak-info">
+        <div class="streak-num">{{ d.streak }}</div>
+        <div class="streak-label">ngày liên tiếp</div>
+      </div>
+      <div class="streak-sub">{{ d.totalDaysStudied }} ngày đã học</div>
+    </div>
+
+    <!-- Today's Progress -->
+    <div class="card today-card">
+      <div class="today-header">
+        <h3>Hôm nay</h3>
+        <span class="badge" [class.badge-mastered]="d.todayCompleted" [class.badge-learning]="!d.todayCompleted">
+          {{ d.todayCompleted ? 'Hoàn thành ✓' : 'Chưa xong' }}
+        </span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="todayPercent"></div>
+        </div>
+        <span class="progress-text">{{ d.todayWordsStudied }}/{{ d.todayTotalWords }} từ</span>
+      </div>
+      <div class="today-actions">
+        <a routerLink="/flashcard" class="btn btn-primary">
+          {{ d.todayCompleted ? 'Ôn lại' : 'Học ngay' }} →
+        </a>
+        <a routerLink="/quiz" class="btn btn-secondary">Quiz</a>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="card stats-card">
+      <h3>Tiến độ tổng quan</h3>
+      <div class="stat-list">
+        <div class="stat-item">
+          <div class="stat-dot" style="background:#9CA3AF"></div>
+          <span class="stat-name">Mới</span>
+          <span class="stat-val">{{ d.newCount }}</span>
+        </div>
+        <div class="stat-item">
+          <div class="stat-dot" style="background:#F59E0B"></div>
+          <span class="stat-name">Đang học</span>
+          <span class="stat-val">{{ d.learningCount }}</span>
+        </div>
+        <div class="stat-item">
+          <div class="stat-dot" style="background:#3B82F6"></div>
+          <span class="stat-name">Ôn tập</span>
+          <span class="stat-val">{{ d.reviewCount }}</span>
+        </div>
+        <div class="stat-item">
+          <div class="stat-dot" style="background:#10B981"></div>
+          <span class="stat-name">Thành thạo</span>
+          <span class="stat-val">{{ d.masteredCount }}</span>
+        </div>
+      </div>
+      <div class="mastered-bar">
+        <div class="mastered-fill" [style.width.%]="progressPercent"></div>
+      </div>
+      <p class="mastered-pct">{{ progressPercent }}% thành thạo</p>
+    </div>
+
+    <!-- Study Actions -->
+    <div class="card quick-links">
+      <h3>Hành động</h3>
+      <div class="links-grid">
+        <a routerLink="/study" class="quick-link ql-study">
+          <span class="ql-icon">✏️</span>
+          <span>Học từ mới</span>
+        </a>
+        <a routerLink="/review" class="quick-link ql-review">
+          <span class="ql-icon">📝</span>
+          <span>
+            Ôn tập
+            <span class="ql-badge" *ngIf="reviewCount() > 0">{{ reviewCount() }}</span>
+          </span>
+        </a>
+        <a routerLink="/words" class="quick-link">
+          <span class="ql-icon">📖</span>
+          <span>Từ điển</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingTpl>
+  <div class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+</ng-template>

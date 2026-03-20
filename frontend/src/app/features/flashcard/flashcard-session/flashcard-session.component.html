@@ -1,0 +1,72 @@
+<div class="container page-content">
+
+  <!-- Loading -->
+  <div class="loading-overlay" *ngIf="loading()">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Session Complete -->
+  <div class="result-screen" *ngIf="done() && !loading()">
+    <div class="result-icon">🎉</div>
+    <h2>Hoàn thành rồi!</h2>
+    <p>Bạn đã học xong {{ totalWords }} từ hôm nay</p>
+    <div class="result-score">
+      <span class="score-num">{{ correctCount }}</span>
+      <span class="score-sep">/</span>
+      <span class="score-total">{{ totalWords }}</span>
+      <span class="score-label">từ đã nhớ</span>
+    </div>
+    <div class="result-actions">
+      <button class="btn btn-primary btn-lg" (click)="goToQuiz()">Làm quiz ngay</button>
+      <a routerLink="/dashboard" class="btn btn-secondary btn-lg">Về trang chủ</a>
+    </div>
+  </div>
+
+  <!-- Flashcard Session -->
+  <ng-container *ngIf="!done() && !loading() && currentWord as word">
+    <div class="session-header">
+      <a routerLink="/dashboard" class="back-btn">← Quay lại</a>
+      <h2>Flashcard hôm nay</h2>
+      <span class="progress-indicator">{{ currentIndex() + 1 }}/{{ totalWords }}</span>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="session-progress">
+      <div class="session-progress-fill"
+        [style.width.%]="((currentIndex()) / totalWords) * 100"></div>
+    </div>
+
+    <!-- Card -->
+    <div class="flashcard-wrap">
+      <div class="flashcard" [class.flipped]="flipped()" (click)="flip()">
+        <div class="card-face card-front">
+          <div class="word-pos">{{ word.partOfSpeech }}</div>
+          <div class="word-text">{{ word.word }}</div>
+          <div class="word-pron">{{ word.pronunciation }}</div>
+          <div class="flip-hint">Nhấn để xem nghĩa 👆</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="word-category">{{ word.category }}</div>
+          <div class="meaning">{{ word.meaningVi }}</div>
+          <div class="example" *ngIf="word.exampleSentence">
+            <p class="ex-en">"{{ word.exampleSentence }}"</p>
+            <p class="ex-vi">{{ word.exampleTranslation }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action buttons (only show after flip) -->
+    <div class="answer-btns" *ngIf="flipped()">
+      <button class="btn btn-wrong" (click)="answer(false)">
+        <span>✗</span> Chưa nhớ
+      </button>
+      <button class="btn btn-correct" (click)="answer(true)">
+        <span>✓</span> Đã nhớ
+      </button>
+    </div>
+
+    <p class="flip-prompt" *ngIf="!flipped()">Nhấn vào thẻ để lật</p>
+  </ng-container>
+
+</div>

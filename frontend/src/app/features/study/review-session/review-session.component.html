@@ -1,0 +1,89 @@
+<div class="review-container">
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading()">
+    <div class="spinner"></div>
+    <p>Đang tải...</p>
+  </div>
+
+  <!-- PHASE: INTRO -->
+  <ng-container *ngIf="phase() === 'intro' && !loading()">
+    <div class="intro-card">
+      <div class="icon">📚</div>
+      <h2>Ôn tập từ đã học</h2>
+
+      <div class="due-badge" *ngIf="reviewCount() > 0">
+        <span class="due-num">{{ reviewCount() }}</span>
+        <span class="due-label">từ cần ôn tập hôm nay</span>
+      </div>
+
+      <div class="no-due" *ngIf="reviewCount() === 0">
+        <p>Bạn không có từ nào cần ôn tập hôm nay!</p>
+        <p class="hint">Hãy học thêm từ mới để bắt đầu hành trình.</p>
+      </div>
+
+      <button class="btn-start" (click)="startReview()" [disabled]="reviewCount() === 0">
+        Bắt đầu ôn tập
+      </button>
+      <a routerLink="/study" class="btn-outline">Học từ mới</a>
+      <a routerLink="/dashboard" class="btn-ghost">Về trang chủ</a>
+    </div>
+  </ng-container>
+
+  <!-- PHASE: QUIZ -->
+  <ng-container *ngIf="phase() === 'quiz' && currentQuestion">
+    <div class="phase-header">
+      <span class="phase-label">Ôn tập</span>
+      <span class="progress-text">{{ quizIndex() + 1 }} / {{ questions().length }}</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="((quizIndex() + 1) / questions().length) * 100"></div>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-word">{{ currentQuestion.word }}</div>
+      <div class="quiz-pron">{{ currentQuestion.pronunciation }}</div>
+      <p class="quiz-prompt">Chọn nghĩa đúng:</p>
+
+      <div class="options">
+        <button
+          *ngFor="let opt of currentQuestion.options; let i = index"
+          class="option-btn"
+          [class]="getOptionClass(i)"
+          (click)="selectOption(i)">
+          {{ opt }}
+        </button>
+      </div>
+
+      <button class="btn-next" *ngIf="answered()" (click)="next()">
+        {{ quizIndex() + 1 < questions().length ? 'Câu tiếp theo →' : 'Xem kết quả' }}
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- PHASE: DONE -->
+  <ng-container *ngIf="phase() === 'done'">
+    <div class="done-card">
+      <div class="done-icon">{{ scorePercent >= 80 ? '🏆' : scorePercent >= 50 ? '👍' : '💪' }}</div>
+      <h2>Ôn tập hoàn thành!</h2>
+
+      <div class="score-circle">
+        <div class="score-val">{{ scorePercent }}%</div>
+        <div class="score-label">{{ score() }} / {{ questions().length }} đúng</div>
+      </div>
+
+      <div class="score-msg">
+        <span *ngIf="scorePercent >= 80">Xuất sắc! Bạn đang tiến bộ rất tốt.</span>
+        <span *ngIf="scorePercent >= 50 && scorePercent < 80">Tốt lắm! Hãy tiếp tục ôn tập.</span>
+        <span *ngIf="scorePercent < 50">Cần luyện thêm. Đừng nản nhé!</span>
+      </div>
+
+      <div class="done-actions">
+        <button class="btn-start" (click)="resetToIntro()">Ôn tập lại</button>
+        <a routerLink="/study" class="btn-outline">Học từ mới</a>
+        <a routerLink="/dashboard" class="btn-ghost">Về trang chủ</a>
+      </div>
+    </div>
+  </ng-container>
+
+</div>

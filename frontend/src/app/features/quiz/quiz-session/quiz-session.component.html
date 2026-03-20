@@ -1,0 +1,72 @@
+<div class="container page-content">
+
+  <div class="loading-overlay" *ngIf="loading()">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Quiz Done -->
+  <div class="result-screen" *ngIf="done() && !loading()">
+    <div class="result-emoji">
+      {{ scorePercent >= 80 ? '🏆' : scorePercent >= 60 ? '👍' : '📚' }}
+    </div>
+    <h2>Quiz hoàn thành!</h2>
+    <div class="score-display">
+      <span class="score-big">{{ score() }}</span>
+      <span class="score-denom">/{{ questions().length }}</span>
+    </div>
+    <p class="score-msg" *ngIf="scorePercent >= 80">Xuất sắc! Bạn nhớ rất tốt!</p>
+    <p class="score-msg" *ngIf="scorePercent >= 60 && scorePercent < 80">Tốt! Hãy ôn thêm nhé!</p>
+    <p class="score-msg" *ngIf="scorePercent < 60">Cần ôn luyện thêm! Hãy thử lại sau.</p>
+
+    <div class="result-review">
+      <div *ngFor="let r of results" class="review-item" [class.review-correct]="r.correct" [class.review-wrong]="!r.correct">
+        <span class="review-icon">{{ r.correct ? '✓' : '✗' }}</span>
+        <span class="review-word">{{ r.question.word }}</span>
+        <span class="review-answer">{{ r.question.options[r.question.correctIndex] }}</span>
+      </div>
+    </div>
+
+    <div class="done-actions">
+      <a routerLink="/dashboard" class="btn btn-primary btn-lg">Về trang chủ</a>
+      <a routerLink="/flashcard" class="btn btn-secondary btn-lg">Học lại</a>
+    </div>
+  </div>
+
+  <!-- Quiz Session -->
+  <ng-container *ngIf="!done() && !loading() && currentQuestion as q">
+    <div class="quiz-header">
+      <a routerLink="/dashboard" class="back-btn">← Quay lại</a>
+      <span class="quiz-progress">{{ currentIndex() + 1 }}/{{ questions().length }}</span>
+    </div>
+
+    <div class="quiz-progress-bar">
+      <div class="quiz-progress-fill"
+        [style.width.%]="((currentIndex()) / questions().length) * 100"></div>
+    </div>
+
+    <div class="question-card card">
+      <div class="question-word">{{ q.word }}</div>
+      <div class="question-pron" *ngIf="q.pronunciation">{{ q.pronunciation }}</div>
+      <p class="question-prompt">Nghĩa tiếng Việt là gì?</p>
+
+      <div class="options-list">
+        <button
+          *ngFor="let opt of q.options; let i = index"
+          class="option-btn"
+          [class]="getOptionClass(i)"
+          (click)="selectOption(i)"
+          [disabled]="answered()">
+          <span class="option-letter">{{ 'ABCD'[i] }}</span>
+          <span class="option-text">{{ opt }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="next-wrap" *ngIf="answered()">
+      <button class="btn btn-primary btn-lg" (click)="next()">
+        {{ currentIndex() + 1 < questions().length ? 'Câu tiếp theo →' : 'Xem kết quả →' }}
+      </button>
+    </div>
+  </ng-container>
+
+</div>

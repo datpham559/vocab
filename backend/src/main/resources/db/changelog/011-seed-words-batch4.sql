@@ -1,0 +1,97 @@
+--liquibase formatted sql
+
+--changeset vocab:011-seed-words-batch4
+INSERT INTO words (word, pronunciation, meaning_vi, part_of_speech, difficulty, example_sentence, example_translation)
+SELECT v.word, v.pronunciation, v.meaning_vi, v.part_of_speech, v.difficulty, v.example_sentence, v.example_translation
+FROM (VALUES
+-- INTERMEDIATE: Travel & Places
+(N'hotel', N'/hoʊˈtel/', N'khách sạn', N'noun', N'INTERMEDIATE', N'We stayed at a luxury hotel.', N'Chúng tôi ở tại khách sạn sang trọng.'),
+(N'reservation', N'/ˌrezərˈveɪʃən/', N'đặt phòng / đặt chỗ', N'noun', N'INTERMEDIATE', N'I made a reservation for two.', N'Tôi đã đặt chỗ cho hai người.'),
+(N'passport', N'/ˈpæspɔːrt/', N'hộ chiếu', N'noun', N'INTERMEDIATE', N'Don''t forget your passport.', N'Đừng quên hộ chiếu của bạn.'),
+(N'visa', N'/ˈviːzə/', N'thị thực', N'noun', N'INTERMEDIATE', N'Apply for a visa in advance.', N'Xin thị thực trước.'),
+(N'luggage', N'/ˈlʌɡɪdʒ/', N'hành lý', N'noun', N'INTERMEDIATE', N'Carry-on luggage only.', N'Chỉ được mang hành lý xách tay.'),
+(N'destination', N'/ˌdestɪˈneɪʃən/', N'điểm đến', N'noun', N'INTERMEDIATE', N'What is your final destination?', N'Điểm đến cuối cùng của bạn là đâu?'),
+(N'tourism', N'/ˈtʊərɪzəm/', N'du lịch (ngành)', N'noun', N'INTERMEDIATE', N'Tourism is important for the economy.', N'Du lịch quan trọng cho kinh tế.'),
+(N'tourist', N'/ˈtʊərɪst/', N'khách du lịch', N'noun', N'INTERMEDIATE', N'Many tourists visit this city.', N'Nhiều du khách đến thăm thành phố này.'),
+(N'currency', N'/ˈkɜːrənsi/', N'tiền tệ', N'noun', N'INTERMEDIATE', N'Exchange your currency at the bank.', N'Đổi tiền tệ tại ngân hàng.'),
+(N'culture', N'/ˈkʌltʃər/', N'văn hóa', N'noun', N'INTERMEDIATE', N'Every country has its own culture.', N'Mỗi quốc gia có văn hóa riêng.'),
+(N'tradition', N'/trəˈdɪʃən/', N'truyền thống', N'noun', N'INTERMEDIATE', N'This is an ancient tradition.', N'Đây là một truyền thống cổ xưa.'),
+(N'landmark', N'/ˈlændmɑːrk/', N'địa danh nổi tiếng', N'noun', N'INTERMEDIATE', N'The Eiffel Tower is a famous landmark.', N'Tháp Eiffel là địa danh nổi tiếng.'),
+(N'souvenir', N'/ˌsuːvəˈnɪr/', N'đồ lưu niệm', N'noun', N'INTERMEDIATE', N'Buy a souvenir to remember the trip.', N'Mua đồ lưu niệm để nhớ chuyến đi.'),
+(N'guided tour', N'/ˈɡaɪdɪd tʊr/', N'tour có hướng dẫn', N'noun', N'INTERMEDIATE', N'Join a guided tour of the museum.', N'Tham gia tour có hướng dẫn viên ở bảo tàng.'),
+(N'accommodation', N'/əˌkɒməˈdeɪʃən/', N'chỗ ở', N'noun', N'INTERMEDIATE', N'Find accommodation near the center.', N'Tìm chỗ ở gần trung tâm.'),
+(N'explore', N'/ɪkˈsplɔːr/', N'khám phá', N'verb', N'INTERMEDIATE', N'We explored the old town.', N'Chúng tôi khám phá khu phố cổ.'),
+(N'discover', N'/dɪˈskʌvər/', N'phát hiện', N'verb', N'INTERMEDIATE', N'Discover new places and cultures.', N'Khám phá những nơi và văn hóa mới.'),
+(N'navigate', N'/ˈnævɪɡeɪt/', N'điều hướng / dẫn đường', N'verb', N'INTERMEDIATE', N'Use GPS to navigate.', N'Dùng GPS để dẫn đường.'),
+(N'picturesque', N'/ˌpɪktʃəˈresk/', N'đẹp như tranh', N'adjective', N'INTERMEDIATE', N'The village is absolutely picturesque.', N'Ngôi làng đẹp như tranh.'),
+(N'exotic', N'/ɪɡˈzɒtɪk/', N'kỳ lạ / ngoại lai', N'adjective', N'INTERMEDIATE', N'They tried exotic food.', N'Họ thử đồ ăn kỳ lạ.'),
+-- INTERMEDIATE: Education (advanced)
+(N'university', N'/ˌjuːnɪˈvɜːrsəti/', N'trường đại học', N'noun', N'INTERMEDIATE', N'She studies at a top university.', N'Cô ấy học tại trường đại học hàng đầu.'),
+(N'graduate', N'/ˈɡrædʒuət/', N'sinh viên tốt nghiệp', N'noun', N'INTERMEDIATE', N'He is a recent graduate.', N'Anh ấy mới tốt nghiệp.'),
+(N'degree', N'/dɪˈɡriː/', N'bằng cấp', N'noun', N'INTERMEDIATE', N'She earned a degree in science.', N'Cô ấy lấy bằng khoa học.'),
+(N'scholarship', N'/ˈskɒlərʃɪp/', N'học bổng', N'noun', N'INTERMEDIATE', N'He received a full scholarship.', N'Anh ấy nhận được học bổng toàn phần.'),
+(N'lecture', N'/ˈlektʃər/', N'bài giảng', N'noun', N'INTERMEDIATE', N'The lecture lasted two hours.', N'Bài giảng kéo dài hai tiếng.'),
+(N'seminar', N'/ˈsemɪnɑːr/', N'buổi hội thảo / seminar', N'noun', N'INTERMEDIATE', N'Attend the seminar on Thursday.', N'Tham dự hội thảo vào thứ Năm.'),
+(N'thesis', N'/ˈθiːsɪs/', N'luận văn', N'noun', N'INTERMEDIATE', N'She is writing her thesis now.', N'Cô ấy đang viết luận văn.'),
+(N'research', N'/ˈriːsɜːrtʃ/', N'nghiên cứu', N'noun', N'INTERMEDIATE', N'His research is groundbreaking.', N'Nghiên cứu của anh ấy là đột phá.'),
+(N'knowledge', N'/ˈnɒlɪdʒ/', N'kiến thức', N'noun', N'INTERMEDIATE', N'Knowledge is power.', N'Kiến thức là sức mạnh.'),
+(N'curriculum', N'/kəˈrɪkjʊləm/', N'chương trình học', N'noun', N'INTERMEDIATE', N'The curriculum is updated yearly.', N'Chương trình học được cập nhật hàng năm.'),
+-- INTERMEDIATE: Finance
+(N'bank', N'/bæŋk/', N'ngân hàng', N'noun', N'INTERMEDIATE', N'Open an account at the bank.', N'Mở tài khoản tại ngân hàng.'),
+(N'account', N'/əˈkaʊnt/', N'tài khoản', N'noun', N'INTERMEDIATE', N'Check your account balance.', N'Kiểm tra số dư tài khoản.'),
+(N'interest', N'/ˈɪntrəst/', N'lãi suất', N'noun', N'INTERMEDIATE', N'The interest rate is low now.', N'Lãi suất hiện tại thấp.'),
+(N'investment', N'/ɪnˈvestmənt/', N'đầu tư', N'noun', N'INTERMEDIATE', N'A good investment pays off later.', N'Đầu tư tốt sẽ mang lại kết quả sau.'),
+(N'loan', N'/loʊn/', N'khoản vay', N'noun', N'INTERMEDIATE', N'Apply for a bank loan.', N'Đăng ký vay ngân hàng.'),
+(N'debt', N'/det/', N'nợ', N'noun', N'INTERMEDIATE', N'Pay off your debt as soon as possible.', N'Trả nợ sớm nhất có thể.'),
+(N'tax', N'/tæks/', N'thuế', N'noun', N'INTERMEDIATE', N'Pay your taxes on time.', N'Đóng thuế đúng hạn.'),
+(N'insurance', N'/ɪnˈʃʊərəns/', N'bảo hiểm', N'noun', N'INTERMEDIATE', N'Health insurance is essential.', N'Bảo hiểm sức khỏe rất cần thiết.'),
+(N'mortgage', N'/ˈmɔːrɡɪdʒ/', N'vay thế chấp mua nhà', N'noun', N'INTERMEDIATE', N'They got a mortgage for the house.', N'Họ vay thế chấp để mua nhà.'),
+(N'afford', N'/əˈfɔːrd/', N'đủ khả năng chi trả', N'verb', N'INTERMEDIATE', N'I cannot afford a new car now.', N'Tôi không đủ khả năng mua xe mới lúc này.'),
+-- INTERMEDIATE: Environment
+(N'environment', N'/ɪnˈvaɪrənmənt/', N'môi trường', N'noun', N'INTERMEDIATE', N'Protect the environment for future generations.', N'Bảo vệ môi trường cho thế hệ tương lai.'),
+(N'pollution', N'/pəˈluːʃən/', N'ô nhiễm', N'noun', N'INTERMEDIATE', N'Air pollution is a serious problem.', N'Ô nhiễm không khí là vấn đề nghiêm trọng.'),
+(N'climate', N'/ˈklaɪmɪt/', N'khí hậu', N'noun', N'INTERMEDIATE', N'Climate change affects everyone.', N'Biến đổi khí hậu ảnh hưởng đến tất cả mọi người.'),
+(N'recycling', N'/ˌriːˈsaɪklɪŋ/', N'tái chế', N'noun', N'INTERMEDIATE', N'Recycling reduces waste.', N'Tái chế giảm rác thải.'),
+(N'sustainability', N'/səˌsteɪnəˈbɪlɪti/', N'tính bền vững', N'noun', N'INTERMEDIATE', N'Sustainability is key to our future.', N'Tính bền vững là chìa khóa cho tương lai của chúng ta.'),
+(N'renewable', N'/rɪˈnjuːəbəl/', N'có thể tái tạo', N'adjective', N'INTERMEDIATE', N'Solar is a renewable energy source.', N'Mặt trời là nguồn năng lượng tái tạo.'),
+(N'carbon', N'/ˈkɑːrbən/', N'carbon', N'noun', N'INTERMEDIATE', N'Reduce your carbon footprint.', N'Giảm dấu chân carbon của bạn.'),
+(N'wildlife', N'/ˈwaɪldlaɪf/', N'động thực vật hoang dã', N'noun', N'INTERMEDIATE', N'Protect wildlife from extinction.', N'Bảo vệ động vật hoang dã khỏi tuyệt chủng.'),
+(N'ecosystem', N'/ˈiːkoʊsɪstəm/', N'hệ sinh thái', N'noun', N'INTERMEDIATE', N'The ecosystem must be preserved.', N'Hệ sinh thái cần được bảo tồn.'),
+(N'contaminate', N'/kənˈtæmɪneɪt/', N'làm ô nhiễm', N'verb', N'INTERMEDIATE', N'Chemicals contaminate the water.', N'Hóa chất làm ô nhiễm nước.'),
+-- INTERMEDIATE: Emotions & Personality
+(N'confident', N'/ˈkɒnfɪdənt/', N'tự tin', N'adjective', N'INTERMEDIATE', N'She is confident in her abilities.', N'Cô ấy tự tin vào khả năng của mình.'),
+(N'anxious', N'/ˈæŋkʃəs/', N'lo lắng / hồi hộp', N'adjective', N'INTERMEDIATE', N'He feels anxious about the exam.', N'Anh ấy lo lắng về kỳ thi.'),
+(N'grateful', N'/ˈɡreɪtfəl/', N'biết ơn', N'adjective', N'INTERMEDIATE', N'I am grateful for your help.', N'Tôi biết ơn sự giúp đỡ của bạn.'),
+(N'frustrated', N'/ˈfrʌstreɪtɪd/', N'thất vọng / bực bội', N'adjective', N'INTERMEDIATE', N'He felt frustrated with the results.', N'Anh ấy thất vọng với kết quả.'),
+(N'enthusiastic', N'/ɪnˌθjuːziˈæstɪk/', N'nhiệt tình / hăng hái', N'adjective', N'INTERMEDIATE', N'She is enthusiastic about learning.', N'Cô ấy rất hăng hái trong việc học.'),
+(N'optimistic', N'/ˌɒptɪˈmɪstɪk/', N'lạc quan', N'adjective', N'INTERMEDIATE', N'Stay optimistic even in hard times.', N'Hãy lạc quan ngay cả trong lúc khó khăn.'),
+(N'pessimistic', N'/ˌpesɪˈmɪstɪk/', N'bi quan', N'adjective', N'INTERMEDIATE', N'Try not to be so pessimistic.', N'Đừng quá bi quan.'),
+(N'stubborn', N'/ˈstʌbərn/', N'bướng bỉnh', N'adjective', N'INTERMEDIATE', N'He is too stubborn to change.', N'Anh ấy quá bướng bỉnh để thay đổi.'),
+(N'generous', N'/ˈdʒenərəs/', N'hào phóng', N'adjective', N'INTERMEDIATE', N'She is very generous to everyone.', N'Cô ấy rất hào phóng với mọi người.'),
+(N'selfish', N'/ˈselfɪʃ/', N'ích kỷ', N'adjective', N'INTERMEDIATE', N'Don''t be selfish, share with others.', N'Đừng ích kỷ, hãy chia sẻ với người khác.'),
+-- ADVANCED: Academic & Intellectual
+(N'paradigm', N'/ˈpærədaɪm/', N'mô hình / quan niệm', N'noun', N'ADVANCED', N'This challenges the existing paradigm.', N'Điều này thách thức mô hình hiện có.'),
+(N'hypothesis', N'/haɪˈpɒθɪsɪs/', N'giả thuyết', N'noun', N'ADVANCED', N'Test the hypothesis in the lab.', N'Kiểm tra giả thuyết trong phòng thí nghiệm.'),
+(N'empirical', N'/ɪmˈpɪrɪkəl/', N'thực nghiệm / dựa trên bằng chứng', N'adjective', N'ADVANCED', N'Empirical evidence supports the theory.', N'Bằng chứng thực nghiệm ủng hộ lý thuyết.'),
+(N'methodology', N'/ˌmeθəˈdɒlədʒi/', N'phương pháp luận', N'noun', N'ADVANCED', N'Describe your research methodology.', N'Mô tả phương pháp nghiên cứu của bạn.'),
+(N'inference', N'/ˈɪnfərəns/', N'suy luận', N'noun', N'ADVANCED', N'Draw an inference from the data.', N'Rút ra suy luận từ dữ liệu.'),
+(N'synthesis', N'/ˈsɪnθɪsɪs/', N'tổng hợp', N'noun', N'ADVANCED', N'Synthesis of ideas leads to innovation.', N'Tổng hợp ý tưởng dẫn đến sự đổi mới.'),
+(N'ambiguous', N'/æmˈbɪɡjuəs/', N'mơ hồ / khó hiểu', N'adjective', N'ADVANCED', N'The instructions are ambiguous.', N'Hướng dẫn rất mơ hồ.'),
+(N'coherent', N'/koʊˈhɪərənt/', N'mạch lạc / nhất quán', N'adjective', N'ADVANCED', N'Write a coherent argument.', N'Viết một lập luận mạch lạc.'),
+(N'pragmatic', N'/præɡˈmætɪk/', N'thực dụng', N'adjective', N'ADVANCED', N'Be pragmatic when solving problems.', N'Hãy thực dụng khi giải quyết vấn đề.'),
+(N'jurisdiction', N'/ˌdʒʊərɪsˈdɪkʃən/', N'thẩm quyền pháp lý', N'noun', N'ADVANCED', N'This falls under federal jurisdiction.', N'Điều này thuộc thẩm quyền liên bang.'),
+-- ADVANCED: Leadership & Management
+(N'delegate', N'/ˈdelɪɡeɪt/', N'ủy quyền / đại biểu', N'verb', N'ADVANCED', N'A good manager knows how to delegate.', N'Một người quản lý tốt biết cách ủy quyền.'),
+(N'accountability', N'/əˌkaʊntəˈbɪlɪti/', N'trách nhiệm giải trình', N'noun', N'ADVANCED', N'Accountability is essential in leadership.', N'Trách nhiệm giải trình thiết yếu trong lãnh đạo.'),
+(N'transparency', N'/trænsˈpærənsi/', N'sự minh bạch', N'noun', N'ADVANCED', N'Transparency builds trust.', N'Sự minh bạch xây dựng niềm tin.'),
+(N'integrity', N'/ɪnˈteɡrɪti/', N'sự chính trực', N'noun', N'ADVANCED', N'Act with integrity always.', N'Hành động với sự chính trực.'),
+(N'initiative', N'/ɪˈnɪʃiətɪv/', N'sáng kiến / tinh thần chủ động', N'noun', N'ADVANCED', N'Take initiative in your career.', N'Hãy chủ động trong sự nghiệp của bạn.'),
+(N'scalable', N'/ˈskeɪləbəl/', N'có thể mở rộng quy mô', N'adjective', N'ADVANCED', N'Build a scalable solution.', N'Xây dựng giải pháp có thể mở rộng.'),
+(N'sustainable', N'/səˈsteɪnəbəl/', N'bền vững', N'adjective', N'ADVANCED', N'We need a sustainable business model.', N'Chúng ta cần mô hình kinh doanh bền vững.'),
+(N'optimize', N'/ˈɒptɪmaɪz/', N'tối ưu hóa', N'verb', N'ADVANCED', N'Optimize the workflow for efficiency.', N'Tối ưu hóa quy trình làm việc để hiệu quả hơn.'),
+(N'facilitate', N'/fəˈsɪlɪteɪt/', N'tạo điều kiện / hỗ trợ', N'verb', N'ADVANCED', N'The system facilitates communication.', N'Hệ thống tạo điều kiện cho giao tiếp.'),
+(N'leverage', N'/ˈlevərɪdʒ/', N'tận dụng', N'verb', N'ADVANCED', N'Leverage your strengths to succeed.', N'Tận dụng thế mạnh của bạn để thành công.')
+) AS v(word, pronunciation, meaning_vi, part_of_speech, difficulty, example_sentence, example_translation)
+WHERE NOT EXISTS (SELECT 1 FROM words w WHERE w.word = v.word);
+
+--rollback DELETE FROM words WHERE word IN ('hotel','reservation','passport','visa','luggage','destination','tourism','tourist','currency','culture','tradition','landmark','souvenir','guided tour','accommodation','explore','discover','navigate','picturesque','exotic','university','graduate','degree','scholarship','lecture','seminar','thesis','research','knowledge','curriculum','bank','account','interest','investment','loan','debt','tax','insurance','mortgage','afford','environment','pollution','climate','recycling','sustainability','renewable','carbon','wildlife','ecosystem','contaminate','confident','anxious','grateful','frustrated','enthusiastic','optimistic','pessimistic','stubborn','generous','selfish','paradigm','hypothesis','empirical','methodology','inference','synthesis','ambiguous','coherent','pragmatic','jurisdiction','delegate','accountability','transparency','integrity','initiative','scalable','sustainable','optimize','facilitate','leverage');

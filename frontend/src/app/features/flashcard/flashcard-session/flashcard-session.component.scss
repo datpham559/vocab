@@ -1,0 +1,198 @@
+.session-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+
+  h2 { font-size: 20px; font-weight: 700; }
+
+  .back-btn {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 14px;
+    &:hover { color: var(--primary); }
+  }
+
+  .progress-indicator {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+}
+
+.session-progress {
+  height: 6px;
+  background: var(--border);
+  border-radius: var(--radius-full);
+  margin-bottom: 40px;
+  overflow: hidden;
+
+  .session-progress-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: var(--radius-full);
+    transition: width 0.4s ease;
+  }
+}
+
+.flashcard-wrap {
+  perspective: 1000px;
+  width: 100%;
+  max-width: 540px;
+  height: 320px;
+  margin: 0 auto 32px;
+}
+
+.flashcard {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+
+  &.flipped { transform: rotateY(180deg); }
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  border: 2px solid var(--border);
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.card-back { transform: rotateY(180deg); }
+
+.card-front {
+  .word-pos {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: var(--primary-light);
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+  }
+
+  .word-text { font-size: 40px; font-weight: 800; color: var(--text-primary); }
+  .word-pron { font-size: 16px; color: var(--text-secondary); }
+  .flip-hint { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+}
+
+.card-back {
+  gap: 16px;
+
+  .word-category {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .meaning { font-size: 28px; font-weight: 700; color: var(--text-primary); }
+
+  .example {
+    text-align: center;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+    width: 100%;
+
+    .ex-en { font-style: italic; color: var(--text-secondary); font-size: 14px; margin-bottom: 4px; }
+    .ex-vi { color: var(--text-muted); font-size: 13px; }
+  }
+}
+
+.answer-btns {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+
+  .btn-wrong {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 32px;
+    background: #FEF2F2;
+    color: var(--danger);
+    border: 2px solid #FECACA;
+    border-radius: var(--radius-lg);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    &:hover { background: var(--danger); color: white; }
+  }
+
+  .btn-correct {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 32px;
+    background: #ECFDF5;
+    color: #059669;
+    border: 2px solid #A7F3D0;
+    border-radius: var(--radius-lg);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    &:hover { background: var(--success); color: white; }
+  }
+}
+
+.flip-prompt {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* Result Screen */
+.result-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 60vh;
+  gap: 16px;
+
+  .result-icon { font-size: 64px; }
+  h2 { font-size: 28px; font-weight: 800; }
+  p { color: var(--text-secondary); font-size: 16px; }
+
+  .result-score {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 16px 0;
+
+    .score-num { font-size: 56px; font-weight: 800; color: var(--primary); }
+    .score-sep { font-size: 32px; color: var(--text-muted); }
+    .score-total { font-size: 32px; font-weight: 700; color: var(--text-secondary); }
+    .score-label { font-size: 16px; color: var(--text-secondary); margin-left: 8px; }
+  }
+
+  .result-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+}
+
+.spinner {
+  width: 40px; height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

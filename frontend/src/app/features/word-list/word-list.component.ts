@@ -1,0 +1,156 @@
+import { Component, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { WordService } from '../../core/services/word.service';
+import { ProgressService } from '../../core/services/progress.service';
+import { Word, WordDifficulty, UserWordProgress, ProgressStatus } from '../../core/models/word.model';
+
+@Component({
+  selector: 'app-word-list',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './word-list.component.html',
+  styleUrls: ['./word-list.component.scss']
+})
+export class WordListComponent implements OnInit {
+  words = signal<Word[]>([]);
+  progress = signal<Map<number, ProgressStatus>>(new Map());
+  loading = signal(true);
+  totalPages = signal(0);
+  currentPage = signal(0);
+  totalElements = signal(0);
+
+  searchTerm = '';
+  selectedDifficulty: WordDifficulty | '' = '';
+  selectedLetter = '';
+  expandedWordId: number | null = null;
+  pageSize = 20;
+  readonly pageSizeOptions = [10, 20, 50, 100];
+  readonly alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  stats = signal<{ total: number; BEGINNER: number; INTERMEDIATE: number; ADVANCED: number } | null>(null);
+
+  constructor(private wordService: WordService, private progressService: ProgressService) {}
+
+  ngOnInit(): void {
+    this.load();
+    this.wordService.getStats().subscribe(s => this.stats.set(s));
+    this.progressService.getMyProgress().subscribe(progresses => {
+      const map = new Map<number, ProgressStatus>();
+      progresses.forEach(p => map.set(p.wordId, p.status));
+      this.progress.set(map);
+    });
+  }
+
+  onPageSizeChange(): void {
+    this.currentPage.set(0);
+    this.load();
+  }
+
+  setLetter(letter: string): void {
+    this.selectedLetter = letter;
+    this.currentPage.set(0);
+    this.load();
+  }
+
+  load(): void {
+    this.loading.set(true);
+    this.wordService.getWords(
+      this.currentPage(),
+      this.pageSize,
+      this.selectedDifficulty || undefined,
+      undefined,
+      this.searchTerm || undefined,
+      this.selectedLetter || undefined
+    ).subscribe({
+      next: page => {
+        this.words.set(page.content);
+        this.totalPages.set(page.totalPages);
+        this.totalElements.set(page.totalElements);
+        this.loading.set(false);
+      },
+      error: () => this.loading.set(false)
+    });
+  }
+
+  search(): void {
+    this.currentPage.set(0);
+    this.load();
+  }
+
+  setDifficulty(d: WordDifficulty | ''): void {
+    this.selectedDifficulty = d;
+    this.currentPage.set(0);
+    this.load();
+  }
+
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.selectedDifficulty = '';
+    this.selectedLetter = '';
+    this.currentPage.set(0);
+    this.load();
+  }
+
+  setPage(page: number): void {
+    if (page < 0 || page >= this.totalPages()) return;
+    this.currentPage.set(page);
+    this.load();
+  }
+
+  filterByWord(word: string, event: Event): void {
+    event.stopPropagation();
+    this.searchTerm = word;
+    this.selectedDifficulty = '';
+    this.selectedLetter = '';
+    this.currentPage.set(0);
+    this.load();
+  }
+
+  toggleExpand(id: number): void {
+    this.expandedWordId = this.expandedWordId === id ? null : id;
+  }
+
+  getStatus(wordId: number): ProgressStatus | null {
+    return this.progress().get(wordId) || null;
+  }
+
+  getDifficultyClass(d: WordDifficulty): string {
+    return `badge-${d.toLowerCase()}`;
+  }
+
+  getStatusClass(s: ProgressStatus | null): string {
+    if (!s) return '';
+    return `badge-${s.toLowerCase()}`;
+  }
+
+  getStatusLabel(s: ProgressStatus | null): string {
+    const labels: Record<string, string> = { NEW: 'Mới', LEARNING: 'Đang học', REVIEW: 'Ôn tập', MASTERED: 'Thành thạo' };
+    return s ? (labels[s] || s) : 'Chưa học';
+  }
+
+  get pages(): number[] {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const delta = 2;
+    const pages: number[] = [];
+
+    const rangeStart = Math.max(0, current - delta);
+    const rangeEnd = Math.min(total - 1, current + delta);
+
+    if (rangeStart > 0) {
+      pages.push(0);
+      if (rangeStart > 1) pages.push(-1); // ellipsis
+    }
+
+    for (let i = rangeStart; i <= rangeEnd; i++) {
+      pages.push(i);
+    }
+
+    if (rangeEnd < total - 1) {
+      if (rangeEnd < total - 2) pages.push(-1); // ellipsis
+      pages.push(total - 1);
+    }
+
+    return pages;
+  }
+}

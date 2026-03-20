@@ -1,0 +1,48 @@
+# ========================
+# Backend (Maven / Spring Boot)
+# ========================
+backend/target/
+backend/.mvn/wrapper/maven-wrapper.jar
+backend/*.log
+backend/.settings/
+backend/.classpath
+backend/.project
+backend/.factorypath
+*.class
+*.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ========================
+# Frontend (Node / Angular)
+# ========================
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/*.log
+
+# ========================
+# IDE
+# ========================
+.idea/
+*.iml
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ========================
+# OS
+# ========================
+.DS_Store
+Thumbs.db
+
+# ========================
+# Env / Secrets
+# ========================
+*.env
+.env
+application-local.yml
+.claude/

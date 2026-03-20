@@ -1,0 +1,124 @@
+<div class="study-container">
+
+  <!-- PHASE: SELECT -->
+  <ng-container *ngIf="phase() === 'select'">
+    <div class="select-card">
+      <h2>Học từ vựng</h2>
+      <p class="subtitle">Chọn số lượng từ muốn học trong phiên này</p>
+
+      <div class="count-options">
+        <button
+          *ngFor="let n of countOptions"
+          class="count-btn"
+          [class.active]="selectedCount === n"
+          (click)="selectedCount = n">
+          {{ n }} từ
+        </button>
+      </div>
+
+      <button class="btn-start" (click)="start()" [disabled]="loading()">
+        <span *ngIf="!loading()">Bắt đầu học</span>
+        <span *ngIf="loading()">Đang tải...</span>
+      </button>
+
+      <a routerLink="/review" class="review-link">Ôn tập từ đã học →</a>
+    </div>
+  </ng-container>
+
+  <!-- PHASE: FLASHCARD -->
+  <ng-container *ngIf="phase() === 'flashcard' && currentWord">
+    <div class="phase-header">
+      <span class="phase-label">Flashcard</span>
+      <span class="progress-text">{{ cardIndex() + 1 }} / {{ words().length }}</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" [style.width.%]="((cardIndex() + 1) / words().length) * 100"></div></div>
+
+    <div class="flashcard" [class.flipped]="flipped()" (click)="flip()">
+      <div class="card-inner">
+        <div class="card-front">
+          <div class="word-pos">{{ currentWord.partOfSpeech }}</div>
+          <div class="word-text">{{ currentWord.word }}</div>
+          <div class="word-pron">{{ currentWord.pronunciation }}</div>
+          <div class="flip-hint">Nhấn để xem nghĩa</div>
+        </div>
+        <div class="card-back">
+          <div class="meaning">{{ currentWord.meaningVi }}</div>
+          <div class="example" *ngIf="currentWord.exampleSentence">
+            <em>{{ currentWord.exampleSentence }}</em>
+            <div class="example-trans">{{ currentWord.exampleTranslation }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="answer-btns" *ngIf="flipped()">
+      <button class="btn-wrong" (click)="answer(false)">✗ Chưa nhớ</button>
+      <button class="btn-correct" (click)="answer(true)">✓ Đã nhớ</button>
+    </div>
+  </ng-container>
+
+  <!-- Loading between phases -->
+  <div class="loading-state" *ngIf="loading()">
+    <div class="spinner"></div>
+    <p>Đang tải...</p>
+  </div>
+
+  <!-- PHASE: QUIZ -->
+  <ng-container *ngIf="phase() === 'quiz' && currentQuestion">
+    <div class="phase-header">
+      <span class="phase-label">Quiz</span>
+      <span class="progress-text">{{ quizIndex() + 1 }} / {{ questions().length }}</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" [style.width.%]="((quizIndex() + 1) / questions().length) * 100"></div></div>
+
+    <div class="quiz-card">
+      <div class="quiz-word">{{ currentQuestion.word }}</div>
+      <div class="quiz-pron">{{ currentQuestion.pronunciation }}</div>
+      <p class="quiz-prompt">Chọn nghĩa đúng:</p>
+
+      <div class="options">
+        <button
+          *ngFor="let opt of currentQuestion.options; let i = index"
+          class="option-btn"
+          [class]="getOptionClass(i)"
+          (click)="selectOption(i)">
+          {{ opt }}
+        </button>
+      </div>
+
+      <button class="btn-next" *ngIf="answered()" (click)="nextQuestion()">
+        {{ quizIndex() + 1 < questions().length ? 'Câu tiếp theo →' : 'Xem kết quả' }}
+      </button>
+    </div>
+  </ng-container>
+
+  <!-- PHASE: DONE -->
+  <ng-container *ngIf="phase() === 'done'">
+    <div class="done-card">
+      <div class="done-icon">🎉</div>
+      <h2>Hoàn thành!</h2>
+
+      <div class="result-stats">
+        <div class="stat-box">
+          <div class="stat-val">{{ words().length }}</div>
+          <div class="stat-label">Từ đã học</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">{{ flashCorrect }} / {{ words().length }}</div>
+          <div class="stat-label">Nhớ khi học</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val">{{ quizScorePercent }}%</div>
+          <div class="stat-label">Điểm quiz</div>
+        </div>
+      </div>
+
+      <div class="done-actions">
+        <button class="btn-start" (click)="restart()">Học thêm</button>
+        <a routerLink="/review" class="btn-outline">Ôn tập ngay</a>
+        <a routerLink="/dashboard" class="btn-outline">Về trang chủ</a>
+      </div>
+    </div>
+  </ng-container>
+
+</div>

@@ -1,0 +1,92 @@
+--liquibase formatted sql
+
+--changeset vocab:020-seed-words-batch13
+INSERT INTO words (word, pronunciation, meaning_vi, part_of_speech, difficulty, example_sentence, example_translation)
+SELECT v.word, v.pronunciation, v.meaning_vi, v.part_of_speech, v.difficulty, v.example_sentence, v.example_translation
+FROM (VALUES
+-- BEGINNER: Tools & Household Items
+(N'knife', N'/naɪf/', N'con dao', N'noun', N'BEGINNER', N'Be careful with the knife.', N'Cẩn thận với dao.'),
+(N'fork', N'/fɔːrk/', N'cái dĩa', N'noun', N'BEGINNER', N'Use a fork to eat spaghetti.', N'Dùng dĩa để ăn mì ý.'),
+(N'spoon', N'/spuːn/', N'cái thìa', N'noun', N'BEGINNER', N'Stir the soup with a spoon.', N'Khuấy súp bằng thìa.'),
+(N'cup', N'/kʌp/', N'cái cốc', N'noun', N'BEGINNER', N'Pour tea into the cup.', N'Rót trà vào cốc.'),
+(N'plate', N'/pleɪt/', N'cái đĩa', N'noun', N'BEGINNER', N'Put food on the plate.', N'Đặt đồ ăn vào đĩa.'),
+(N'glass', N'/ɡlæs/', N'cái ly (thủy tinh)', N'noun', N'BEGINNER', N'Fill the glass with water.', N'Đổ đầy nước vào ly.'),
+(N'bowl', N'/boʊl/', N'cái bát / tô', N'noun', N'BEGINNER', N'She ate a bowl of soup.', N'Cô ấy ăn một bát súp.'),
+(N'pot', N'/pɒt/', N'cái nồi', N'noun', N'BEGINNER', N'Boil water in the pot.', N'Đun nước trong nồi.'),
+(N'pan', N'/pæn/', N'chảo', N'noun', N'BEGINNER', N'Fry eggs in the pan.', N'Chiên trứng trong chảo.'),
+(N'scissors', N'/ˈsɪzərz/', N'cái kéo', N'noun', N'BEGINNER', N'Cut the paper with scissors.', N'Cắt giấy bằng kéo.'),
+(N'hammer', N'/ˈhæmər/', N'cái búa', N'noun', N'BEGINNER', N'Use a hammer to fix the nail.', N'Dùng búa để đóng đinh.'),
+(N'nail', N'/neɪl/', N'cái đinh', N'noun', N'BEGINNER', N'Hammer the nail into the wall.', N'Đóng đinh vào tường.'),
+(N'rope', N'/roʊp/', N'sợi dây thừng', N'noun', N'BEGINNER', N'Tie the boat with a rope.', N'Buộc thuyền bằng dây thừng.'),
+(N'string', N'/strɪŋ/', N'sợi chỉ / dây', N'noun', N'BEGINNER', N'Tie the package with string.', N'Buộc gói hàng bằng dây.'),
+(N'tape', N'/teɪp/', N'băng dán', N'noun', N'BEGINNER', N'Use tape to close the box.', N'Dùng băng dán để đóng hộp.'),
+-- BEGINNER: Common Verbs 3
+(N'turn', N'/tɜːrn/', N'quay / rẽ', N'verb', N'BEGINNER', N'Turn right at the corner.', N'Rẽ phải ở góc đường.'),
+(N'change', N'/tʃeɪndʒ/', N'thay đổi', N'verb', N'BEGINNER', N'Change your habits for the better.', N'Thay đổi thói quen để tốt hơn.'),
+(N'choose', N'/tʃuːz/', N'chọn', N'verb', N'BEGINNER', N'Choose carefully.', N'Hãy chọn cẩn thận.'),
+(N'decide', N'/dɪˈsaɪd/', N'quyết định', N'verb', N'BEGINNER', N'Decide quickly.', N'Hãy quyết định nhanh.'),
+(N'forget', N'/fərˈɡet/', N'quên', N'verb', N'BEGINNER', N'Don''t forget to lock the door.', N'Đừng quên khóa cửa.'),
+(N'remember', N'/rɪˈmembər/', N'nhớ', N'verb', N'BEGINNER', N'Remember to call me.', N'Nhớ gọi cho tôi.'),
+(N'understand', N'/ˌʌndərˈstænd/', N'hiểu', N'verb', N'BEGINNER', N'Do you understand the question?', N'Bạn có hiểu câu hỏi không?'),
+(N'explain', N'/ɪkˈspleɪn/', N'giải thích', N'verb', N'BEGINNER', N'Please explain this to me.', N'Hãy giải thích điều này cho tôi.'),
+(N'meet', N'/miːt/', N'gặp gỡ', N'verb', N'BEGINNER', N'Nice to meet you!', N'Rất vui được gặp bạn!'),
+(N'wait', N'/weɪt/', N'chờ đợi', N'verb', N'BEGINNER', N'Please wait for me.', N'Hãy chờ tôi.'),
+(N'jump', N'/dʒʌmp/', N'nhảy', N'verb', N'BEGINNER', N'Jump as high as you can.', N'Nhảy cao nhất có thể.'),
+(N'sing', N'/sɪŋ/', N'hát', N'verb', N'BEGINNER', N'She sings beautifully.', N'Cô ấy hát rất hay.'),
+(N'dance', N'/dæns/', N'nhảy múa', N'verb', N'BEGINNER', N'They love to dance.', N'Họ thích nhảy múa.'),
+(N'laugh', N'/læf/', N'cười', N'verb', N'BEGINNER', N'Laughter is the best medicine.', N'Tiếng cười là liều thuốc tốt nhất.'),
+(N'cry', N'/kraɪ/', N'khóc', N'verb', N'BEGINNER', N'The baby cries at night.', N'Em bé khóc vào ban đêm.'),
+(N'smile', N'/smaɪl/', N'mỉm cười', N'verb', N'BEGINNER', N'Smile and the world smiles back.', N'Mỉm cười và thế giới sẽ mỉm cười lại.'),
+-- INTERMEDIATE: Business English
+(N'quarterly', N'/ˈkwɔːrtərli/', N'hàng quý', N'adjective', N'INTERMEDIATE', N'Submit the quarterly report.', N'Nộp báo cáo hàng quý.'),
+(N'revenue', N'/ˈrevənjuː/', N'doanh thu', N'noun', N'INTERMEDIATE', N'The company revenue grew 20%.', N'Doanh thu công ty tăng 20%.'),
+(N'overhead', N'/ˈoʊvərhed/', N'chi phí chung', N'noun', N'INTERMEDIATE', N'Reduce overhead costs.', N'Giảm chi phí chung.'),
+(N'stakeholder', N'/ˈsteɪkhoʊldər/', N'các bên liên quan', N'noun', N'INTERMEDIATE', N'Inform all stakeholders about the change.', N'Thông báo cho tất cả các bên liên quan.'),
+(N'benchmark', N'/ˈbentʃmɑːrk/', N'chuẩn mực so sánh', N'noun', N'INTERMEDIATE', N'Set a benchmark for performance.', N'Đặt chuẩn so sánh cho hiệu suất.'),
+(N'objective', N'/əbˈdʒektɪv/', N'mục tiêu / khách quan', N'noun', N'INTERMEDIATE', N'State your objectives clearly.', N'Nêu rõ mục tiêu của bạn.'),
+(N'proposal', N'/prəˈpoʊzəl/', N'bản đề xuất', N'noun', N'INTERMEDIATE', N'Submit a proposal by Friday.', N'Nộp đề xuất trước thứ Sáu.'),
+(N'agenda', N'/əˈdʒendə/', N'chương trình nghị sự', N'noun', N'INTERMEDIATE', N'What is on the agenda today?', N'Hôm nay có gì trong chương trình nghị sự?'),
+(N'collaborate', N'/kəˈlæbəreɪt/', N'hợp tác', N'verb', N'INTERMEDIATE', N'We collaborate with the client.', N'Chúng tôi hợp tác với khách hàng.'),
+(N'negotiate', N'/nɪˈɡoʊʃieɪt/', N'đàm phán', N'verb', N'INTERMEDIATE', N'Negotiate the terms of the deal.', N'Đàm phán các điều khoản thỏa thuận.'),
+(N'allocate', N'/ˈæləkeɪt/', N'phân bổ', N'verb', N'INTERMEDIATE', N'Allocate resources fairly.', N'Phân bổ nguồn lực công bằng.'),
+(N'prioritize', N'/praɪˈɒrɪtaɪz/', N'ưu tiên', N'verb', N'INTERMEDIATE', N'Prioritize important tasks.', N'Ưu tiên những việc quan trọng.'),
+(N'implement', N'/ˈɪmplɪment/', N'thực thi', N'verb', N'INTERMEDIATE', N'Implement the new strategy.', N'Thực thi chiến lược mới.'),
+(N'streamline', N'/ˈstriːmlaɪn/', N'tinh gọn quy trình', N'verb', N'INTERMEDIATE', N'Streamline the workflow.', N'Tinh gọn quy trình làm việc.'),
+(N'outsource', N'/ˌaʊtˈsɔːrs/', N'thuê ngoài', N'verb', N'INTERMEDIATE', N'Outsource non-core work.', N'Thuê ngoài công việc không cốt lõi.'),
+-- INTERMEDIATE: Health & Well-being
+(N'nutrition', N'/njuˈtrɪʃən/', N'dinh dưỡng', N'noun', N'INTERMEDIATE', N'Good nutrition is essential.', N'Dinh dưỡng tốt rất cần thiết.'),
+(N'vitamin', N'/ˈvaɪtəmɪn/', N'vitamin', N'noun', N'INTERMEDIATE', N'Take your vitamins daily.', N'Uống vitamin hàng ngày.'),
+(N'mineral', N'/ˈmɪnərəl/', N'khoáng chất', N'noun', N'INTERMEDIATE', N'Minerals keep bones strong.', N'Khoáng chất giúp xương chắc khỏe.'),
+(N'supplement', N'/ˈsʌplɪmənt/', N'chất bổ sung', N'noun', N'INTERMEDIATE', N'Take a vitamin supplement.', N'Uống thêm vitamin bổ sung.'),
+(N'cardio', N'/ˈkɑːrdioʊ/', N'bài tập tim mạch', N'noun', N'INTERMEDIATE', N'Do cardio three times a week.', N'Tập cardio ba lần một tuần.'),
+(N'flexibility', N'/ˌfleksɪˈbɪlɪti/', N'sự dẻo dai', N'noun', N'INTERMEDIATE', N'Yoga improves flexibility.', N'Yoga cải thiện sự dẻo dai.'),
+(N'stamina', N'/ˈstæmɪnə/', N'sức bền', N'noun', N'INTERMEDIATE', N'Running builds stamina.', N'Chạy bộ xây dựng sức bền.'),
+(N'posture', N'/ˈpɒstʃər/', N'tư thế', N'noun', N'INTERMEDIATE', N'Good posture prevents back pain.', N'Tư thế tốt ngăn đau lưng.'),
+(N'meditation', N'/ˌmedɪˈteɪʃən/', N'thiền định', N'noun', N'INTERMEDIATE', N'Meditation reduces stress.', N'Thiền định giảm căng thẳng.'),
+(N'hydration', N'/haɪˈdreɪʃən/', N'việc uống đủ nước', N'noun', N'INTERMEDIATE', N'Proper hydration is important.', N'Uống đủ nước rất quan trọng.'),
+-- ADVANCED: Environmental Policy
+(N'mitigation', N'/ˌmɪtɪˈɡeɪʃən/', N'giảm thiểu (tác hại)', N'noun', N'ADVANCED', N'Climate mitigation is urgent.', N'Giảm thiểu biến đổi khí hậu rất cấp bách.'),
+(N'sequestration', N'/ˌsiːkweˈstreɪʃən/', N'thu giữ carbon', N'noun', N'ADVANCED', N'Carbon sequestration reduces emissions.', N'Thu giữ carbon làm giảm phát thải.'),
+(N'biodegradable', N'/ˌbaɪoʊdɪˈɡreɪdəbəl/', N'có thể phân hủy sinh học', N'adjective', N'ADVANCED', N'Use biodegradable packaging.', N'Dùng bao bì phân hủy sinh học.'),
+(N'ecological', N'/ˌiːkəˈlɒdʒɪkəl/', N'sinh thái / thuộc sinh thái học', N'adjective', N'ADVANCED', N'Consider the ecological impact.', N'Xem xét tác động sinh thái.'),
+(N'biomass', N'/ˈbaɪoʊmæs/', N'sinh khối', N'noun', N'ADVANCED', N'Biomass can generate energy.', N'Sinh khối có thể tạo ra năng lượng.'),
+(N'geothermal', N'/ˌdʒiːoʊˈθɜːrməl/', N'địa nhiệt', N'adjective', N'ADVANCED', N'Iceland uses geothermal energy.', N'Iceland dùng năng lượng địa nhiệt.'),
+(N'photovoltaic', N'/ˌfoʊtoʊvɒlˈteɪɪk/', N'quang điện', N'adjective', N'ADVANCED', N'Photovoltaic cells convert sunlight to electricity.', N'Pin quang điện chuyển đổi ánh sáng mặt trời thành điện.'),
+(N'net zero', N'/net zɪərəʊ/', N'phát thải bằng không', N'noun', N'ADVANCED', N'Achieve net zero by 2050.', N'Đạt phát thải bằng không vào năm 2050.'),
+(N'carbon neutral', N'/ˈkɑːrbən ˈnjuːtrəl/', N'trung hòa carbon', N'adjective', N'ADVANCED', N'The company aims to be carbon neutral.', N'Công ty hướng tới trung hòa carbon.'),
+(N'biodiversity hotspot', N'/ˌbaɪoʊdaɪˈvɜːrsɪti ˈhɒtspɒt/', N'điểm nóng đa dạng sinh học', N'noun', N'ADVANCED', N'Protect biodiversity hotspots worldwide.', N'Bảo vệ các điểm nóng đa dạng sinh học trên toàn thế giới.'),
+-- ADVANCED: Economics (continued)
+(N'oligopoly', N'/ˌɒlɪˈɡɒpəli/', N'thị trường độc quyền nhóm', N'noun', N'ADVANCED', N'Tech companies form an oligopoly.', N'Các công ty công nghệ tạo thành độc quyền nhóm.'),
+(N'duopoly', N'/djuːˈɒpəli/', N'độc quyền đôi', N'noun', N'ADVANCED', N'A duopoly controls the market.', N'Độc quyền đôi kiểm soát thị trường.'),
+(N'elasticity', N'/ˌɪlæˈstɪsɪti/', N'độ co giãn (kinh tế)', N'noun', N'ADVANCED', N'Price elasticity affects demand.', N'Độ co giãn giá ảnh hưởng đến cầu.'),
+(N'macroeconomics', N'/ˌmækroʊˌiːkəˈnɒmɪks/', N'kinh tế vĩ mô', N'noun', N'ADVANCED', N'Macroeconomics studies national economies.', N'Kinh tế vĩ mô nghiên cứu nền kinh tế quốc gia.'),
+(N'microeconomics', N'/ˌmaɪkroʊˌiːkəˈnɒmɪks/', N'kinh tế vi mô', N'noun', N'ADVANCED', N'Microeconomics studies individual markets.', N'Kinh tế vi mô nghiên cứu thị trường cá nhân.'),
+(N'supply chain', N'/səˈplaɪ tʃeɪn/', N'chuỗi cung ứng', N'noun', N'ADVANCED', N'The supply chain was disrupted.', N'Chuỗi cung ứng bị gián đoạn.'),
+(N'market share', N'/ˈmɑːrkɪt ʃer/', N'thị phần', N'noun', N'ADVANCED', N'Increase market share through innovation.', N'Tăng thị phần qua đổi mới.'),
+(N'trade deficit', N'/treɪd ˈdefɪsɪt/', N'thâm hụt thương mại', N'noun', N'ADVANCED', N'The country has a trade deficit.', N'Đất nước bị thâm hụt thương mại.'),
+(N'quantitative easing', N'/ˈkwɒntɪtətɪv ˈiːzɪŋ/', N'nới lỏng định lượng', N'noun', N'ADVANCED', N'The central bank uses quantitative easing.', N'Ngân hàng trung ương dùng nới lỏng định lượng.'),
+(N'stagflation', N'/stæɡˈfleɪʃən/', N'đình lạm', N'noun', N'ADVANCED', N'Stagflation combines recession with inflation.', N'Đình lạm kết hợp suy thoái và lạm phát.')
+) AS v(word, pronunciation, meaning_vi, part_of_speech, difficulty, example_sentence, example_translation)
+WHERE NOT EXISTS (SELECT 1 FROM words w WHERE w.word = v.word);
+
+--rollback DELETE FROM words WHERE word IN ('knife','fork','spoon','cup','plate','glass','bowl','pot','pan','scissors','hammer','nail','rope','string','tape','turn','change','choose','decide','forget','remember','understand','explain','meet','wait','jump','sing','dance','laugh','cry','smile','quarterly','revenue','overhead','stakeholder','benchmark','objective','proposal','agenda','collaborate','negotiate','allocate','prioritize','implement','streamline','outsource','nutrition','vitamin','mineral','supplement','cardio','flexibility','stamina','posture','meditation','hydration','mitigation','sequestration','biodegradable','ecological','biomass','geothermal','photovoltaic','net zero','carbon neutral','biodiversity hotspot','oligopoly','duopoly','elasticity','macroeconomics','microeconomics','supply chain','market share','trade deficit','quantitative easing','stagflation');

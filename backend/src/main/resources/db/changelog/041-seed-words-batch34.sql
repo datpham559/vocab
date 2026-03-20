@@ -1,0 +1,72 @@
+--liquibase formatted sql
+
+--changeset vocab:041-seed-words-batch34
+INSERT INTO words (word, pronunciation, meaning_vi, part_of_speech, difficulty, example_sentence, example_translation)
+SELECT v.word, v.pronunciation, v.meaning_vi, v.part_of_speech, v.difficulty, v.example_sentence, v.example_translation
+FROM (VALUES
+-- Thematic: Geography & World
+(N'Arctic', N'/ˈɑːrktɪk/', N'Bắc Cực', N'noun', N'INTERMEDIATE', N'The Arctic is covered in ice.', N'Bắc Cực được bao phủ bởi băng.'),
+(N'atlas', N'/ˈætləs/', N'tập bản đồ', N'noun', N'BEGINNER', N'Look it up in the atlas.', N'Tra trong tập bản đồ.'),
+(N'bay', N'/beɪ/', N'vịnh biển', N'noun', N'BEGINNER', N'The bay is calm today.', N'Vịnh biển hôm nay yên tĩnh.'),
+(N'canal', N'/kəˈnæl/', N'kênh đào', N'noun', N'INTERMEDIATE', N'The canal connects two rivers.', N'Kênh đào nối hai con sông.'),
+(N'canyon', N'/ˈkænjən/', N'hẻm núi', N'noun', N'INTERMEDIATE', N'The Grand Canyon is enormous.', N'Hẻm núi Grand Canyon rất to lớn.'),
+(N'cape', N'/keɪp/', N'mũi đất', N'noun', N'INTERMEDIATE', N'Cape Town is in South Africa.', N'Cape Town ở Nam Phi.'),
+(N'continent', N'/ˈkɒntɪnənt/', N'lục địa', N'noun', N'BEGINNER', N'There are seven continents on Earth.', N'Trái Đất có bảy lục địa.'),
+(N'coordinates', N'/koʊˈɔːrdɪnɪts/', N'tọa độ', N'noun', N'INTERMEDIATE', N'Enter the coordinates to find the location.', N'Nhập tọa độ để tìm vị trí.'),
+(N'coral reef', N'/ˈkɒrəl riːf/', N'rạn san hô', N'noun', N'INTERMEDIATE', N'Coral reefs are full of marine life.', N'Rạn san hô đầy sinh vật biển.'),
+(N'delta', N'/ˈdeltə/', N'đồng bằng châu thổ', N'noun', N'INTERMEDIATE', N'The Mekong Delta is fertile.', N'Đồng bằng Mekong rất màu mỡ.'),
+(N'desert', N'/ˈdezərt/', N'sa mạc', N'noun', N'BEGINNER', N'The Sahara is the largest desert.', N'Sahara là sa mạc lớn nhất.'),
+(N'equator', N'/ɪˈkweɪtər/', N'đường xích đạo', N'noun', N'INTERMEDIATE', N'Countries on the equator are hot.', N'Các nước ở xích đạo rất nóng.'),
+(N'estuary', N'/ˈestʃueri/', N'cửa sông', N'noun', N'ADVANCED', N'Fish thrive in the estuary.', N'Cá sinh sống phát triển ở cửa sông.'),
+(N'fjord', N'/fjɔːrd/', N'vịnh hẹp', N'noun', N'ADVANCED', N'Norway has many beautiful fjords.', N'Na Uy có nhiều vịnh hẹp đẹp.'),
+(N'gulf', N'/ɡʌlf/', N'vịnh (lớn)', N'noun', N'INTERMEDIATE', N'The Gulf of Mexico is warm.', N'Vịnh Mexico ấm áp.'),
+(N'hemisphere', N'/ˈhemɪsfɪər/', N'bán cầu', N'noun', N'INTERMEDIATE', N'We live in the northern hemisphere.', N'Chúng ta sống ở bán cầu bắc.'),
+(N'highland', N'/ˈhaɪlənd/', N'vùng cao nguyên', N'noun', N'INTERMEDIATE', N'The highland air is fresh.', N'Không khí cao nguyên trong lành.'),
+(N'inlet', N'/ˈɪnlet/', N'vịnh nhỏ / cửa vào', N'noun', N'ADVANCED', N'The inlet provides shelter for boats.', N'Vịnh nhỏ tạo chỗ trú ẩn cho thuyền.'),
+(N'isthmus', N'/ˈɪsməs/', N'eo đất', N'noun', N'ADVANCED', N'Panama is an isthmus.', N'Panama là một eo đất.'),
+(N'jungle', N'/ˈdʒʌŋɡəl/', N'rừng nhiệt đới', N'noun', N'BEGINNER', N'The Amazon jungle is massive.', N'Rừng nhiệt đới Amazon rất lớn.'),
+(N'latitude', N'/ˈlætɪtjuːd/', N'vĩ độ', N'noun', N'INTERMEDIATE', N'The latitude affects the climate.', N'Vĩ độ ảnh hưởng đến khí hậu.'),
+(N'lava', N'/ˈlɑːvə/', N'dung nham', N'noun', N'INTERMEDIATE', N'Lava flows down the volcano.', N'Dung nham chảy xuống núi lửa.'),
+(N'longitude', N'/ˈlɒndʒɪtjuːd/', N'kinh độ', N'noun', N'INTERMEDIATE', N'Longitude measures east-west position.', N'Kinh độ đo vị trí đông-tây.'),
+(N'marsh', N'/mɑːrʃ/', N'đầm lầy', N'noun', N'INTERMEDIATE', N'Birds nest in the marsh.', N'Chim làm tổ trong đầm lầy.'),
+(N'mesa', N'/ˈmeɪsə/', N'cao nguyên dạng bàn', N'noun', N'ADVANCED', N'Mesas are flat-topped hills.', N'Mesa là đồi đỉnh phẳng.'),
+(N'monsoon', N'/ˌmɒnˈsuːn/', N'mùa gió', N'noun', N'INTERMEDIATE', N'The monsoon brings heavy rain.', N'Mùa gió mang lại mưa lớn.'),
+(N'moor', N'/mʊər/', N'đồng hoang', N'noun', N'ADVANCED', N'The moors of England are misty.', N'Đồng hoang ở Anh đầy sương mù.'),
+(N'oasis', N'/oʊˈeɪsɪs/', N'ốc đảo', N'noun', N'INTERMEDIATE', N'The oasis provided water for travelers.', N'Ốc đảo cung cấp nước cho người đi đường.'),
+(N'peninsula', N'/pɪˈnɪnsjʊlə/', N'bán đảo', N'noun', N'INTERMEDIATE', N'Italy is shaped like a peninsula.', N'Ý có hình dạng như một bán đảo.'),
+(N'plain', N'/pleɪn/', N'đồng bằng', N'noun', N'BEGINNER', N'The plain stretches for miles.', N'Đồng bằng trải dài nhiều dặm.'),
+(N'plateau', N'/plæˈtoʊ/', N'cao nguyên', N'noun', N'INTERMEDIATE', N'The Tibetan plateau is the highest.', N'Cao nguyên Tây Tạng là cao nhất.'),
+(N'polar', N'/ˈpoʊlər/', N'cực (địa lý)', N'adjective', N'INTERMEDIATE', N'Polar bears live in the Arctic.', N'Gấu Bắc Cực sống ở Bắc Cực.'),
+(N'prairie', N'/ˈpreəri/', N'thảo nguyên', N'noun', N'INTERMEDIATE', N'Wild grasses cover the prairie.', N'Cỏ hoang phủ khắp thảo nguyên.'),
+(N'reef', N'/riːf/', N'rạn đá / bãi đá ngầm', N'noun', N'INTERMEDIATE', N'The reef is home to many fish.', N'Rạn đá là nơi trú ẩn của nhiều loài cá.'),
+(N'ridge', N'/rɪdʒ/', N'đỉnh núi / sườn núi', N'noun', N'INTERMEDIATE', N'We hiked along the mountain ridge.', N'Chúng tôi đi bộ dọc theo sườn núi.'),
+(N'savanna', N'/səˈvænə/', N'đồng cỏ nhiệt đới', N'noun', N'INTERMEDIATE', N'Lions roam the African savanna.', N'Sư tử lang thang trên đồng cỏ châu Phi.'),
+(N'slope', N'/sloʊp/', N'sườn dốc', N'noun', N'BEGINNER', N'Be careful on the steep slope.', N'Cẩn thận trên sườn dốc.'),
+(N'summit', N'/ˈsʌmɪt/', N'đỉnh núi / hội nghị cấp cao', N'noun', N'INTERMEDIATE', N'They reached the summit at noon.', N'Họ đạt đến đỉnh núi vào buổi trưa.'),
+(N'swamp', N'/swɒmp/', N'vùng đầm lầy', N'noun', N'INTERMEDIATE', N'Alligators live in swamps.', N'Cá sấu Mỹ sống ở đầm lầy.'),
+(N'terrain', N'/təˈreɪn/', N'địa hình', N'noun', N'INTERMEDIATE', N'The terrain is rough and rocky.', N'Địa hình gồ ghề và nhiều đá.'),
+(N'tundra', N'/ˈtʌndrə/', N'đồng tuyết băng', N'noun', N'ADVANCED', N'The tundra is a cold, treeless plain.', N'Đồng tuyết băng là đồng bằng lạnh không có cây.'),
+(N'wetland', N'/ˈwetlænd/', N'vùng đất ngập nước', N'noun', N'INTERMEDIATE', N'Wetlands are vital ecosystems.', N'Vùng đất ngập nước là hệ sinh thái quan trọng.'),
+-- Thematic: Plants & Agriculture
+(N'algae', N'/ˈælɡiː/', N'tảo', N'noun', N'INTERMEDIATE', N'Algae grow in water.', N'Tảo mọc trong nước.'),
+(N'blossom', N'/ˈblɒsəm/', N'hoa nở', N'noun', N'INTERMEDIATE', N'Cherry blossoms are beautiful.', N'Hoa anh đào rất đẹp.'),
+(N'branch', N'/brɑːntʃ/', N'cành cây', N'noun', N'BEGINNER', N'Birds sit on tree branches.', N'Chim ngồi trên cành cây.'),
+(N'cactus', N'/ˈkæktəs/', N'cây xương rồng', N'noun', N'BEGINNER', N'Cacti grow in dry climates.', N'Xương rồng mọc ở khí hậu khô.'),
+(N'compost', N'/ˈkɒmpɒst/', N'phân hữu cơ', N'noun', N'INTERMEDIATE', N'Add compost to improve soil.', N'Thêm phân hữu cơ để cải thiện đất.'),
+(N'crop', N'/krɒp/', N'mùa vụ / cây trồng', N'noun', N'INTERMEDIATE', N'The farmers planted new crops.', N'Nông dân trồng cây mùa vụ mới.'),
+(N'fertilizer', N'/ˈfɜːrtɪlaɪzər/', N'phân bón', N'noun', N'INTERMEDIATE', N'Apply fertilizer for better growth.', N'Bón phân để cây phát triển tốt hơn.'),
+(N'fern', N'/fɜːrn/', N'dương xỉ', N'noun', N'INTERMEDIATE', N'Ferns grow in shady areas.', N'Dương xỉ mọc ở khu vực bóng mát.'),
+(N'irrigation', N'/ˌɪrɪˈɡeɪʃən/', N'tưới tiêu', N'noun', N'INTERMEDIATE', N'Irrigation helps crops in dry areas.', N'Tưới tiêu giúp cây trong khu vực khô.'),
+(N'moss', N'/mɒs/', N'rêu', N'noun', N'BEGINNER', N'Moss covers the rocks.', N'Rêu phủ lên những tảng đá.'),
+(N'orchard', N'/ˈɔːrtʃərd/', N'vườn cây ăn quả', N'noun', N'INTERMEDIATE', N'She has an apple orchard.', N'Cô ấy có một vườn táo.'),
+(N'petal', N'/ˈpetəl/', N'cánh hoa', N'noun', N'BEGINNER', N'The petals fell in the breeze.', N'Cánh hoa rơi trong gió nhẹ.'),
+(N'pollen', N'/ˈpɒlɪn/', N'phấn hoa', N'noun', N'INTERMEDIATE', N'Bees collect pollen from flowers.', N'Ong thu thập phấn hoa từ hoa.'),
+(N'root', N'/ruːt/', N'rễ cây', N'noun', N'BEGINNER', N'The roots go deep in the ground.', N'Rễ cây ăn sâu vào đất.'),
+(N'seed', N'/siːd/', N'hạt giống', N'noun', N'BEGINNER', N'Plant the seeds in spring.', N'Gieo hạt giống vào mùa xuân.'),
+(N'stem', N'/stem/', N'thân cây / cuống', N'noun', N'BEGINNER', N'The stem supports the plant.', N'Thân cây đỡ toàn bộ cây.'),
+(N'vine', N'/vaɪn/', N'dây leo / nho', N'noun', N'INTERMEDIATE', N'Grapes grow on vines.', N'Nho mọc trên dây leo.'),
+(N'weed', N'/wiːd/', N'cỏ dại', N'noun', N'BEGINNER', N'Pull out the weeds from the garden.', N'Nhổ cỏ dại trong vườn.')
+) AS v(word, pronunciation, meaning_vi, part_of_speech, difficulty, example_sentence, example_translation)
+WHERE NOT EXISTS (SELECT 1 FROM words w WHERE w.word = v.word);
+
+--rollback DELETE FROM words WHERE word IN ('Arctic','atlas','bay','canal','canyon','cape','continent','coordinates','coral reef','delta','desert','equator','estuary','fjord','gulf','hemisphere','highland','inlet','isthmus','jungle','latitude','lava','longitude','marsh','mesa','monsoon','moor','oasis','peninsula','plain','plateau','polar','prairie','reef','ridge','savanna','slope','summit','swamp','terrain','tundra','wetland','algae','blossom','branch','cactus','compost','crop','fertilizer','fern','irrigation','moss','orchard','petal','pollen','root','seed','stem','vine','weed');
