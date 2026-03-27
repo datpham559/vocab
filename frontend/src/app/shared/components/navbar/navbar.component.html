@@ -17,6 +17,11 @@
         </a>
       </li>
       <li>
+        <a routerLink="/topics" routerLinkActive="active">
+          Chủ đề
+        </a>
+      </li>
+      <li>
         <a routerLink="/review" routerLinkActive="active" class="nav-review">
           Ôn tập
           <span class="review-badge" *ngIf="reviewCount() > 0">{{ reviewCount() }}</span>
@@ -27,9 +32,31 @@
           Từ vựng
         </a>
       </li>
+      <li>
+        <a routerLink="/exam" routerLinkActive="active">
+          Kiểm tra trình độ
+        </a>
+      </li>
+      <li>
+        <a routerLink="/room" routerLinkActive="active">
+          Phòng Quiz
+        </a>
+      </li>
+      <li *ngIf="authService.isAdmin()">
+        <a routerLink="/admin" routerLinkActive="active" class="nav-admin">
+          Quản trị
+        </a>
+      </li>
     </ul>
 
     <div class="nav-user">
+      <button
+        class="btn-kbd"
+        (click)="kbdService.toggle()"
+        [title]="kbdService.hintsEnabled() ? 'Ẩn gợi ý phím tắt' : 'Hiện gợi ý phím tắt'"
+        [class.active]="kbdService.hintsEnabled()">
+        ⌨️
+      </button>
       <span class="username">{{ authService.currentUser()?.displayName }}</span>
       <button class="btn btn-sm btn-outline" (click)="logout()">Đăng xuất</button>
     </div>

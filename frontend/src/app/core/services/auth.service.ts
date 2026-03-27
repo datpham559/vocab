@@ -14,6 +14,7 @@ export class AuthService {
   private _currentUser = signal<User | null>(this.loadUser());
   readonly currentUser = this._currentUser.asReadonly();
   readonly isAuthenticated = computed(() => this._currentUser() !== null);
+  readonly isAdmin = computed(() => this._currentUser()?.role === 'ROLE_ADMIN');
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -47,7 +48,8 @@ export class AuthService {
       username: res.username,
       email: res.email,
       displayName: res.displayName,
-      token: res.token
+      token: res.token,
+      role: res.role
     };
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));
     this._currentUser.set(user);

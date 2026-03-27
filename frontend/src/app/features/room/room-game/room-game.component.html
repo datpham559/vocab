@@ -1,0 +1,147 @@
+<div class="game-container">
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading()">
+    <div class="spinner"></div>
+    <p>Đang kết nối phòng...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="error-state" *ngIf="error() && !loading()">
+    <div class="error-icon">❌</div>
+    <p>{{ error() }}</p>
+    <a routerLink="/room" class="btn-outline">Quay lại</a>
+  </div>
+
+  <ng-container *ngIf="state && !loading() && !error()">
+
+    <!-- WAITING phase -->
+    <ng-container *ngIf="state.status === 'WAITING'">
+      <div class="waiting-card">
+        <div class="room-code-display">
+          <span class="code-label">Mã phòng</span>
+          <span class="code-value">{{ state.code }}</span>
+          <button class="btn-copy" (click)="copyCode()" title="Sao chép">📋</button>
+        </div>
+        <p class="waiting-info">{{ state.questionCount }} câu · 15 giây/câu</p>
+
+        <div class="participants-list">
+          <div class="participants-title">{{ state.participants.length }} người tham gia</div>
+          <div class="participant-item" *ngFor="let p of state.participants">
+            <span class="participant-crown" *ngIf="p.host">👑</span>
+            <span class="participant-name">{{ p.name }}</span>
+            <span class="participant-you" *ngIf="p.userId === myUserId">(Bạn)</span>
+          </div>
+        </div>
+
+        <div *ngIf="isHost">
+          <button class="btn-start" (click)="startGame()" [disabled]="startingGame() || state.participants.length < 1">
+            {{ startingGame() ? 'Đang bắt đầu...' : '▶ Bắt đầu (' + state.participants.length + ' người)' }}
+          </button>
+        </div>
+        <div class="waiting-msg" *ngIf="!isHost">
+          <div class="spinner-sm"></div>
+          Đang chờ host bắt đầu...
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ACTIVE / SHOWING_RESULT phase -->
+    <ng-container *ngIf="state.status === 'ACTIVE' || state.status === 'SHOWING_RESULT'">
+      <div class="phase-header">
+        <span class="progress-text">Câu {{ state.questionIndex + 1 }} / {{ state.totalQuestions }}</span>
+        <span class="answered-badge">{{ state.answeredCount }}/{{ state.participants.length }} đã trả lời</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="((state.questionIndex + 1) / state.totalQuestions) * 100"></div>
+      </div>
+
+      <div class="timer-row" *ngIf="state.status === 'ACTIVE'">
+        <div class="timer-bar-wrap">
+          <div class="timer-bar-fill" [style.width.%]="timerPercent" [style.background]="timerColor"></div>
+        </div>
+        <span class="timer-num" [style.color]="timerColor">{{ state.timeLeft }}s</span>
+      </div>
+      <div class="result-banner" *ngIf="state.status === 'SHOWING_RESULT'">
+        <span>✅ Kết quả câu {{ state.questionIndex + 1 }}</span>
+        <span class="earned-pts" *ngIf="state.myLastEarned !== null && state.myLastEarned! > 0">+{{ state.myLastEarned }} điểm</span>
+        <span class="earned-pts earned-zero" *ngIf="state.myLastEarned !== null && state.myLastEarned! === 0">Sai rồi</span>
+      </div>
+
+      <div class="quiz-card" *ngIf="state.currentQuestion">
+        <div class="quiz-word">
+          {{ state.currentQuestion.word }}
+          <button class="btn-speak-sm" (click)="speech.speak(state.currentQuestion.word)">🔊</button>
+        </div>
+        <div class="quiz-meta">
+          <span class="quiz-pos" *ngIf="state.currentQuestion.partOfSpeech">{{ state.currentQuestion.partOfSpeech }}</span>
+          <span class="quiz-pron" *ngIf="state.currentQuestion.pronunciation">{{ state.currentQuestion.pronunciation }}</span>
+        </div>
+        <p class="quiz-prompt">Chọn nghĩa đúng:</p>
+        <div class="options">
+          <button
+            *ngFor="let opt of state.currentQuestion.options; let i = index"
+            class="option-btn"
+            [class]="getOptionClass(i)"
+            (click)="selectOption(i)"
+            [disabled]="state.myAnswer !== null || state.status === 'SHOWING_RESULT'">
+            {{ opt }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Live scoreboard -->
+      <div class="live-scores">
+        <div class="live-scores-title">Bảng điểm</div>
+        <div class="score-row" *ngFor="let p of state.participants; let i = index">
+          <span class="score-rank">{{ i + 1 }}</span>
+          <span class="score-name">{{ p.name }} <span class="score-you" *ngIf="p.userId === myUserId">(Bạn)</span></span>
+          <span class="score-pts">{{ p.score }}</span>
+        </div>
+      </div>
+
+      <div class="kbd-hint-bar">
+        <span class="kbd-hint" *ngIf="state.status === 'ACTIVE' && state.myAnswer === null">
+          <kbd>1</kbd>–<kbd>4</kbd> Chọn đáp án
+        </span>
+      </div>
+    </ng-container>
+
+    <!-- DONE phase -->
+    <ng-container *ngIf="state.status === 'DONE'">
+      <div class="done-card">
+        <div class="done-icon">🏆</div>
+        <h2>Kết thúc!</h2>
+
+        <div class="leaderboard">
+          <div class="lb-row lb-header">
+            <span>Hạng</span>
+            <span>Người chơi</span>
+            <span>Điểm</span>
+          </div>
+          <div
+            class="lb-row"
+            *ngFor="let p of state.participants; let i = index"
+            [class.lb-me]="p.userId === myUserId"
+            [class.lb-first]="i === 0">
+            <span class="lb-rank">
+              {{ i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1) + '.' }}
+            </span>
+            <span class="lb-name">
+              {{ p.name }}
+              <span class="lb-you" *ngIf="p.userId === myUserId"> (Bạn)</span>
+              <span class="lb-crown" *ngIf="p.host"> 👑</span>
+            </span>
+            <span class="lb-score">{{ p.score }}</span>
+          </div>
+        </div>
+
+        <div class="done-actions">
+          <a routerLink="/room" class="btn-start">Chơi lại</a>
+          <a routerLink="/dashboard" class="btn-ghost">Trang chủ</a>
+        </div>
+      </div>
+    </ng-container>
+
+  </ng-container>
+</div>

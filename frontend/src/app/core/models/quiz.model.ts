@@ -4,6 +4,9 @@ export interface QuizQuestion {
   pronunciation: string;
   options: string[];
   correctIndex: number;
+  partOfSpeech?: string;
+  difficulty?: string;
+  questionType?: string;
 }
 
 export interface QuizResult {

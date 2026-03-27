@@ -13,4 +13,8 @@ export class DashboardService {
   getDashboard(): Observable<Dashboard> {
     return this.http.get<Dashboard>(this.base);
   }
+
+  getActivity(): Observable<{ date: string; wordsStudied: number }[]> {
+    return this.http.get<{ date: string; wordsStudied: number }[]>(`${this.base}/activity`);
+  }
 }

@@ -1,5 +1,6 @@
 package com.vocab.service;
 
+import com.vocab.dto.response.CategoryInfo;
 import com.vocab.dto.response.QuizQuestionResponse;
 import com.vocab.dto.response.WordResponse;
 import com.vocab.entity.User;
@@ -66,14 +67,37 @@ public class StudyService {
         return quizService.generateQuizForWords(words);
     }
 
-    public List<QuizQuestionResponse> getReviewQuiz(Long userId) {
-        LocalDate today = LocalDate.now();
-        List<UserWordProgress> due = progressRepository.findAllDueForReview(userId, today);
-        List<Word> words = due.stream().map(UserWordProgress::getWord).toList();
+    public List<QuizQuestionResponse> getReviewQuiz(Long userId, int count) {
+        List<UserWordProgress> batch = progressRepository.findForReviewCycle(userId, count);
+        List<Word> words = batch.stream().map(UserWordProgress::getWord).toList();
         return quizService.generateQuizForWords(words);
     }
 
-    public long getReviewCount(Long userId) {
-        return progressRepository.countDueForReview(userId, LocalDate.now());
+    public long getLearnedCount(Long userId) {
+        return progressRepository.countLearned(userId);
+    }
+
+    public List<CategoryInfo> getCategories() {
+        return wordRepository.countByCategory().stream()
+            .map(row -> new CategoryInfo((String) row[0], (Long) row[1]))
+            .toList();
+    }
+
+    @Transactional
+    public List<WordResponse> getStudySessionByCategory(Long userId, String category, int count) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        List<Word> words = wordRepository.findNewWordsForUserByCategory(userId, category, count);
+
+        for (Word word : words) {
+            progressRepository.findByUserIdAndWordId(userId, word.getId())
+                .orElseGet(() -> progressRepository.save(
+                    UserWordProgress.builder()
+                        .user(user).word(word).status(ProgressStatus.NEW).build()
+                ));
+        }
+
+        return words.stream().map(WordResponse::from).toList();
     }
 }

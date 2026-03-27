@@ -1,0 +1,182 @@
+<div class="admin-container">
+  <div class="admin-header">
+    <h1>Quản trị</h1>
+    <div class="tab-bar">
+      <button class="tab-btn" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'">Người dùng <span class="tab-count">{{ users().length }}</span></button>
+      <button class="tab-btn" [class.active]="activeTab === 'words'" (click)="activeTab = 'words'">Thêm từ vựng</button>
+    </div>
+  </div>
+
+  <!-- USERS TAB -->
+  <ng-container *ngIf="activeTab === 'users'">
+
+  <div class="loading-state" *ngIf="loading()">
+    <div class="spinner"></div>
+    <p>Đang tải...</p>
+  </div>
+
+  <div class="error-state" *ngIf="errorMsg()">
+    <p>{{ errorMsg() }}</p>
+  </div>
+
+  <div class="table-wrapper" *ngIf="!loading() && !errorMsg()">
+    <table class="user-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Tên đăng nhập</th>
+          <th>Email</th>
+          <th>Tên hiển thị</th>
+          <th>Vai trò</th>
+          <th>Streak</th>
+          <th>Đã học</th>
+          <th>Ngày tạo</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users()" [class.current-user-row]="isCurrentUser(user)">
+          <td>{{ user.id }}</td>
+          <td>
+            <span class="username-cell">{{ user.username }}</span>
+            <span class="you-tag" *ngIf="isCurrentUser(user)">bạn</span>
+          </td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.displayName }}</td>
+          <td>
+            <span class="role-badge" [class.admin]="user.role === 'ROLE_ADMIN'">
+              {{ user.role === 'ROLE_ADMIN' ? 'Admin' : 'User' }}
+            </span>
+          </td>
+          <td>🔥 {{ user.streak }}</td>
+          <td>{{ user.totalWordsLearned }} từ</td>
+          <td>{{ formatDate(user.createdAt) }}</td>
+          <td class="actions">
+            <button
+              class="btn-role"
+              [class.demote]="user.role === 'ROLE_ADMIN'"
+              (click)="toggleRole(user)"
+              [disabled]="isCurrentUser(user)"
+              [title]="isCurrentUser(user) ? 'Không thể thay đổi vai trò của chính mình' : ''">
+              {{ user.role === 'ROLE_ADMIN' ? 'Hạ xuống User' : 'Lên Admin' }}
+            </button>
+            <button
+              class="btn-delete"
+              (click)="deleteUser(user)"
+              [disabled]="isCurrentUser(user)"
+              [title]="isCurrentUser(user) ? 'Không thể xóa chính mình' : ''">
+              Xóa
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  </ng-container>
+  <!-- END USERS TAB -->
+
+  <!-- WORDS TAB -->
+  <ng-container *ngIf="activeTab === 'words'">
+    <div class="word-add-panel">
+
+      <!-- Lookup section -->
+      <div class="lookup-card">
+        <h2>Tra cứu từ</h2>
+        <p class="lookup-hint">Nhập từ tiếng Anh — hệ thống sẽ kiểm tra trong database và tự động lấy thông tin từ từ điển.</p>
+        <div class="lookup-row">
+          <input
+            class="lookup-input"
+            type="text"
+            placeholder="Nhập từ tiếng Anh..."
+            [(ngModel)]="lookupTerm"
+            (keyup.enter)="lookupWord()"
+          />
+          <button class="btn-lookup" (click)="lookupWord()" [disabled]="lookupLoading() || !lookupTerm.trim()">
+            {{ lookupLoading() ? 'Đang tra...' : 'Tra cứu' }}
+          </button>
+          <button class="btn-manual" (click)="openManual()" title="Nhập thủ công không qua từ điển">✏️ Thủ công</button>
+          <button class="btn-reset" *ngIf="lookupResult() || lookupError() || manualMode" (click)="resetLookup()">✕</button>
+        </div>
+        <p class="lookup-error" *ngIf="lookupError()">{{ lookupError() }}</p>
+      </div>
+
+      <!-- Already exists -->
+      <div class="exists-card" *ngIf="lookupResult()?.existsInDb">
+        <div class="exists-icon">✅</div>
+        <div class="exists-info">
+          <strong>Từ "{{ lookupResult()!.word }}" đã có trong database</strong>
+          <span class="exists-detail" *ngIf="lookupResult()!.meaningVi">— {{ lookupResult()!.meaningVi }}</span>
+          <span class="exists-badge" *ngIf="lookupResult()!.difficulty">{{ lookupResult()!.difficulty }}</span>
+          <span class="exists-badge cat" *ngIf="lookupResult()!.category">{{ lookupResult()!.category }}</span>
+        </div>
+      </div>
+
+      <!-- Save success -->
+      <div class="success-card" *ngIf="saveSuccess()">
+        <div class="success-icon">🎉</div>
+        <strong>Đã lưu từ thành công!</strong>
+        <button class="btn-lookup" (click)="resetLookup()" style="margin-left:1rem">Thêm từ khác</button>
+      </div>
+
+      <!-- Form (shown when word not in DB, or manual mode) -->
+      <div class="word-form-card" *ngIf="(lookupResult() && !lookupResult()!.existsInDb || manualMode) && !saveSuccess()">
+        <h2>Thông tin từ vựng
+          <span class="form-source" *ngIf="!manualMode && lookupResult()?.pronunciation">· Từ từ điển</span>
+          <span class="form-source manual" *ngIf="manualMode">· Nhập thủ công</span>
+        </h2>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Từ tiếng Anh *</label>
+            <input class="form-input" [(ngModel)]="form.word" placeholder="word" />
+          </div>
+          <div class="form-group">
+            <label>Phiên âm IPA</label>
+            <input class="form-input" [(ngModel)]="form.pronunciation" placeholder="/wɜːrd/" />
+          </div>
+          <div class="form-group full">
+            <label>Nghĩa tiếng Việt *</label>
+            <input class="form-input" [(ngModel)]="form.meaningVi" placeholder="Nghĩa tiếng Việt..." />
+          </div>
+          <div class="form-group">
+            <label>Loại từ</label>
+            <input class="form-input" [(ngModel)]="form.partOfSpeech" placeholder="noun / verb / adjective..." />
+          </div>
+          <div class="form-group">
+            <label>Cấp độ *</label>
+            <select class="form-input" [(ngModel)]="form.difficulty">
+              <option *ngFor="let d of difficulties" [value]="d">{{ d }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Chủ đề</label>
+            <select class="form-input" [(ngModel)]="form.category">
+              <option value="">— Không có —</option>
+              <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Câu ví dụ (tiếng Anh)</label>
+            <input class="form-input" [(ngModel)]="form.exampleSentence" placeholder="Example sentence..." />
+          </div>
+          <div class="form-group full">
+            <label>Dịch nghĩa câu ví dụ</label>
+            <input class="form-input" [(ngModel)]="form.exampleTranslation" placeholder="Bản dịch tiếng Việt..." />
+          </div>
+        </div>
+
+        <p class="save-error" *ngIf="saveError()">{{ saveError() }}</p>
+        <div class="form-actions">
+          <button class="btn-save" (click)="saveWord()" [disabled]="saveLoading() || !form.word || !form.meaningVi">
+            {{ saveLoading() ? 'Đang lưu...' : 'Lưu từ vào database' }}
+          </button>
+          <button class="btn-cancel" (click)="resetLookup()">Hủy</button>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+  <!-- END WORDS TAB -->
+
+</div>

@@ -12,19 +12,37 @@
       <div class="icon">📚</div>
       <h2>Ôn tập từ đã học</h2>
 
-      <div class="due-badge" *ngIf="reviewCount() > 0">
-        <span class="due-num">{{ reviewCount() }}</span>
-        <span class="due-label">từ cần ôn tập hôm nay</span>
+      <div class="learned-total" *ngIf="learnedCount() > 0">
+        <span class="learned-num">{{ learnedCount() }}</span>
+        <span class="learned-label">từ đã học</span>
       </div>
 
-      <div class="no-due" *ngIf="reviewCount() === 0">
-        <p>Bạn không có từ nào cần ôn tập hôm nay!</p>
-        <p class="hint">Hãy học thêm từ mới để bắt đầu hành trình.</p>
+      <div class="no-due" *ngIf="learnedCount() === 0">
+        <p>Bạn chưa học từ nào!</p>
+        <p class="hint">Hãy học từ mới trước khi ôn tập.</p>
       </div>
 
-      <button class="btn-start" (click)="startReview()" [disabled]="reviewCount() === 0">
-        Bắt đầu ôn tập
-      </button>
+      <div class="count-selector" *ngIf="learnedCount() > 0">
+        <span class="count-label">Số từ mỗi phiên:</span>
+        <div class="count-options">
+          <button
+            *ngFor="let n of countOptions"
+            class="count-btn"
+            [class.active]="selectedCount === n"
+            (click)="selectedCount = n">
+            {{ n }}
+          </button>
+        </div>
+      </div>
+
+      <div class="start-modes" *ngIf="learnedCount() > 0">
+        <button class="btn-start" (click)="startReview('mixed')">
+          📝 Ôn tập thông thường
+        </button>
+        <button class="btn-start btn-advanced-start" (click)="startReview('advanced')">
+          ✍️ Ôn tập nâng cao
+        </button>
+      </div>
       <a routerLink="/study" class="btn-outline">Học từ mới</a>
       <a routerLink="/dashboard" class="btn-ghost">Về trang chủ</a>
     </div>
@@ -33,7 +51,9 @@
   <!-- PHASE: QUIZ -->
   <ng-container *ngIf="phase() === 'quiz' && currentQuestion">
     <div class="phase-header">
-      <span class="phase-label">Ôn tập</span>
+      <span class="phase-label">
+        {{ reviewMode === 'advanced' ? '✍️ Nâng cao' : (currentMode === 'reverse' ? '✏️ Gõ từ tiếng Anh' : '☑ Chọn nghĩa') }}
+      </span>
       <span class="progress-text">{{ quizIndex() + 1 }} / {{ questions().length }}</span>
     </div>
     <div class="progress-bar">
@@ -41,23 +61,103 @@
     </div>
 
     <div class="quiz-card">
-      <div class="quiz-word">{{ currentQuestion.word }}</div>
-      <div class="quiz-pron">{{ currentQuestion.pronunciation }}</div>
-      <p class="quiz-prompt">Chọn nghĩa đúng:</p>
 
-      <div class="options">
-        <button
-          *ngFor="let opt of currentQuestion.options; let i = index"
-          class="option-btn"
-          [class]="getOptionClass(i)"
-          (click)="selectOption(i)">
-          {{ opt }}
+      <!-- CHOICE MODE: show English word → pick Vietnamese meaning -->
+      <ng-container *ngIf="currentMode === 'choice'">
+        <div class="quiz-word">
+          {{ currentQuestion.word }}
+          <button class="btn-speak-sm" (click)="speech.speak(currentQuestion.word)" title="Nghe phát âm">🔊</button>
+        </div>
+        <div class="quiz-pron">{{ currentQuestion.pronunciation }}</div>
+        <p class="quiz-prompt">Chọn nghĩa đúng:</p>
+
+        <div class="options">
+          <button
+            *ngFor="let opt of currentQuestion.options; let i = index"
+            class="option-btn"
+            [class]="getOptionClass(i)"
+            (click)="selectOption(i)">
+            {{ opt }}
+          </button>
+        </div>
+      </ng-container>
+
+      <!-- REVERSE MODE: show Vietnamese meaning → type English word -->
+      <ng-container *ngIf="currentMode === 'reverse'">
+        <div class="quiz-meaning">{{ currentQuestion.options[currentQuestion.correctIndex] }}</div>
+        <div class="quiz-pron" *ngIf="currentQuestion.pronunciation && answered()">{{ currentQuestion.pronunciation }}</div>
+
+        <!-- Static hint boxes: first letter + blank squares -->
+        <div class="word-hint-boxes" *ngIf="!answered() && hintsRevealed() === 0">
+          <ng-container *ngFor="let h of wordHintBoxes">
+            <span *ngIf="h.char === ' '" class="hint-space"></span>
+            <span *ngIf="h.char !== ' '" class="hint-box" [class.hint-first]="!h.blank">{{ h.char }}</span>
+          </ng-container>
+        </div>
+
+        <!-- Hint boxes (advanced mode, after wrong attempts) -->
+        <div class="hint-row" *ngIf="reviewMode === 'advanced' && hintsRevealed() > 0 && !answered()">
+          <span class="hint-label">Gợi ý:</span>
+          <div class="hint-boxes">
+            <span *ngFor="let h of hintDisplay" class="hint-char" [class.hint-revealed]="h.revealed">{{ h.char }}</span>
+          </div>
+        </div>
+
+        <p class="quiz-prompt">Gõ từ tiếng Anh:</p>
+
+        <div class="type-area">
+          <input
+            #typeInput
+            class="type-input"
+            [class.type-correct]="typeResult() === 'correct'"
+            [class.type-wrong]="typeResult() === 'wrong' && answered()"
+            type="text"
+            placeholder="Nhập từ tiếng Anh..."
+            [(ngModel)]="typedAnswer"
+            (ngModelChange)="onTypedAnswerChange()"
+            (keyup.enter)="submitTyped()"
+            [disabled]="answered()"
+            autocomplete="off"
+          />
+          <button class="btn-submit-type" (click)="submitTyped()" [disabled]="answered() || !typedAnswer.trim()">
+            Kiểm tra
+          </button>
+        </div>
+
+        <!-- Retry feedback (advanced, wrong but not yet finalized) -->
+        <div class="retry-feedback" *ngIf="reviewMode === 'advanced' && typeResult() === 'wrong' && !answered()">
+          ✗ Chưa đúng — thêm 1 gợi ý, thử lại!
+        </div>
+
+        <!-- Give up (advanced, not yet answered) -->
+        <button class="btn-give-up" *ngIf="reviewMode === 'advanced' && !answered()" (click)="giveUp()">
+          Bỏ qua
         </button>
-      </div>
+
+        <!-- Final feedback -->
+        <div class="type-feedback" *ngIf="answered()">
+          <div *ngIf="typeResult() === 'correct'" class="feedback-correct">✓ Chính xác!</div>
+          <div *ngIf="typeResult() === 'wrong'" class="feedback-wrong">✗ Sai rồi</div>
+          <div class="correct-answer">Đáp án: <strong>{{ currentQuestion.word }}</strong>
+            <button class="btn-speak-sm" (click)="speech.speak(currentQuestion.word)" title="Nghe phát âm">🔊</button>
+          </div>
+        </div>
+      </ng-container>
 
       <button class="btn-next" *ngIf="answered()" (click)="next()">
         {{ quizIndex() + 1 < questions().length ? 'Câu tiếp theo →' : 'Xem kết quả' }}
       </button>
+
+      <div class="kbd-hints" *ngIf="kbdService.hintsEnabled()">
+        <ng-container *ngIf="currentMode === 'choice'">
+          <span class="kbd-hint" *ngIf="!answered()"><kbd>1</kbd>–<kbd>4</kbd> Chọn đáp án</span>
+        </ng-container>
+        <ng-container *ngIf="currentMode === 'reverse'">
+          <span class="kbd-hint" *ngIf="!answered()"><kbd>Enter</kbd> Kiểm tra</span>
+          <span class="kbd-hint" *ngIf="reviewMode === 'advanced' && !answered()"><kbd>Esc</kbd> Bỏ qua</span>
+        </ng-container>
+        <span class="kbd-hint" *ngIf="answered()"><kbd>Enter</kbd> Tiếp theo</span>
+      </div>
     </div>
   </ng-container>
 

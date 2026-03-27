@@ -1,5 +1,6 @@
 package com.vocab.service;
 
+import com.vocab.dto.response.ActivityDay;
 import com.vocab.dto.response.DashboardResponse;
 import com.vocab.entity.DailyWordSet;
 import com.vocab.entity.User;
@@ -11,7 +12,9 @@ import com.vocab.repository.UserWordProgressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,5 +51,15 @@ public class DashboardService {
             .todayTotalWords(todaySet.map(s -> s.getWords().size()).orElse(0))
             .totalDaysStudied(totalDaysStudied)
             .build();
+    }
+
+    public List<ActivityDay> getActivity(Long userId) {
+        LocalDate today = LocalDate.now();
+        LocalDate from = today.minusDays(364);
+        return dailyWordSetRepository.findByUserIdAndStudyDateBetween(userId, from, today)
+            .stream()
+            .filter(s -> s.getWordsStudied() > 0)
+            .map(s -> new ActivityDay(s.getStudyDate().toString(), s.getWordsStudied()))
+            .collect(Collectors.toList());
     }
 }

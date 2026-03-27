@@ -33,23 +33,35 @@ public class QuizService {
     }
 
     public QuizQuestionResponse buildQuestion(Word word) {
-        // Get 3 distractors of similar difficulty using SQL Server NEWID()
-        List<Word> distractors = wordRepository.findDistractors(
-            word.getDifficulty().name(), word.getId(), 5
-        );
+        List<Word> distractors = new ArrayList<>();
 
-        // If not enough same difficulty, get any other words
+        // Priority 1: same part of speech (prevents bypass by POS recognition)
+        String pos = word.getPartOfSpeech();
+        if (pos != null && !pos.isBlank()) {
+            distractors = new ArrayList<>(wordRepository.findDistractorsByPos(pos, word.getId(), 5));
+        }
+
+        // Priority 2: same difficulty to fill remaining slots
         if (distractors.size() < 3) {
             List<Long> excludeIds = new ArrayList<>();
             excludeIds.add(word.getId());
             distractors.forEach(d -> excludeIds.add(d.getId()));
-
-            List<Word> extra = wordRepository.findAll().stream()
+            List<Word> byDiff = wordRepository.findDistractors(word.getDifficulty().name(), word.getId(), 5);
+            byDiff.stream()
                 .filter(w -> !excludeIds.contains(w.getId()))
                 .limit(3 - distractors.size())
-                .toList();
-            distractors = new ArrayList<>(distractors);
-            distractors.addAll(extra);
+                .forEach(distractors::add);
+        }
+
+        // Fallback: any other word
+        if (distractors.size() < 3) {
+            List<Long> excludeIds = new ArrayList<>();
+            excludeIds.add(word.getId());
+            distractors.forEach(d -> excludeIds.add(d.getId()));
+            wordRepository.findAll().stream()
+                .filter(w -> !excludeIds.contains(w.getId()))
+                .limit(3 - distractors.size())
+                .forEach(distractors::add);
         }
 
         List<String> options = new ArrayList<>();
@@ -66,8 +78,10 @@ public class QuizService {
             .wordId(word.getId())
             .word(word.getWord())
             .pronunciation(word.getPronunciation())
+            .partOfSpeech(word.getPartOfSpeech())
             .options(options)
             .correctIndex(correctIndex)
+            .difficulty(word.getDifficulty().name())
             .build();
     }
 }

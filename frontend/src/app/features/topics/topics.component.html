@@ -1,0 +1,27 @@
+<div class="container page-content">
+  <div class="page-header">
+    <div>
+      <h1>Học theo chủ đề</h1>
+      <p>Xem từ vựng hoặc bắt đầu học theo chủ đề</p>
+    </div>
+    <a routerLink="/study" class="btn btn-outline">Học từ ngẫu nhiên</a>
+  </div>
+
+  <div class="loading-state" *ngIf="loading()">
+    <div class="spinner"></div>
+    <p>Đang tải...</p>
+  </div>
+
+  <div class="topics-grid" *ngIf="!loading()">
+    <div class="topic-card" *ngFor="let cat of categories()">
+      <div class="topic-icon">{{ getIcon(cat.category) }}</div>
+      <div class="topic-name">{{ getLabel(cat.category) }}</div>
+      <div class="topic-en">{{ cat.category }}</div>
+      <div class="topic-count">{{ cat.wordCount }} từ</div>
+      <div class="topic-actions">
+        <button class="btn-words" (click)="browseWords(cat.category)" title="Xem từ vựng">📖 Xem từ</button>
+        <button class="btn-study" (click)="startStudy(cat.category)" title="Bắt đầu học">▶ Học</button>
+      </div>
+    </div>
+  </div>
+</div>

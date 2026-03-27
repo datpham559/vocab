@@ -4,6 +4,7 @@ export interface User {
   email: string;
   displayName: string;
   token: string;
+  role: string;
 }
 
 export interface AuthResponse {
@@ -13,6 +14,19 @@ export interface AuthResponse {
   username: string;
   email: string;
   displayName: string;
+  role: string;
+}
+
+export interface AdminUser {
+  id: number;
+  username: string;
+  email: string;
+  displayName: string;
+  role: string;
+  streak: number;
+  totalWordsLearned: number;
+  lastStudyDate: string | null;
+  createdAt: string;
 }
 
 export interface LoginRequest {

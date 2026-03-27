@@ -3,6 +3,7 @@ package com.vocab.security;
 import com.vocab.entity.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
@@ -14,12 +15,14 @@ public class UserPrincipal implements UserDetails {
     private final String username;
     private final String email;
     private final String password;
+    private final String role;
 
-    public UserPrincipal(Long id, String username, String email, String password) {
+    public UserPrincipal(Long id, String username, String email, String password, String role) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
+        this.role = role;
     }
 
     public static UserPrincipal create(User user) {
@@ -27,13 +30,14 @@ public class UserPrincipal implements UserDetails {
             user.getId(),
             user.getUsername(),
             user.getEmail(),
-            user.getPassword()
+            user.getPassword(),
+            user.getRole()
         );
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority(role));
     }
 
     @Override

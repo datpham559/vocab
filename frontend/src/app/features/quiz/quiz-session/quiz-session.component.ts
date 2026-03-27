@@ -1,9 +1,10 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, HostListener, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { QuizService } from '../../../core/services/quiz.service';
 import { ProgressService } from '../../../core/services/progress.service';
 import { QuizQuestion } from '../../../core/models/quiz.model';
+import { KeyboardShortcutService } from '../../../core/services/keyboard-shortcut.service';
 
 @Component({
   selector: 'app-quiz-session',
@@ -22,7 +23,23 @@ export class QuizSessionComponent implements OnInit {
   score = signal(0);
   results: { question: QuizQuestion; selectedIndex: number; correct: boolean }[] = [];
 
-  constructor(private quizService: QuizService, private progressService: ProgressService) {}
+  constructor(
+    private quizService: QuizService,
+    private progressService: ProgressService,
+    readonly kbdService: KeyboardShortcutService
+  ) {}
+
+  @HostListener('window:keydown', ['$event'])
+  onKey(e: KeyboardEvent): void {
+    if (this.done() || this.loading()) return;
+    if (['1','2','3','4'].includes(e.key) && !this.answered()) {
+      e.preventDefault();
+      this.selectOption(+e.key - 1);
+    } else if ((e.key === 'Enter' || e.key === ' ') && this.answered()) {
+      e.preventDefault();
+      this.next();
+    }
+  }
 
   ngOnInit(): void {
     this.quizService.getTodayQuiz().subscribe({

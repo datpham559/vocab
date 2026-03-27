@@ -1,13 +1,29 @@
-import { Component, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { StudyService } from '../../../core/services/study.service';
 import { ProgressService } from '../../../core/services/progress.service';
+import { SpeechService } from '../../../core/services/speech.service';
 import { Word } from '../../../core/models/word.model';
 import { QuizQuestion } from '../../../core/models/quiz.model';
 
 type Phase = 'select' | 'flashcard' | 'quiz' | 'done';
+type QuizMode = 'choice' | 'typing';
+type TypeResult = 'correct' | 'close' | 'wrong' | null;
+
+const CATEGORY_LABELS: Record<string, string> = {
+  'Achievement': 'Thành tích', 'Actions': 'Hành động', 'Animals': 'Động vật',
+  'Body': 'Cơ thể', 'Business': 'Kinh doanh', 'Character': 'Tính cách',
+  'Clothing': 'Quần áo', 'Communication': 'Giao tiếp', 'Culture': 'Văn hóa',
+  'Descriptive': 'Mô tả', 'Education': 'Giáo dục', 'Emotions': 'Cảm xúc',
+  'Entertainment': 'Giải trí', 'Food': 'Thực phẩm', 'General': 'Chung',
+  'Health': 'Sức khỏe', 'Home': 'Nhà cửa', 'Language': 'Ngôn ngữ',
+  'Nature': 'Thiên nhiên', 'People': 'Con người', 'Places': 'Địa điểm',
+  'Politics': 'Chính trị', 'Shopping': 'Mua sắm', 'Social': 'Xã hội',
+  'Technology': 'Công nghệ', 'Thinking': 'Tư duy', 'Time': 'Thời gian',
+  'Transport': 'Giao thông', 'Travel': 'Du lịch', 'Work': 'Công việc',
+};
 
 @Component({
   selector: 'app-study-session',
@@ -16,9 +32,15 @@ type Phase = 'select' | 'flashcard' | 'quiz' | 'done';
   templateUrl: './study-session.component.html',
   styleUrls: ['./study-session.component.scss']
 })
-export class StudySessionComponent {
+export class StudySessionComponent implements OnInit {
   phase = signal<Phase>('select');
   loading = signal(false);
+
+  // Category mode
+  activeCategory: string | null = null;
+  get activeCategoryLabel(): string {
+    return this.activeCategory ? (CATEGORY_LABELS[this.activeCategory] ?? this.activeCategory) : '';
+  }
 
   // Select phase
   selectedCount = 20;
@@ -38,15 +60,39 @@ export class StudySessionComponent {
   quizResults: { question: QuizQuestion; selectedIndex: number; correct: boolean }[] = [];
   score = signal(0);
 
+  // Per-question mode
+  questionModes: QuizMode[] = [];
+  get currentMode(): QuizMode { return this.questionModes[this.quizIndex()] ?? 'choice'; }
+
+  // Typing mode
+  typedAnswer = '';
+  typeResult = signal<TypeResult>(null);
+  @ViewChild('typeInput') typeInput?: ElementRef<HTMLInputElement>;
+
+  get wordHintBoxes(): { char: string; blank: boolean }[] {
+    const q = this.currentQuestion;
+    if (!q) return [];
+    return q.word.split('').map((ch, i) => ({
+      char: (i === 0 || ch === ' ' || ch === '-') ? ch : '_',
+      blank: i !== 0 && ch !== ' ' && ch !== '-'
+    }));
+  }
+
   constructor(
     private studyService: StudyService,
-    private progressService: ProgressService
+    private progressService: ProgressService,
+    private route: ActivatedRoute,
+    readonly speech: SpeechService
   ) {}
+
+  ngOnInit(): void {
+    this.activeCategory = this.route.snapshot.queryParamMap.get('category');
+  }
 
   // --- Select phase ---
   start(): void {
     this.loading.set(true);
-    this.studyService.getSession(this.selectedCount).subscribe({
+    this.studyService.getSession(this.selectedCount, this.activeCategory ?? undefined).subscribe({
       next: words => {
         this.words.set(words);
         this.cardIndex.set(0);
@@ -90,9 +136,12 @@ export class StudySessionComponent {
     this.studyService.getQuizForWords(wordIds).subscribe({
       next: questions => {
         this.questions.set(questions);
+        this.questionModes = questions.map(() => 'typing' as QuizMode);
         this.quizIndex.set(0);
         this.selectedOption.set(null);
         this.answered.set(false);
+        this.typedAnswer = '';
+        this.typeResult.set(null);
         this.quizResults = [];
         this.score.set(0);
         this.loading.set(false);
@@ -120,6 +169,31 @@ export class StudySessionComponent {
     this.progressService.updateProgress(q.wordId, correct).subscribe();
   }
 
+  submitTyped(): void {
+    if (this.answered() || !this.typedAnswer.trim()) return;
+
+    const q = this.currentQuestion!;
+    const correctAnswer = q.word;
+    const result = this.checkTypedAnswer(this.typedAnswer, correctAnswer);
+    this.typeResult.set(result);
+    this.answered.set(true);
+
+    const isCorrect = result === 'correct' || result === 'close';
+    if (isCorrect) this.score.set(this.score() + 1);
+    this.quizResults.push({ question: q, selectedIndex: -1, correct: isCorrect });
+    this.progressService.updateProgress(q.wordId, isCorrect).subscribe();
+  }
+
+  private checkTypedAnswer(typed: string, correct: string): TypeResult {
+    const norm = (s: string) => s.toLowerCase().trim().replace(/\s+/g, ' ');
+    const t = norm(typed);
+    const parts = correct.split(/[\/,;]/).map(p => norm(p)).filter(p => p.length > 0);
+
+    if (parts.some(p => p === t)) return 'correct';
+    if (parts.some(p => p.includes(t) || t.includes(p))) return 'close';
+    return 'wrong';
+  }
+
   nextQuestion(): void {
     const next = this.quizIndex() + 1;
     if (next >= this.questions().length) {
@@ -128,6 +202,9 @@ export class StudySessionComponent {
       this.quizIndex.set(next);
       this.selectedOption.set(null);
       this.answered.set(false);
+      this.typedAnswer = '';
+      this.typeResult.set(null);
+      setTimeout(() => this.typeInput?.nativeElement.focus(), 50);
     }
   }
 
@@ -137,6 +214,11 @@ export class StudySessionComponent {
     if (idx === q.correctIndex) return 'correct';
     if (idx === this.selectedOption() && idx !== q.correctIndex) return 'wrong';
     return 'dimmed';
+  }
+
+  get correctAnswerText(): string {
+    const q = this.currentQuestion;
+    return q ? q.word : '';
   }
 
   // --- Stats ---
@@ -156,5 +238,7 @@ export class StudySessionComponent {
     this.flashResults = [];
     this.quizResults = [];
     this.score.set(0);
+    this.typedAnswer = '';
+    this.typeResult.set(null);
   }
 }

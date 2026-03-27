@@ -87,6 +87,62 @@
           <span class="ql-icon">📖</span>
           <span>Từ điển</span>
         </a>
+        <a routerLink="/exam" class="quick-link ql-exam">
+          <span class="ql-icon">🎯</span>
+          <span>Kiểm tra trình độ</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Heatmap -->
+  <div class="card heatmap-card" *ngIf="heatmapWeeks.length > 0">
+    <div class="heatmap-header">
+      <div>
+        <h3>Lịch sử học tập</h3>
+        <p class="heatmap-sub">
+          <strong>{{ totalActiveDays }}</strong> ngày hoạt động &nbsp;·&nbsp;
+          <strong>{{ totalWordsThisYear }}</strong> từ trong 12 tháng qua
+        </p>
+      </div>
+      <div class="heatmap-legend">
+        <span>Ít</span>
+        <div class="legend-cell" [attr.data-level]="0"></div>
+        <div class="legend-cell" [attr.data-level]="1"></div>
+        <div class="legend-cell" [attr.data-level]="2"></div>
+        <div class="legend-cell" [attr.data-level]="3"></div>
+        <div class="legend-cell" [attr.data-level]="4"></div>
+        <span>Nhiều</span>
+      </div>
+    </div>
+
+    <div class="heatmap-body">
+      <!-- Day-of-week labels -->
+      <div class="day-axis">
+        <div class="da-spacer"></div>
+        <div class="da-cell" *ngFor="let d of dayLabels">{{ d }}</div>
+      </div>
+
+      <!-- Scrollable grid -->
+      <div class="heatmap-scroll">
+        <!-- Month labels row -->
+        <div class="month-row">
+          <div class="mc" *ngFor="let week of heatmapWeeks; let wi = index">
+            {{ getMonthLabel(wi) }}
+          </div>
+        </div>
+        <!-- Week columns -->
+        <div class="weeks-row">
+          <div class="week-col" *ngFor="let week of heatmapWeeks">
+            <div
+              class="heatmap-cell"
+              *ngFor="let day of week"
+              [class.empty]="day.empty"
+              [attr.data-level]="day.empty ? null : day.level"
+              [title]="day.empty ? '' : (day.count === 0 ? day.dateStr + ': chưa học' : day.dateStr + ': ' + day.count + ' từ')"
+            ></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

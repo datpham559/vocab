@@ -150,6 +150,12 @@
       border-color: #f59e0b;
       color: #d97706;
     }
+
+    &.ql-exam:hover {
+      background: #fdf4ff;
+      border-color: #a855f7;
+      color: #9333ea;
+    }
   }
 
   .ql-badge {
@@ -167,6 +173,123 @@
     margin-left: 4px;
     vertical-align: middle;
   }
+}
+
+/* Heatmap */
+.heatmap-card {
+  grid-column: 1 / -1; // full width
+}
+
+.heatmap-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+}
+
+.heatmap-sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-secondary);
+
+  .legend-cell {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    &[data-level="0"] { background: #e2e8f0; }
+    &[data-level="1"] { background: #fde68a; }
+    &[data-level="2"] { background: #fbbf24; }
+    &[data-level="3"] { background: #f59e0b; }
+    &[data-level="4"] { background: #d97706; }
+  }
+}
+
+.heatmap-body {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.day-axis {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+
+  .da-spacer { height: 18px; }
+
+  .da-cell {
+    height: 12px;
+    line-height: 12px;
+    font-size: 9px;
+    color: var(--text-secondary);
+    text-align: right;
+    white-space: nowrap;
+    min-width: 18px;
+  }
+}
+
+.heatmap-scroll {
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.month-row {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 4px;
+  height: 18px;
+
+  .mc {
+    width: 12px;
+    font-size: 9px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: visible;
+    flex-shrink: 0;
+  }
+}
+
+.weeks-row {
+  display: flex;
+  gap: 3px;
+}
+
+.week-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.heatmap-cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: #e2e8f0;
+  cursor: default;
+  transition: opacity 0.15s;
+
+  &:hover { opacity: 0.75; }
+  &.empty { background: transparent; }
+
+  &[data-level="0"] { background: #e2e8f0; }
+  &[data-level="1"] { background: #fde68a; }
+  &[data-level="2"] { background: #fbbf24; }
+  &[data-level="3"] { background: #f59e0b; }
+  &[data-level="4"] { background: #d97706; }
 }
 
 /* Spinner */

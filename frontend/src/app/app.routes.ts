@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -48,6 +49,30 @@ export const routes: Routes = [
     path: 'words',
     canActivate: [authGuard],
     loadComponent: () => import('./features/word-list/word-list.component').then(m => m.WordListComponent)
+  },
+  {
+    path: 'topics',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/topics/topics.component').then(m => m.TopicsComponent)
+  },
+  {
+    path: 'exam',
+    loadComponent: () => import('./features/exam/level-exam.component').then(m => m.LevelExamComponent)
+  },
+  {
+    path: 'room',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/room/room-lobby/room-lobby.component').then(m => m.RoomLobbyComponent)
+  },
+  {
+    path: 'room/:code',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/room/room-game/room-game.component').then(m => m.RoomGameComponent)
+  },
+  {
+    path: 'admin',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () => import('./features/admin/admin-panel.component').then(m => m.AdminPanelComponent)
   },
   { path: '**', redirectTo: '/dashboard' }
 ];

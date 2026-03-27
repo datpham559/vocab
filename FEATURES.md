@@ -35,85 +35,139 @@ Trang tổng quan sau khi đăng nhập, hiển thị:
 
 ---
 
-### 3. Học từ vựng tự do — `/study` *(mới)*
+### 3. Học từ vựng tự do — `/study`
 
 Học từ không giới hạn số lượng, không bị ràng buộc bộ từ hàng ngày.
 
 **Luồng học:**
 
 ```
-Chọn số từ → Flashcard → Quiz → Kết quả
+Chọn số từ → Flashcard → Quiz gõ từ → Kết quả
 ```
 
 | Bước | Mô tả |
 |---|---|
 | Chọn số từ | 10 / 20 / 50 / 100 / 200 từ — người dùng tự quyết |
-| Flashcard | Xem từ → lật thẻ xem nghĩa → đánh dấu Đã nhớ / Chưa nhớ |
-| Quiz | Trắc nghiệm 4 lựa chọn cho đúng các từ vừa học trong phiên |
+| Flashcard | Mặt trước: từ tiếng Anh + phiên âm; mặt sau: nghĩa tiếng Việt + ví dụ. Nút Đã nhớ / Chưa nhớ **luôn hiển thị** (không cần lật trước) |
+| Quiz gõ từ | Hiển thị nghĩa tiếng Việt → người dùng **gõ từ tiếng Anh** |
+| Ô gợi ý từ | Hiển thị số ô bằng số chữ cái, chữ cái đầu được tiết lộ |
 | Kết quả | Thống kê số từ nhớ khi học flashcard + điểm % quiz |
 
 **Logic chọn từ:**
 1. Ưu tiên 1: Từ đang ở LEARNING / REVIEW và đến hạn ôn hôm nay
 2. Ưu tiên 2: Từ chưa từng gặp (chưa có trong `user_word_progress`)
 
-Từ đã MASTERED **không xuất hiện** trong phiên học mới.
-
 ---
 
-### 4. Ôn tập — `/review` *(mới)*
+### 4. Ôn tập — `/review`
 
-Ôn lại từ đã học theo lịch spaced repetition.
+Ôn lại toàn bộ từ đã học theo vòng lặp — không giới hạn trong ngày.
 
 | Tính năng | Mô tả |
 |---|---|
-| Đếm từ cần ôn | Hiển thị số từ đến hạn hôm nay ngay màn hình đầu |
-| Quiz ôn tập | Trắc nghiệm 4 lựa chọn cho tất cả từ đến hạn (LEARNING + REVIEW + MASTERED) |
-| Phản hồi trực tiếp | Highlight đáp án đúng/sai ngay sau khi chọn |
+| Tổng từ đã học | Hiển thị tổng số từ đã từng học (≠ NEW) |
+| Chọn số từ/phiên | 10 / 20 / 30 / 50 từ mỗi phiên |
+| Chu kỳ ôn | Mỗi lần ôn lấy các từ **lâu nhất chưa được ôn** (oldest `last_reviewed` first) — hết 1 vòng thì bắt đầu lại |
+| Chế độ thông thường | Cho từ tiếng Anh → chọn nghĩa tiếng Việt (4 lựa chọn) |
+| Chế độ nâng cao | Cho nghĩa tiếng Việt → **gõ từ tiếng Anh**; mỗi lần sai tiết lộ thêm 1 gợi ý; có nút Bỏ qua |
+| Ô gợi ý (nâng cao) | Sau lần sai đầu: hiện các ô chữ cái, lần lượt tiết lộ thêm theo số lần sai |
+| Phản hồi trực tiếp | Highlight đáp án đúng/sai ngay sau khi chọn/gõ |
 | Kết quả | Điểm %, thông điệp động lực theo kết quả |
-| Badge trên navbar | Số từ cần ôn hiển thị nổi bật trên menu điều hướng |
+| Badge trên navbar | Số từ đã học hiển thị trên menu điều hướng |
 
 ---
 
-### 5. Bộ từ hàng ngày (Daily Word Set)
+### 5. Kiểm tra trình độ — `/exam`
+
+Đánh giá trình độ CEFR (A1 → C2) thông qua bài kiểm tra từ vựng.
+
+| Tính năng | Mô tả |
+|---|---|
+| Chọn số câu | 30 / 40 / 50 / 60 câu |
+| Chế độ chọn đáp án | 4 lựa chọn — chọn nghĩa tiếng Việt đúng |
+| Chế độ gõ từ | Hiển thị nghĩa tiếng Việt → gõ từ tiếng Anh |
+| Chế độ hỗn hợp | Ngẫu nhiên xen kẽ cả 2 dạng câu hỏi |
+| Ô gợi ý từ | Ở dạng gõ: hiện số ô + chữ cái đầu |
+| Đồng hồ đếm ngược | 15 giây / câu, hiển thị thanh timer |
+| Phân bổ câu hỏi | 40% Beginner + 40% Intermediate + 20% Advanced |
+| Loại từ (part of speech) | Hiển thị loại từ trong câu hỏi |
+| Nhiễu cùng loại từ | Đáp án nhiễu được chọn cùng `part_of_speech` — ngăn bypass bằng nhận diện loại từ |
+| Thuật toán CEFR | Gated algorithm: phải qua được cấp thấp mới đạt cấp cao |
+| Kết quả chi tiết | Điểm từng cấp độ + xếp loại CEFR tổng thể |
+
+**Thuật toán CEFR:**
+```
+A ≥ 90% + I ≥ 60% + B ≥ 60% → C2
+A ≥ 70% + I ≥ 60% + B ≥ 60% → C1
+I ≥ 65% + B ≥ 50%             → B2
+I ≥ 40% hoặc B ≥ 70%          → B1
+B ≥ 50%                        → A2
+Còn lại                        → A1
+```
+
+---
+
+### 6. Phòng Quiz nhiều người — `/room`
+
+Thi đấu quiz realtime với nhiều người chơi, không cần WebSocket.
+
+**Luồng:**
+```
+Tạo phòng / Nhập mã → Chờ đủ người → Host bắt đầu → Quiz → Bảng xếp hạng
+```
+
+| Tính năng | Mô tả |
+|---|---|
+| Tạo phòng | Chọn số câu (10/20/30), nhận mã phòng 6 ký tự |
+| Vào phòng | Nhập mã phòng để tham gia |
+| Chờ phòng | Danh sách người tham gia realtime, host thấy nút Bắt đầu |
+| Quiz multiplayer | 4 lựa chọn, đồng hồ 15 giây/câu |
+| Phím tắt | `1`–`4` để chọn đáp án nhanh |
+| Thang điểm tốc độ | Tối đa **1000 điểm**/câu — trả lời càng nhanh càng nhiều điểm (min 500 nếu đúng, 0 nếu sai) |
+| Điểm vừa kiếm | Hiện badge `+750 điểm` hoặc `Sai rồi` sau mỗi câu |
+| Bảng điểm live | Cập nhật realtime sau mỗi câu, sắp xếp theo điểm |
+| Kết quả cuối | Leaderboard với huy chương 🥇🥈🥉, tô sáng vị trí của mình |
+| Tự dọn phòng | Phòng tự xóa sau 2 giờ không hoạt động |
+| Polling | Frontend poll mỗi 1 giây — không cần WebSocket |
+
+---
+
+### 7. Bộ từ hàng ngày (Daily Word Set)
 
 - Mỗi ngày hệ thống **tự động tạo 1 bộ 10 từ** cho mỗi người dùng
 - Logic chọn từ theo thứ tự ưu tiên:
   1. Từ đang LEARNING / REVIEW và đến hạn ôn (`next_review ≤ hôm nay`)
   2. Từ chưa từng gặp (NEW) — random bằng `NEWID()`
-  3. Dự phòng nếu chưa đủ 10 từ
 - Bộ từ được tạo **một lần duy nhất mỗi ngày** — truy cập lại vẫn là bộ cũ
 - Hoàn thành bộ từ → cập nhật **streak**
 
 ---
 
-### 6. Flashcard (Thẻ lật)
-
-Có trong cả chế độ học tự do (`/study`) và bộ từ hàng ngày (`/flashcard`):
+### 8. Flashcard (Thẻ lật)
 
 | Bước | Mô tả |
 |---|---|
-| Mặt trước | Từ tiếng Anh + phiên âm + loại từ |
+| Mặt trước | Từ tiếng Anh + phiên âm + loại từ + nút phát âm 🔊 |
 | Lật thẻ | Animation 3D → nghĩa tiếng Việt + câu ví dụ + dịch |
-| Đánh giá | Đã nhớ ✓ / Chưa nhớ ✗ — cập nhật tiến độ ngay lập tức |
+| Đánh giá | Đã nhớ ✓ / Chưa nhớ ✗ — **không cần lật thẻ trước** |
 | Thanh tiến trình | Hiển thị đang ở từ thứ mấy / tổng số từ |
 
 ---
 
-### 7. Quiz (Trắc nghiệm)
-
-Dùng trong nhiều ngữ cảnh: sau flashcard, ôn tập hàng ngày, review theo lịch:
+### 9. Quiz (Trắc nghiệm)
 
 | Tính năng | Mô tả |
 |---|---|
 | Dạng câu hỏi | Cho từ tiếng Anh → chọn nghĩa tiếng Việt đúng |
-| 4 lựa chọn | 1 đáp án đúng + 3 từ nhiễu cùng độ khó (random `NEWID()`) |
+| 4 lựa chọn | 1 đáp án đúng + 3 từ nhiễu **cùng loại từ** (nếu có), fallback cùng độ khó |
+| Loại từ | Hiển thị `part of speech` trong câu hỏi |
+| Phím tắt | `1`–`4` chọn đáp án |
 | Phản hồi ngay | Đáp án đúng highlight xanh, sai highlight đỏ |
-| Tiến độ | Thanh tiến trình theo câu, không quay lại câu trước |
 | Kết quả | Điểm số và phần trăm |
 
 ---
 
-### 8. Hệ thống Spaced Repetition (Lặp lại ngắt quãng)
+### 10. Hệ thống Spaced Repetition
 
 Mỗi từ có trạng thái học, tự động lên lịch ôn:
 
@@ -133,53 +187,86 @@ NEW → LEARNING → REVIEW → MASTERED
 
 ---
 
-### 9. Kho từ vựng — `/words`
+### 11. Kho từ vựng — `/words`
 
 | Tính năng | Mô tả |
 |---|---|
 | Tổng số từ | Hiển thị tổng số từ trong hệ thống kèm số theo từng cấp độ |
 | Tìm kiếm | Tìm theo từ tiếng Anh hoặc nghĩa tiếng Việt |
-| Lọc theo cấp độ | Tất cả / Cơ bản / Trung cấp / Nâng cao — kèm số lượng từng loại |
+| Lọc theo cấp độ | Tất cả / Cơ bản / Trung cấp / Nâng cao |
 | Lọc A-Z | 26 nút chữ cái — click để lọc từ bắt đầu bằng chữ cái đó |
-| Phân trang | Chọn số từ mỗi trang: 10 / 20 / 50 / 100; phân trang thông minh với `…` |
+| Phân trang | Chọn số từ mỗi trang: 10 / 20 / 50 / 100 |
 | Xem chi tiết | Click từ → mở rộng xem loại từ, chủ đề, ví dụ |
 | Dữ liệu | ~3.000 từ vựng tiếng Anh phổ biến, chia 3 cấp độ |
 
 ---
 
-### 10. Theo dõi tiến độ (Progress Tracking)
+### 12. Học theo chủ đề — `/topics`
 
-- Mỗi cặp (người dùng, từ) lưu riêng trong `user_word_progress`
-- Ghi nhận: số lần đúng, sai, lần ôn cuối, ngày ôn tiếp theo
-- API `/api/progress` trả toàn bộ tiến độ của người dùng
+| Tính năng | Mô tả |
+|---|---|
+| Danh sách chủ đề | Hiển thị tất cả chủ đề có trong hệ thống kèm số từ mỗi chủ đề |
+| Học theo chủ đề | Chọn chủ đề → vào phiên học chỉ gồm từ thuộc chủ đề đó |
 
 ---
 
-## Luồng sử dụng
+### 13. Quản trị — `/admin`
 
-### Học từ mới (khuyên dùng)
+Chỉ dành cho tài khoản có role ADMIN.
+
+| Tính năng | Mô tả |
+|---|---|
+| Danh sách người dùng | Xem toàn bộ tài khoản, thống kê streak và số từ đã học |
+| Thêm từ vựng | Nhập tay hoặc tra từ qua Gemini AI để tự điền thông tin |
+| Quản lý từ | Xem, sửa, xóa từ trong kho |
+
+---
+
+### 14. Tiện ích
+
+| Tính năng | Mô tả |
+|---|---|
+| Phát âm 🔊 | Web Speech API phát âm từ tiếng Anh — có ở flashcard, quiz, review, phòng quiz |
+| Phím tắt | Bật/tắt gợi ý phím tắt qua nút ⌨️ trên navbar |
+| Gợi ý phím tắt | Hiện hint `1–4`, `Enter`, `Esc` tùy ngữ cảnh trong từng màn hình |
+
+---
+
+## Luồng sử dụng điển hình
+
+### Học từ mới
 ```
-Dashboard → Học từ mới (/study)
+Dashboard → Học từ (/study)
   → Chọn số từ (vd: 20)
-  → Flashcard 20 từ (lật + đánh giá)
-  → Quiz 20 câu (trắc nghiệm)
+  → Flashcard 20 từ
+  → Quiz gõ từ 20 câu
   → Kết quả
 ```
 
-### Ôn tập hàng ngày
+### Ôn tập
 ```
-Dashboard / Navbar → Ôn tập (/review)  [badge hiện số từ cần ôn]
-  → Xem số từ đến hạn hôm nay
-  → Quiz tất cả từ đến hạn
-  → Kết quả + cập nhật lịch spaced repetition
+Navbar → Ôn tập (/review)
+  → Xem tổng số từ đã học
+  → Chọn số từ/phiên + chế độ (thường / nâng cao)
+  → Quiz → Kết quả
 ```
 
-### Bộ từ hàng ngày (legacy)
+### Thi đấu nhiều người
 ```
-Dashboard → Học ngay (/flashcard)
-  → Flashcard 10 từ hôm nay
-  → Quiz (/quiz)
-  → Dashboard (cập nhật streak)
+Navbar → Phòng Quiz (/room)
+  → Tạo phòng (chọn số câu) → Chia sẻ mã
+  → Các người chơi nhập mã vào phòng
+  → Host bấm Bắt đầu
+  → Quiz 15s/câu, chấm điểm tốc độ
+  → Bảng xếp hạng cuối
+```
+
+### Kiểm tra trình độ
+```
+Navbar → Kiểm tra trình độ (/exam)
+  → Chọn số câu + chế độ
+  → Làm bài (có đồng hồ)
+  → Xem kết quả CEFR
 ```
 
 ---
@@ -187,11 +274,12 @@ Dashboard → Học ngay (/flashcard)
 ## Cấu trúc dữ liệu
 
 ```
-users                    — tài khoản, streak, last_study_date
-words                    — kho ~3.000 từ vựng
-user_word_progress       — tiến độ của từng người với từng từ (status, next_review)
+users                    — tài khoản, streak, last_study_date, role
+words                    — kho ~3.000 từ vựng (word, meaning, pos, category, difficulty)
+user_word_progress       — tiến độ của từng người với từng từ (status, next_review, last_reviewed)
 daily_word_sets          — bộ 10 từ mỗi ngày của mỗi người
 daily_word_set_words     — quan hệ N-N giữa bộ từ và từ vựng
+[in-memory]              — active_rooms: phòng quiz đang hoạt động (ConcurrentHashMap)
 ```
 
 ---
@@ -211,13 +299,15 @@ daily_word_set_words     — quan hệ N-N giữa bộ từ và từ vựng
 | GET | `/api/progress` | Tiến độ học của user hiện tại |
 | PATCH | `/api/progress/{wordId}` | Cập nhật tiến độ sau khi học |
 
-### Học từ tự do *(mới)*
+### Học từ tự do
 | Method | Endpoint | Mô tả |
 |---|---|---|
-| GET | `/api/study/session?count=20` | Lấy N từ để học (không giới hạn) |
+| GET | `/api/study/session?count=20` | Lấy N từ để học |
 | GET | `/api/study/quiz?wordIds=1,2,3` | Quiz cho các từ vừa học |
-| GET | `/api/study/review` | Quiz ôn tập từ đến hạn |
-| GET | `/api/study/review/count` | Số từ cần ôn hôm nay |
+| GET | `/api/study/review?count=20` | Quiz ôn tập (cycle-based) |
+| GET | `/api/study/review/count` | Tổng số từ đã học |
+| GET | `/api/study/categories` | Danh sách chủ đề kèm số từ |
+| GET | `/api/study/session/category?category=X&count=20` | Học từ theo chủ đề |
 
 ### Bộ từ hàng ngày
 | Method | Endpoint | Mô tả |
@@ -229,8 +319,30 @@ daily_word_set_words     — quan hệ N-N giữa bộ từ và từ vựng
 ### Từ vựng
 | Method | Endpoint | Mô tả |
 |---|---|---|
-| GET | `/api/words` | Danh sách từ (phân trang, lọc difficulty, lọc A-Z, tìm kiếm) |
+| GET | `/api/words` | Danh sách từ (phân trang, lọc, tìm kiếm) |
 | GET | `/api/words/stats` | Tổng số từ theo từng cấp độ |
+| GET | `/api/words/lookup?word=X` | Tra từ qua Gemini AI (admin) |
+
+### Kiểm tra trình độ
+| Method | Endpoint | Mô tả |
+|---|---|---|
+| GET | `/api/exam/questions?count=40` | Lấy bộ câu hỏi kiểm tra |
+
+### Phòng Quiz
+| Method | Endpoint | Mô tả |
+|---|---|---|
+| POST | `/api/room` | Tạo phòng mới |
+| POST | `/api/room/{code}/join` | Vào phòng |
+| POST | `/api/room/{code}/start` | Bắt đầu game (chỉ host) |
+| POST | `/api/room/{code}/answer` | Gửi đáp án |
+| GET | `/api/room/{code}/state` | Lấy trạng thái phòng (polling) |
+
+### Admin
+| Method | Endpoint | Mô tả |
+|---|---|---|
+| GET | `/api/admin/users` | Danh sách người dùng |
+| POST | `/api/admin/words` | Thêm từ mới |
+| DELETE | `/api/admin/words/{id}` | Xóa từ |
 
 ---
 
@@ -241,7 +353,10 @@ daily_word_set_words     — quan hệ N-N giữa bộ từ và từ vựng
 | Backend | Spring Boot 3.2, Spring Security, Spring Data JPA |
 | Auth | JWT (jjwt 0.12.5), BCrypt |
 | Database | SQL Server 2019+, Liquibase (SQL script format) |
+| In-memory state | ConcurrentHashMap, ScheduledExecutorService (phòng quiz) |
+| AI | Google Gemini API (tra từ tự động) |
 | Frontend | Angular 17, Standalone Components, Signals |
 | HTTP | HttpClient + Functional Interceptors |
+| Realtime | Polling (interval + switchMap) — không dùng WebSocket |
 | Styling | SCSS, CSS Variables, CSS 3D Transform (flashcard) |
-| Dữ liệu | ~3.000 từ vựng, seed qua 50 file Liquibase changeset |
+| Dữ liệu | ~3.000 từ vựng, seed qua 50+ file Liquibase changeset |

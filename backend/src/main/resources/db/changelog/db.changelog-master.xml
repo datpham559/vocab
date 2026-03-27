@@ -58,5 +58,7 @@
     <include file="db/changelog/051-seed-words-batch44.sql"/>
     <include file="db/changelog/052-seed-words-batch45.sql"/>
     <include file="db/changelog/053-seed-words-batch46.sql"/>
+    <include file="db/changelog/054-add-role-to-users.sql"/>
+    <include file="db/changelog/055-fix-word-categories.sql"/>
 
 </databaseChangeLog>

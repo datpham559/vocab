@@ -1,14 +1,29 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { WordService } from '../../core/services/word.service';
 import { ProgressService } from '../../core/services/progress.service';
+import { SpeechService } from '../../core/services/speech.service';
 import { Word, WordDifficulty, UserWordProgress, ProgressStatus } from '../../core/models/word.model';
+
+const CATEGORY_LABELS: Record<string, string> = {
+  'Achievement': 'Thành tích', 'Actions': 'Hành động', 'Animals': 'Động vật',
+  'Body': 'Cơ thể', 'Business': 'Kinh doanh', 'Character': 'Tính cách',
+  'Clothing': 'Quần áo', 'Communication': 'Giao tiếp', 'Culture': 'Văn hóa',
+  'Descriptive': 'Mô tả', 'Education': 'Giáo dục', 'Emotions': 'Cảm xúc',
+  'Entertainment': 'Giải trí', 'Food': 'Thực phẩm', 'General': 'Chung',
+  'Health': 'Sức khỏe', 'Home': 'Nhà cửa', 'Language': 'Ngôn ngữ',
+  'Nature': 'Thiên nhiên', 'People': 'Con người', 'Places': 'Địa điểm',
+  'Politics': 'Chính trị', 'Shopping': 'Mua sắm', 'Social': 'Xã hội',
+  'Technology': 'Công nghệ', 'Thinking': 'Tư duy', 'Time': 'Thời gian',
+  'Transport': 'Giao thông', 'Travel': 'Du lịch', 'Work': 'Công việc',
+};
 
 @Component({
   selector: 'app-word-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './word-list.component.html',
   styleUrls: ['./word-list.component.scss']
 })
@@ -23,15 +38,26 @@ export class WordListComponent implements OnInit {
   searchTerm = '';
   selectedDifficulty: WordDifficulty | '' = '';
   selectedLetter = '';
+  selectedCategory = '';
   expandedWordId: number | null = null;
   pageSize = 20;
   readonly pageSizeOptions = [10, 20, 50, 100];
   readonly alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   stats = signal<{ total: number; BEGINNER: number; INTERMEDIATE: number; ADVANCED: number } | null>(null);
 
-  constructor(private wordService: WordService, private progressService: ProgressService) {}
+  constructor(
+    private wordService: WordService,
+    private progressService: ProgressService,
+    private route: ActivatedRoute,
+    readonly speech: SpeechService
+  ) {}
+
+  get categoryLabel(): string {
+    return this.selectedCategory ? (CATEGORY_LABELS[this.selectedCategory] ?? this.selectedCategory) : '';
+  }
 
   ngOnInit(): void {
+    this.selectedCategory = this.route.snapshot.queryParamMap.get('category') ?? '';
     this.load();
     this.wordService.getStats().subscribe(s => this.stats.set(s));
     this.progressService.getMyProgress().subscribe(progresses => {
@@ -48,6 +74,7 @@ export class WordListComponent implements OnInit {
 
   setLetter(letter: string): void {
     this.selectedLetter = letter;
+    this.searchTerm = ''; // letter filter và search xung đột nhau
     this.currentPage.set(0);
     this.load();
   }
@@ -58,7 +85,7 @@ export class WordListComponent implements OnInit {
       this.currentPage(),
       this.pageSize,
       this.selectedDifficulty || undefined,
-      undefined,
+      this.selectedCategory || undefined,
       this.searchTerm || undefined,
       this.selectedLetter || undefined
     ).subscribe({
@@ -73,6 +100,7 @@ export class WordListComponent implements OnInit {
   }
 
   search(): void {
+    this.selectedLetter = ''; // search và letter filter xung đột nhau
     this.currentPage.set(0);
     this.load();
   }
@@ -83,10 +111,21 @@ export class WordListComponent implements OnInit {
     this.load();
   }
 
+  // Xóa search/letter/difficulty nhưng GIỮ category
   clearFilters(): void {
     this.searchTerm = '';
     this.selectedDifficulty = '';
     this.selectedLetter = '';
+    this.currentPage.set(0);
+    this.load();
+  }
+
+  // Xóa tất cả kể cả category (dùng cho nút "Xem tất cả")
+  clearAll(): void {
+    this.searchTerm = '';
+    this.selectedDifficulty = '';
+    this.selectedLetter = '';
+    this.selectedCategory = '';
     this.currentPage.set(0);
     this.load();
   }

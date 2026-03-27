@@ -42,6 +42,10 @@ public class User {
     @Builder.Default
     private Integer totalWordsLearned = 0;
 
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private String role = "ROLE_USER";
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

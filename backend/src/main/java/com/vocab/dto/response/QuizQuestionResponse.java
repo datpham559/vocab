@@ -12,4 +12,7 @@ public class QuizQuestionResponse {
     private String pronunciation;
     private List<String> options;    // 4 options including correct answer
     private int correctIndex;        // index of correct answer in options list
+    private String partOfSpeech;
+    private String difficulty;       // BEGINNER / INTERMEDIATE / ADVANCED (used for exam scoring)
+    private String questionType;     // CHOICE / TYPING (used for exam question format)
 }

@@ -37,4 +37,15 @@ public interface UserWordProgressRepository extends JpaRepository<UserWordProgre
            "AND p.status IN ('LEARNING', 'REVIEW', 'MASTERED') " +
            "AND p.nextReview <= :today")
     long countDueForReview(@Param("userId") Long userId, @Param("today") LocalDate today);
+
+    // Cycle-based review: all learned words ordered by lastReviewed ASC (never-reviewed first)
+    @Query(value = "SELECT TOP (:limit) p.* FROM user_word_progress p " +
+           "WHERE p.user_id = :userId AND p.status <> 'NEW' " +
+           "ORDER BY p.last_reviewed ASC",
+           nativeQuery = true)
+    List<UserWordProgress> findForReviewCycle(@Param("userId") Long userId,
+                                              @Param("limit") int limit);
+
+    @Query("SELECT COUNT(p) FROM UserWordProgress p WHERE p.user.id = :userId AND p.status <> 'NEW'")
+    long countLearned(@Param("userId") Long userId);
 }

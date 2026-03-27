@@ -67,6 +67,11 @@
         {{ currentIndex() + 1 < questions().length ? 'Câu tiếp theo →' : 'Xem kết quả →' }}
       </button>
     </div>
+
+    <div class="kbd-hints" *ngIf="kbdService.hintsEnabled()">
+      <span class="kbd-hint" *ngIf="!answered()"><kbd>1</kbd>–<kbd>4</kbd> Chọn đáp án</span>
+      <span class="kbd-hint" *ngIf="answered()"><kbd>Enter</kbd> Tiếp theo</span>
+    </div>
   </ng-container>
 
 </div>

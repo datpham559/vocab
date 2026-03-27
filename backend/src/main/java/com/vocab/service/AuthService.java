@@ -55,6 +55,7 @@ public class AuthService {
             .username(user.getUsername())
             .email(user.getEmail())
             .displayName(user.getDisplayName())
+            .role(user.getRole())
             .build();
     }
 
@@ -74,6 +75,7 @@ public class AuthService {
             .username(user.getUsername())
             .email(user.getEmail())
             .displayName(user.getDisplayName())
+            .role(user.getRole())
             .build();
     }
 }

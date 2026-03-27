@@ -1,5 +1,6 @@
 package com.vocab.controller;
 
+import com.vocab.dto.response.ActivityDay;
 import com.vocab.dto.response.DashboardResponse;
 import com.vocab.security.UserPrincipal;
 import com.vocab.service.DashboardService;
@@ -7,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/dashboard")
@@ -19,5 +21,11 @@ public class DashboardController {
     public ResponseEntity<DashboardResponse> getDashboard(
             @AuthenticationPrincipal UserPrincipal principal) {
         return ResponseEntity.ok(dashboardService.getDashboard(principal.getId()));
+    }
+
+    @GetMapping("/activity")
+    public ResponseEntity<List<ActivityDay>> getActivity(
+            @AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(dashboardService.getActivity(principal.getId()));
     }
 }

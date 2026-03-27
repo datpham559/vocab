@@ -1,8 +1,10 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, HostListener, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { DailyWordSetService } from '../../../core/services/daily-word-set.service';
 import { ProgressService } from '../../../core/services/progress.service';
+import { SpeechService } from '../../../core/services/speech.service';
+import { KeyboardShortcutService } from '../../../core/services/keyboard-shortcut.service';
 import { DailyWordSet } from '../../../core/models/daily-word-set.model';
 import { Word } from '../../../core/models/word.model';
 
@@ -24,8 +26,24 @@ export class FlashcardSessionComponent implements OnInit {
   constructor(
     private dailySetService: DailyWordSetService,
     private progressService: ProgressService,
-    private router: Router
+    private router: Router,
+    readonly speech: SpeechService,
+    readonly kbdService: KeyboardShortcutService
   ) {}
+
+  @HostListener('window:keydown', ['$event'])
+  onKey(e: KeyboardEvent): void {
+    if (this.loading() || this.done()) return;
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      if (!this.flipped()) { this.flip(); }
+      else { this.answer(true); }
+    } else if ((e.key === 'ArrowRight' || e.key === '2') && this.flipped()) {
+      e.preventDefault(); this.answer(true);
+    } else if ((e.key === 'ArrowLeft' || e.key === '1') && this.flipped()) {
+      e.preventDefault(); this.answer(false);
+    }
+  }
 
   ngOnInit(): void {
     this.dailySetService.getTodaySet().subscribe({

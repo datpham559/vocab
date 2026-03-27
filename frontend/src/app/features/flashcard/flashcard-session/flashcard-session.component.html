@@ -43,6 +43,7 @@
           <div class="word-pos">{{ word.partOfSpeech }}</div>
           <div class="word-text">{{ word.word }}</div>
           <div class="word-pron">{{ word.pronunciation }}</div>
+          <button class="btn-speak" (click)="speech.speak(word.word); $event.stopPropagation()" title="Nghe phát âm">🔊</button>
           <div class="flip-hint">Nhấn để xem nghĩa 👆</div>
         </div>
         <div class="card-face card-back">
@@ -64,6 +65,12 @@
       <button class="btn btn-correct" (click)="answer(true)">
         <span>✓</span> Đã nhớ
       </button>
+    </div>
+
+    <div class="kbd-hints" *ngIf="kbdService.hintsEnabled()">
+      <span class="kbd-hint" *ngIf="!flipped()"><kbd>Space</kbd> Lật thẻ</span>
+      <span class="kbd-hint" *ngIf="flipped()"><kbd>←</kbd> <kbd>1</kbd> Chưa nhớ</span>
+      <span class="kbd-hint" *ngIf="flipped()"><kbd>→</kbd> <kbd>2</kbd> Đã nhớ</span>
     </div>
 
     <p class="flip-prompt" *ngIf="!flipped()">Nhấn vào thẻ để lật</p>

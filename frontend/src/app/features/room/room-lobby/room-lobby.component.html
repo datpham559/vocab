@@ -1,0 +1,53 @@
+<div class="lobby-container">
+  <div class="lobby-card">
+    <div class="lobby-icon">🎮</div>
+    <h1>Phòng Quiz</h1>
+    <p class="lobby-desc">Thi đấu từ vựng cùng bạn bè theo thời gian thực</p>
+
+    <div class="tab-bar">
+      <button class="tab-btn" [class.active]="tab === 'create'" (click)="tab = 'create'">Tạo phòng</button>
+      <button class="tab-btn" [class.active]="tab === 'join'" (click)="tab = 'join'">Vào phòng</button>
+    </div>
+
+    <!-- CREATE -->
+    <div class="tab-content" *ngIf="tab === 'create'">
+      <div class="field-group">
+        <label class="field-label">Số câu hỏi</label>
+        <div class="count-options">
+          <button
+            *ngFor="let n of countOptions"
+            class="count-btn"
+            [class.active]="questionCount === n"
+            (click)="questionCount = n">
+            {{ n }} câu
+          </button>
+        </div>
+      </div>
+      <button class="btn-start" (click)="createRoom()" [disabled]="loading()">
+        {{ loading() ? 'Đang tạo...' : '+ Tạo phòng mới' }}
+      </button>
+    </div>
+
+    <!-- JOIN -->
+    <div class="tab-content" *ngIf="tab === 'join'">
+      <div class="field-group">
+        <label class="field-label">Mã phòng</label>
+        <input
+          class="code-input"
+          type="text"
+          placeholder="Nhập mã 6 ký tự..."
+          [(ngModel)]="joinCode"
+          (keyup.enter)="joinRoom()"
+          maxlength="6"
+          autocomplete="off"
+        />
+      </div>
+      <button class="btn-start" (click)="joinRoom()" [disabled]="loading() || !joinCode.trim()">
+        {{ loading() ? 'Đang vào...' : '→ Vào phòng' }}
+      </button>
+    </div>
+
+    <div class="error-msg" *ngIf="error()">{{ error() }}</div>
+    <a routerLink="/dashboard" class="btn-ghost">Quay lại</a>
+  </div>
+</div>

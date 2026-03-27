@@ -1,5 +1,20 @@
 <div class="container page-content">
-  <div class="page-header">
+  <!-- Category banner -->
+  <div class="category-banner" *ngIf="selectedCategory">
+    <div class="cat-info">
+      <span class="cat-back">
+        <a routerLink="/topics">← Chủ đề</a>
+      </span>
+      <span class="cat-title">{{ categoryLabel }}</span>
+      <span class="cat-sub">{{ totalElements() }} từ</span>
+    </div>
+    <div class="cat-actions">
+      <a [routerLink]="['/study']" [queryParams]="{category: selectedCategory}" class="btn-cat-study">▶ Học chủ đề này</a>
+      <button class="btn-cat-clear" (click)="clearAll()">Xem tất cả</button>
+    </div>
+  </div>
+
+  <div class="page-header" *ngIf="!selectedCategory">
     <h1>Kho từ vựng</h1>
     <p>{{ totalElements() }} từ đang hiển thị</p>
   </div>
@@ -29,16 +44,19 @@
   <div class="filters card">
     <!-- Search -->
     <div class="search-row">
-      <input
-        type="text"
-        class="form-control search-input"
-        placeholder="Tìm kiếm từ vựng..."
-        [(ngModel)]="searchTerm"
-        (keyup.enter)="search()"
-      />
-      <button class="btn-search" (click)="search()">Tìm</button>
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Tìm từ tiếng Anh hoặc nghĩa tiếng Việt..."
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="search()"
+        />
+      </div>
+      <button class="btn-search" (click)="search()">Tìm kiếm</button>
       <button class="btn-clear" *ngIf="searchTerm || selectedDifficulty || selectedLetter" (click)="clearFilters()">
-        ✕ Xóa bộ lọc
+        ✕ Xóa
       </button>
     </div>
 
@@ -79,12 +97,14 @@
     <div class="empty-state" *ngIf="words().length === 0">
       <p>Không tìm thấy từ nào phù hợp.</p>
       <button class="btn-clear" (click)="clearFilters()">Xóa bộ lọc</button>
+      <button class="btn-clear" *ngIf="selectedCategory" (click)="clearAll()" style="margin-top:8px">Xem tất cả từ vựng</button>
     </div>
 
     <div *ngFor="let word of words()" class="word-card card" (click)="toggleExpand(word.id)">
       <div class="word-header">
         <div class="word-main">
           <span class="word-text" (click)="filterByWord(word.word, $event)">{{ word.word }}</span>
+          <button class="btn-speak-sm" (click)="speech.speak(word.word); $event.stopPropagation()" title="Nghe phát âm">🔊</button>
           <span class="word-pron">{{ word.pronunciation }}</span>
           <span class="badge" [ngClass]="getDifficultyClass(word.difficulty)">{{ word.difficulty }}</span>
         </div>

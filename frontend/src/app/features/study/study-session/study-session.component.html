@@ -3,7 +3,12 @@
   <!-- PHASE: SELECT -->
   <ng-container *ngIf="phase() === 'select'">
     <div class="select-card">
-      <h2>Học từ vựng</h2>
+      <div class="category-badge" *ngIf="activeCategory">
+        <span class="cat-label">Chủ đề: <strong>{{ activeCategoryLabel }}</strong></span>
+        <a routerLink="/topics" class="cat-change">Đổi chủ đề</a>
+      </div>
+
+      <h2>{{ activeCategory ? 'Học chủ đề ' + activeCategoryLabel : 'Học từ vựng' }}</h2>
       <p class="subtitle">Chọn số lượng từ muốn học trong phiên này</p>
 
       <div class="count-options">
@@ -21,6 +26,7 @@
         <span *ngIf="loading()">Đang tải...</span>
       </button>
 
+      <a routerLink="/topics" class="review-link" *ngIf="!activeCategory">Học theo chủ đề →</a>
       <a routerLink="/review" class="review-link">Ôn tập từ đã học →</a>
     </div>
   </ng-container>
@@ -39,6 +45,7 @@
           <div class="word-pos">{{ currentWord.partOfSpeech }}</div>
           <div class="word-text">{{ currentWord.word }}</div>
           <div class="word-pron">{{ currentWord.pronunciation }}</div>
+          <button class="btn-speak" (click)="speech.speak(currentWord.word); $event.stopPropagation()" title="Nghe phát âm">🔊</button>
           <div class="flip-hint">Nhấn để xem nghĩa</div>
         </div>
         <div class="card-back">
@@ -51,7 +58,7 @@
       </div>
     </div>
 
-    <div class="answer-btns" *ngIf="flipped()">
+    <div class="answer-btns">
       <button class="btn-wrong" (click)="answer(false)">✗ Chưa nhớ</button>
       <button class="btn-correct" (click)="answer(true)">✓ Đã nhớ</button>
     </div>
@@ -66,24 +73,48 @@
   <!-- PHASE: QUIZ -->
   <ng-container *ngIf="phase() === 'quiz' && currentQuestion">
     <div class="phase-header">
-      <span class="phase-label">Quiz</span>
+      <span class="phase-label">✏️ Gõ từ tiếng Anh</span>
       <span class="progress-text">{{ quizIndex() + 1 }} / {{ questions().length }}</span>
     </div>
     <div class="progress-bar"><div class="progress-fill" [style.width.%]="((quizIndex() + 1) / questions().length) * 100"></div></div>
 
     <div class="quiz-card">
-      <div class="quiz-word">{{ currentQuestion.word }}</div>
-      <div class="quiz-pron">{{ currentQuestion.pronunciation }}</div>
-      <p class="quiz-prompt">Chọn nghĩa đúng:</p>
+      <div class="quiz-meaning-vi">{{ currentQuestion.options[currentQuestion.correctIndex] }}</div>
 
-      <div class="options">
-        <button
-          *ngFor="let opt of currentQuestion.options; let i = index"
-          class="option-btn"
-          [class]="getOptionClass(i)"
-          (click)="selectOption(i)">
-          {{ opt }}
+      <div class="word-hint-boxes">
+        <ng-container *ngFor="let h of wordHintBoxes">
+          <span *ngIf="h.char === ' '" class="hint-space"></span>
+          <span *ngIf="h.char !== ' '" class="hint-box" [class.hint-first]="!h.blank">{{ h.char }}</span>
+        </ng-container>
+      </div>
+
+      <p class="quiz-prompt">Gõ từ tiếng Anh:</p>
+      <div class="type-area">
+        <input
+          #typeInput
+          class="type-input"
+          [class.type-correct]="typeResult() === 'correct'"
+          [class.type-close]="typeResult() === 'close'"
+          [class.type-wrong]="typeResult() === 'wrong'"
+          type="text"
+          placeholder="Nhập từ tiếng Anh..."
+          [(ngModel)]="typedAnswer"
+          (keyup.enter)="submitTyped()"
+          [disabled]="answered()"
+          autocomplete="off"
+        />
+        <button class="btn-submit-type" (click)="submitTyped()" [disabled]="answered() || !typedAnswer.trim()">
+          Kiểm tra
         </button>
+      </div>
+
+      <div class="type-feedback" *ngIf="answered()">
+        <div *ngIf="typeResult() === 'correct'" class="feedback-correct">✓ Chính xác!</div>
+        <div *ngIf="typeResult() === 'close'" class="feedback-close">~ Gần đúng!</div>
+        <div *ngIf="typeResult() === 'wrong'" class="feedback-wrong">✗ Sai rồi</div>
+        <div class="correct-answer">Đáp án: <strong>{{ correctAnswerText }}</strong>
+          <button class="btn-speak-sm" (click)="speech.speak(correctAnswerText)" title="Nghe phát âm">🔊</button>
+        </div>
       </div>
 
       <button class="btn-next" *ngIf="answered()" (click)="nextQuestion()">
