@@ -45,4 +45,5 @@ Thumbs.db
 *.env
 .env
 application-local.yml
+backend/src/main/resources/application.yml
 .claude/
