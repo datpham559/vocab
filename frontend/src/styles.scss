@@ -217,51 +217,202 @@ body {
   min-height: 200px;
 }
 
-/* Dark mode overrides for hardcoded white backgrounds */
+/* ============================================================
+   DARK MODE — comprehensive overrides
+   ============================================================ */
 [data-theme="dark"] {
-  .navbar { background: var(--surface) !important; border-bottom-color: var(--border) !important; }
 
-  .card, .intro-card, .done-card, .quiz-card, .waiting-card,
-  .flashcard-inner .flashcard-front, .flashcard-inner .flashcard-back {
+  /* ---- Navbar ---- */
+  .navbar {
+    background: var(--surface) !important;
+    border-bottom-color: var(--border) !important;
+  }
+
+  /* ---- Generic cards / white surfaces ---- */
+  .card,
+  .select-card, .done-card, .quiz-card, .waiting-card,
+  .intro-card, .result-card, .score-breakdown,
+  .stats-bar, .stat-box,
+  .lb-row.lb-header {
     background: var(--surface) !important;
     border-color: var(--border) !important;
     color: var(--text-primary) !important;
   }
 
+  /* ---- Flashcard faces ---- */
+  .card-front {
+    background: var(--surface) !important;
+    .word-text { color: var(--text-primary) !important; }
+    .word-pron { color: var(--text-secondary) !important; }
+    .word-pos  { color: var(--text-muted) !important; }
+    .flip-hint { color: var(--text-muted) !important; }
+  }
+
+  /* ---- Headings & text ---- */
+  h1, h2, h3, h4 { color: var(--text-primary) !important; }
+  .mode-title, .quiz-meaning-vi, .quiz-word { color: var(--text-primary) !important; }
+  .intro-desc, .mode-desc, .progress-text, .quiz-pron,
+  .quiz-prompt, .quiz-pron, .count-label, .intro-note,
+  .score-pct, .result-desc, .correct-answer,
+  .loading-state { color: var(--text-secondary) !important; }
+
+  /* ---- Progress / timer bars ---- */
+  .progress-bar, .timer-bar-wrap, .score-bar-wrap { background: #334155 !important; }
+
+  /* ---- Option buttons (quiz/review/exam) ---- */
   .option-btn {
-    background: var(--surface) !important;
-    border-color: var(--border) !important;
+    background: #1e293b !important;
+    border-color: #334155 !important;
     color: var(--text-primary) !important;
-    &:hover:not(:disabled) { background: #1e1b4b !important; border-color: var(--primary) !important; }
-    &.correct { background: #052e16 !important; border-color: #16a34a !important; color: #4ade80 !important; }
-    &.wrong   { background: #450a0a !important; border-color: #dc2626 !important; color: #f87171 !important; }
-    &.dimmed  { opacity: 0.35 !important; }
+
+    &:hover:not(:disabled) {
+      background: #1e1b4b !important;
+      border-color: var(--primary) !important;
+    }
+    &.correct  { background: #052e16 !important; border-color: #16a34a !important; color: #4ade80 !important; }
+    &.wrong    { background: #450a0a !important; border-color: #dc2626 !important; color: #fca5a5 !important; }
+    &.selected-answer { background: #1e1b4b !important; border-color: var(--primary) !important; }
+    &.dimmed   { opacity: 0.3 !important; }
   }
 
-  .type-input {
+  /* ---- Text inputs ---- */
+  .type-input, .search-input, .form-control, input, select, textarea {
     background: var(--surface) !important;
     border-color: var(--border) !important;
     color: var(--text-primary) !important;
     &::placeholder { color: var(--text-muted) !important; }
     &:focus { border-color: var(--primary) !important; }
-    &.type-correct { background: #052e16 !important; }
-    &.type-wrong   { background: #450a0a !important; }
+    &:disabled { background: #0f172a !important; color: var(--text-muted) !important; }
+    &.type-correct { background: #052e16 !important; border-color: #16a34a !important; }
+    &.type-close   { background: #431407 !important; border-color: #f59e0b !important; }
+    &.type-wrong   { background: #450a0a !important; border-color: #dc2626 !important; }
   }
 
-  .kbd-hints { background: var(--surface) !important; border-color: var(--border) !important; color: var(--text-secondary) !important; }
-  kbd { background: #1e293b !important; border-color: #475569 !important; color: var(--text-primary) !important; }
+  /* ---- Toggle / count / filter / mode buttons ---- */
+  .count-btn, .mode-btn, .filter-btn, .az-btn, .page-btn, .btn-clear {
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text-secondary) !important;
 
-  .form-control { background: var(--surface) !important; border-color: var(--border) !important; color: var(--text-primary) !important; }
+    &:hover { border-color: var(--primary) !important; color: var(--primary) !important; }
+    &.active {
+      background: var(--primary) !important;
+      border-color: var(--primary) !important;
+      color: #fff !important;
+    }
+  }
 
-  .progress-bar { background: #334155 !important; }
-  .score-circle { background: linear-gradient(135deg, #451a03, #78350f) !important; }
+  /* ---- Mode cards (exam) ---- */
+  .mode-card {
+    background: #1a2236 !important;
+    border-color: var(--border) !important;
+    &:hover:not(:disabled) { background: #1e1b4b !important; border-color: var(--primary) !important; }
+    &--mixed:hover:not(:disabled) { background: #1c1a0a !important; border-color: #f59e0b !important; }
+  }
 
-  h1, h2, h3, h4 { color: var(--text-primary) !important; }
-  p { color: var(--text-secondary); }
+  /* ---- Intro rules / breakdown boxes ---- */
+  .intro-rules, .score-breakdown, .stat-box, .type-feedback {
+    background: #1a2236 !important;
+    color: var(--text-secondary) !important;
+    border-color: var(--border) !important;
+  }
 
+  /* ---- Answer feedback ---- */
+  .type-feedback {
+    .feedback-correct { color: #4ade80 !important; }
+    .feedback-close   { color: #fbbf24 !important; }
+    .feedback-wrong   { color: #f87171 !important; }
+    .correct-answer   { color: var(--text-secondary) !important; strong { color: var(--text-primary) !important; } }
+  }
+
+  /* ---- Answer buttons (flashcard) ---- */
+  .btn-wrong   { background: #450a0a !important; color: #fca5a5 !important; }
+  .btn-correct { background: #052e16 !important; color: #4ade80 !important; }
+
+  /* ---- Word list ---- */
+  .stats-bar    { background: var(--surface) !important; }
+  .category-banner {
+    background: #1e1b4b !important;
+    border-color: #4338ca !important;
+    .cat-title { color: #a5b4fc !important; }
+    .cat-back a { color: #818cf8 !important; }
+    .cat-sub { background: #1e293b !important; color: #a5b4fc !important; }
+    .btn-cat-clear { background: #1e293b !important; color: #818cf8 !important; border-color: #4338ca !important; }
+  }
+  .btn-clear { background: var(--surface) !important; color: var(--text-secondary) !important; }
+  .page-size-selector select { background: var(--surface) !important; color: var(--text-primary) !important; }
+
+  /* ---- Quick links (dashboard) ---- */
+  .quick-link {
+    background: #1a2236 !important;
+    color: var(--text-primary) !important;
+    &:hover, &.ql-study:hover, &.ql-review:hover, &.ql-exam:hover {
+      background: #1e1b4b !important;
+      border-color: var(--primary) !important;
+      color: var(--primary) !important;
+    }
+  }
+
+  /* ---- Heatmap ---- */
+  .heatmap-cell[data-level="0"], .legend-cell[data-level="0"] { background: #1e293b !important; }
+
+  /* ---- Room/multiplayer ---- */
   .live-scores, .leaderboard { background: var(--surface) !important; }
-  .score-row, .lb-row { border-color: var(--border) !important; }
-  .lb-me { background: #1e1b4b !important; }
+  .score-row  { border-color: var(--border) !important; background: transparent !important; }
+  .lb-row     { border-color: var(--border) !important; }
+  .lb-me      { background: #1e1b4b !important; }
+  .result-banner { background: #052e16 !important; color: #4ade80 !important; }
+
+  /* ---- Hint boxes ---- */
+  .hint-char {
+    background: #1a2236 !important;
+    border-color: var(--border) !important;
+    color: var(--text-secondary) !important;
+    &.hint-revealed { background: #431407 !important; border-color: #f59e0b !important; color: #fbbf24 !important; }
+  }
+
+  /* ---- Mode indicator tag ---- */
+  .mode-indicator { background: #1e293b !important; color: var(--text-secondary) !important; }
+
+  /* ---- Tags: level, mode-tag ---- */
+  .level-tag {
+    &.beginner     { background: #052e16 !important; color: #4ade80 !important; }
+    &.intermediate { background: #431407 !important; color: #fbbf24 !important; }
+    &.advanced     { background: #2e1065 !important; color: #c4b5fd !important; }
+  }
+  .mode-tag {
+    background: #1e1b4b !important; color: #a5b4fc !important;
+    &--hard  { background: #450a0a !important; color: #fca5a5 !important; }
+    &--mixed { background: #431407 !important; color: #fbbf24 !important; }
+  }
+
+  /* ---- Keyboard hints ---- */
+  .kbd-hints {
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text-secondary) !important;
+  }
+  kbd {
+    background: #1e293b !important;
+    border-color: #475569 !important;
+    color: var(--text-primary) !important;
+  }
+
+  /* ---- Category badge (study) ---- */
+  .category-badge {
+    background: #1e1b4b !important;
+    border-color: #4338ca !important;
+    color: #a5b4fc !important;
+    .cat-change { color: #818cf8 !important; }
+  }
+
+  /* ---- Due/score badges ---- */
+  .score-circle { background: linear-gradient(135deg, #451a03, #78350f) !important; }
+  .score-val    { color: #fbbf24 !important; }
+  .score-label  { color: #fde68a !important; }
+
+  /* ---- Scrollbar ---- */
+  ::-webkit-scrollbar-thumb { background: #334155 !important; }
 }
 
 /* Scrollbar */
