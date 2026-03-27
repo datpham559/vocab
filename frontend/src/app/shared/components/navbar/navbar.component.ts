@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { StudyService } from '../../../core/services/study.service';
 import { KeyboardShortcutService } from '../../../core/services/keyboard-shortcut.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 @Component({
   selector: 'app-navbar',
@@ -18,7 +19,8 @@ export class NavbarComponent implements OnInit {
   constructor(
     readonly authService: AuthService,
     private studyService: StudyService,
-    readonly kbdService: KeyboardShortcutService
+    readonly kbdService: KeyboardShortcutService,
+    readonly themeService: ThemeService
   ) {}
 
   ngOnInit(): void {

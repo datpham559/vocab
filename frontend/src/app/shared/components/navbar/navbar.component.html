@@ -52,6 +52,13 @@
     <div class="nav-user">
       <button
         class="btn-kbd"
+        (click)="themeService.toggle()"
+        [title]="themeService.isDark() ? 'Chuyển sang sáng' : 'Chuyển sang tối'"
+        [class.active]="themeService.isDark()">
+        {{ themeService.isDark() ? '☀️' : '🌙' }}
+      </button>
+      <button
+        class="btn-kbd"
         (click)="kbdService.toggle()"
         [title]="kbdService.hintsEnabled() ? 'Ẩn gợi ý phím tắt' : 'Hiện gợi ý phím tắt'"
         [class.active]="kbdService.hintsEnabled()">
