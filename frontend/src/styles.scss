@@ -353,8 +353,24 @@ body {
     }
   }
 
+  /* ---- Topics ---- */
+  .topic-card {
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    &:hover { border-color: #4338ca !important; box-shadow: 0 4px 16px rgba(99,102,241,0.2) !important; }
+  }
+  .btn-words {
+    background: #1a2236 !important;
+    color: var(--text-secondary) !important;
+    border-color: var(--border) !important;
+    &:hover { background: #263348 !important; border-color: #475569 !important; }
+  }
+
   /* ---- Heatmap ---- */
-  .heatmap-cell[data-level="0"], .legend-cell[data-level="0"] { background: #1e293b !important; }
+  // Level-0 (no activity) cần đủ sáng để phân biệt với nền
+  .heatmap-cell[data-level="0"] { background: #263348 !important; }
+  .heatmap-cell.empty           { background: transparent !important; }
+  .legend-cell[data-level="0"]  { background: #263348 !important; }
 
   /* ---- Room/multiplayer ---- */
   .live-scores, .leaderboard { background: var(--surface) !important; }
