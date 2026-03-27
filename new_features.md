@@ -1,36 +1,36 @@
-# New Features — Kế hoạch phát triển chi tiết
+# New Features — Kế hoạch phát triển
 
-## Ngắn hạn
+## Nhóm A — Ít code, giá trị cao
 
-| # | Tính năng | Mô tả | Hoàn thành |
-|---|---|---|---|
-| 1 | Nghe phát âm | Web Speech API phát âm từ — flashcard, quiz, word list | 2026-03-20 |
-| 2 | Học theo cấp độ | Thêm filter BEGINNER / INTERMEDIATE / ADVANCED vào `/study` | |
-| 3 | Đánh dấu yêu thích | Thêm cột `is_favorite` vào `user_word_progress`, filter trong `/words` | |
-| 4 | Gõ đáp án | Thay quiz chọn 4 đáp án bằng ô input gõ tay | 2026-03-20 |
+| # | Tính năng | Mô tả | Effort | Hoàn thành |
+|---|---|---|---|---|
+| A1 | Bookmark từ yêu thích | Đánh dấu từ khó để ôn riêng, có trang `/favorites` | Thấp | |
+| A2 | Dark mode | CSS variables đã có sẵn, toggle trên navbar | Thấp | |
+| A3 | Trang cá nhân `/profile` | Đổi tên hiển thị, xem lịch sử phiên học, thống kê cá nhân | Thấp | |
+| A4 | Bảng xếp hạng | Rank theo streak hoặc số từ đã học — data đã có sẵn | Thấp | |
 
-## Trung hạn
+## Nhóm B — Nâng cao trải nghiệm học
 
-| # | Tính năng | Mô tả | Hoàn thành |
-|---|---|---|---|
-| 5 | Biểu đồ học tập | Chart số từ học mỗi ngày trong 7/30 ngày qua — cần thêm bảng lịch sử học | 2026-03-20 |
-| 6 | Lịch hoạt động | Calendar kiểu GitHub contributions hiển thị ngày có học | 2026-03-20 |
-| 7 | Học theo chủ đề | Lọc từ theo topic (business, travel, technology...) — cần dữ liệu `category` đầy đủ | 2026-03-20 |
-| 8 | Từ hay quên nhất | Thống kê tỉ lệ đúng/sai theo từng từ, highlight từ yếu | |
+| # | Tính năng | Mô tả | Effort | Hoàn thành |
+|---|---|---|---|---|
+| B1 | Trang thống kê `/stats` | Biểu đồ từ học mỗi ngày, accuracy theo category, từ hay sai nhất | Trung bình | |
+| B2 | Listening mode | Phát âm → chọn/gõ từ tiếng Anh tương ứng (Speech API đã có) | Trung bình | |
+| B3 | Lịch ôn tập | Calendar hiện số từ đến hạn từng ngày trong tháng | Trung bình | |
+| B4 | Từ hay quên nhất | Top 10 từ có tỉ lệ sai cao nhất của user | Thấp | |
+| B5 | Combo streak trong quiz | Trả lời đúng liên tiếp → nhân điểm + animation | Thấp | |
 
-## Dài hạn
+## Nhóm C — Gamification / Xã hội
 
-| # | Tính năng | Mô tả | Hoàn thành |
-|---|---|---|---|
-| 9 | Hệ thống XP | Tích lũy điểm sau mỗi phiên học — cần thiết kế công thức điểm | |
-| 10 | Thành tích | Badge khi đạt mốc (học 100 từ, streak 7 ngày...) | |
-| 11 | Bảng xếp hạng | So sánh streak / số từ với người dùng khác — cần expose public stats | |
-| 12 | Thêm từ tự tạo | User tự thêm từ vựng riêng — cần phân quyền và UI riêng | |
-| 13 | Xuất danh sách từ | Export CSV / PDF danh sách từ đã học | |
+| # | Tính năng | Mô tả | Effort | Hoàn thành |
+|---|---|---|---|---|
+| C1 | Hệ thống XP + cấp độ | Tích điểm sau mỗi phiên, level 1→50 hiển thị trên profile | Trung bình | |
+| C2 | Thành tích (badges) | Mốc: 100 từ, streak 7 ngày, hoàn thành 10 phòng quiz... | Trung bình | |
+| C3 | Chia sẻ kết quả | Export kết quả exam/quiz thành ảnh để share | Cao | |
 
-## Quản trị
+## Nhóm D — Kỹ thuật
 
-| # | Tính năng | Mô tả | Hoàn thành |
-|---|---|---|---|
-| 14 | Quản lý người dùng | Trang admin xem / đổi role / xóa tài khoản | 2026-03-20 |
-| 15 | Kiểm tra trình độ | 30 câu quiz 3 cấp độ, không lưu kết quả, hiện level + biểu đồ chi tiết | 2026-03-20 |
+| # | Tính năng | Mô tả | Effort | Hoàn thành |
+|---|---|---|---|---|
+| D1 | PWA / Offline | Cache từ vựng, học được khi mất mạng | Cao | |
+| D2 | Nhắc nhở học | Notification trình duyệt nhắc khi quá 1 ngày chưa học | Trung bình | |
+| D3 | Export danh sách từ | Xuất CSV các từ đã học / yêu thích | Thấp | |
