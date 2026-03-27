@@ -23,34 +23,33 @@
     <table class="user-table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Tên đăng nhập</th>
+          <th>Người dùng</th>
           <th>Email</th>
-          <th>Tên hiển thị</th>
           <th>Vai trò</th>
-          <th>Streak</th>
-          <th>Đã học</th>
+          <th>Thống kê</th>
           <th>Ngày tạo</th>
           <th>Hành động</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let user of users()" [class.current-user-row]="isCurrentUser(user)">
-          <td>{{ user.id }}</td>
           <td>
             <span class="username-cell">{{ user.username }}</span>
             <span class="you-tag" *ngIf="isCurrentUser(user)">bạn</span>
+            <div class="display-name">{{ user.displayName }}</div>
           </td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.displayName }}</td>
+          <td class="email-cell">{{ user.email }}</td>
           <td>
             <span class="role-badge" [class.admin]="user.role === 'ROLE_ADMIN'">
               {{ user.role === 'ROLE_ADMIN' ? 'Admin' : 'User' }}
             </span>
           </td>
-          <td>🔥 {{ user.streak }}</td>
-          <td>{{ user.totalWordsLearned }} từ</td>
-          <td>{{ formatDate(user.createdAt) }}</td>
+          <td class="stats-cell">
+            <span>🔥 {{ user.streak }}</span>
+            <span class="sep">·</span>
+            <span>📚 {{ user.totalWordsLearned }}</span>
+          </td>
+          <td class="date-cell">{{ formatDate(user.createdAt) }}</td>
           <td class="actions">
             <button
               class="btn-role"
@@ -58,7 +57,7 @@
               (click)="toggleRole(user)"
               [disabled]="isCurrentUser(user)"
               [title]="isCurrentUser(user) ? 'Không thể thay đổi vai trò của chính mình' : ''">
-              {{ user.role === 'ROLE_ADMIN' ? 'Hạ xuống User' : 'Lên Admin' }}
+              {{ user.role === 'ROLE_ADMIN' ? '↓ User' : '↑ Admin' }}
             </button>
             <button
               class="btn-delete"
