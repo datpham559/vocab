@@ -373,11 +373,97 @@ body {
   .legend-cell[data-level="0"]  { background: #263348 !important; }
 
   /* ---- Room/multiplayer ---- */
-  .live-scores, .leaderboard { background: var(--surface) !important; }
-  .score-row  { border-color: var(--border) !important; background: transparent !important; }
-  .lb-row     { border-color: var(--border) !important; }
-  .lb-me      { background: #1e1b4b !important; }
+
+  // Lobby
+  .lobby-card {
+    background: var(--surface) !important;
+    h1 { color: var(--text-primary) !important; }
+  }
+  .lobby-desc { color: var(--text-secondary) !important; }
+  .tab-bar { border-bottom-color: var(--border) !important; }
+  .tab-btn {
+    color: var(--text-muted) !important;
+    &.active { color: var(--primary) !important; border-bottom-color: var(--primary) !important; }
+    &:hover:not(.active) { color: var(--text-secondary) !important; }
+  }
+  .field-label { color: var(--text-secondary) !important; }
+  .code-input {
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text-primary) !important;
+    &:focus { border-color: var(--primary) !important; }
+  }
+
+  // Waiting room
+  .waiting-card { background: var(--surface) !important; }
+  .room-code-display { background: #1a2236 !important; }
+  .code-label { color: var(--text-secondary) !important; }
+  .waiting-info { color: var(--text-muted) !important; }
+  .participants-list { border-color: var(--border) !important; }
+  .participants-title {
+    background: #1a2236 !important;
+    color: var(--text-secondary) !important;
+  }
+  .participant-item {
+    border-top-color: var(--border) !important;
+    color: var(--text-primary) !important;
+  }
+  .participant-you { color: var(--primary) !important; }
+  .waiting-msg { color: var(--text-secondary) !important; }
+  .spinner-sm { border-color: var(--border) !important; border-top-color: var(--primary) !important; }
+
+  // Quiz phase
+  .answered-badge {
+    background: #1a2236 !important;
+    color: var(--text-secondary) !important;
+  }
+  .progress-text { color: var(--text-secondary) !important; }
+  .quiz-card { background: var(--surface) !important; }
+  .quiz-word { color: var(--text-primary) !important; }
+  .quiz-pron { color: var(--text-secondary) !important; }
+  .quiz-prompt { color: var(--text-secondary) !important; }
+
   .result-banner { background: #052e16 !important; color: #4ade80 !important; }
+
+  // Scoreboard
+  .live-scores { background: var(--surface) !important; }
+  .live-scores-title {
+    background: #1a2236 !important;
+    color: var(--text-secondary) !important;
+  }
+  .score-row  {
+    border-top-color: var(--border) !important;
+    background: transparent !important;
+  }
+  .score-rank { color: var(--text-muted) !important; }
+  .score-name { color: var(--text-primary) !important; }
+  .score-you  { color: var(--primary) !important; }
+  .score-pts  { color: var(--text-primary) !important; }
+
+  .kbd-hint-bar {
+    color: var(--text-muted) !important;
+    kbd {
+      background: #1a2236 !important;
+      border-color: var(--border) !important;
+      color: var(--text-secondary) !important;
+    }
+  }
+
+  // Done / leaderboard
+  .done-card { background: var(--surface) !important; }
+  .leaderboard { border-color: var(--border) !important; }
+  .lb-header {
+    background: #1a2236 !important;
+    color: var(--text-secondary) !important;
+  }
+  .lb-row {
+    border-top-color: var(--border) !important;
+    &.lb-first { background: #2d1f00 !important; }
+    &.lb-me    { background: #1e1b4b !important; }
+  }
+  .lb-name  { color: var(--text-primary) !important; }
+  .lb-you   { color: var(--primary) !important; }
+  .lb-score { color: var(--text-primary) !important; }
 
   /* ---- Hint boxes ---- */
   .hint-char {
