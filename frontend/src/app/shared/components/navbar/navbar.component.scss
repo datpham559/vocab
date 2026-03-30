@@ -14,7 +14,7 @@
   display: flex;
   align-items: center;
   height: 100%;
-  gap: 16px;
+  gap: 4px;
   padding: 0 16px;
   max-width: 1400px;
   margin: 0 auto;
@@ -26,6 +26,7 @@
   gap: 6px;
   text-decoration: none;
   flex-shrink: 0;
+  margin-right: 8px;
 
   .logo-icon { font-size: 18px; }
 
@@ -42,16 +43,15 @@
   list-style: none;
   gap: 2px;
   flex: 1;
-  flex-wrap: nowrap;
-  overflow: hidden;
+  align-items: center;
 
-  a {
+  > li > a {
     display: block;
-    padding: 5px 12px;
+    padding: 5px 11px;
     border-radius: var(--radius-full);
     text-decoration: none;
     color: var(--text-secondary);
-    font-size: 14.5px;
+    font-size: 14px;
     font-weight: 500;
     white-space: nowrap;
     transition: all 0.2s;
@@ -61,13 +61,77 @@
   }
 }
 
-.nav-review {
+// ── Dropdown ──────────────────────────────────────────
+.nav-dropdown {
   position: relative;
-  display: flex !important;
-  align-items: center;
-  gap: 6px;
+
+  &:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+  &:hover .dropdown-trigger { background: var(--primary-light); color: var(--primary); }
 }
 
+.dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 11px;
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: default;
+  user-select: none;
+  white-space: nowrap;
+  transition: all 0.2s;
+
+  &.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+
+  .chevron {
+    font-size: 10px;
+    opacity: 0.6;
+    margin-left: 1px;
+  }
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 180px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 6px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.18s, visibility 0.18s, transform 0.18s;
+  z-index: 200;
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 7px;
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: all 0.15s;
+
+    &:hover { background: var(--primary-light); color: var(--primary); }
+    &.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+  }
+}
+
+.dropdown-review {
+  display: flex;
+  align-items: center;
+  justify-content: space-between !important;
+}
+
+// ── Review badges ──────────────────────────────────────
 .review-badge {
   display: inline-flex;
   align-items: center;
@@ -83,11 +147,27 @@
   line-height: 1;
 }
 
-.nav-admin {
-  color: #7c3aed !important;
-  font-weight: 600;
+.review-badge-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: #f59e0b;
+  color: white;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
 }
 
+.nav-admin {
+  color: #7c3aed !important;
+  font-weight: 600 !important;
+}
+
+// ── Right-side controls ────────────────────────────────
 .btn-kbd {
   background: none;
   border: 1.5px solid #e2e8f0;
@@ -109,12 +189,19 @@
 .nav-user {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
+  margin-left: 8px;
 
   .username {
     font-size: 14px;
     font-weight: 500;
     color: var(--text-secondary);
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    transition: all 0.15s;
+    &:hover { background: var(--primary-light); color: var(--primary); }
   }
 }

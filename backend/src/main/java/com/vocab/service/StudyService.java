@@ -77,6 +77,13 @@ public class StudyService {
         return progressRepository.countLearned(userId);
     }
 
+    public List<WordResponse> getBookmarksSession(Long userId) {
+        return progressRepository.findByUserIdAndBookmarkedTrue(userId)
+            .stream()
+            .map(p -> WordResponse.from(p.getWord()))
+            .toList();
+    }
+
     public List<CategoryInfo> getCategories() {
         return wordRepository.countByCategory().stream()
             .map(row -> new CategoryInfo((String) row[0], (Long) row[1]))

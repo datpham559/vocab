@@ -23,7 +23,30 @@
           <span class="code-value">{{ state.code }}</span>
           <button class="btn-copy" (click)="copyCode()" title="Sao chép">📋</button>
         </div>
-        <p class="waiting-info">{{ state.questionCount }} câu · 15 giây/câu</p>
+        <p class="waiting-info">
+          {{ state.totalQuestions || state.questionCount }} câu · 15 giây/câu
+          <span class="mode-pill">{{ state.quizMode === 'CHOICE' ? '🔤 Chọn từ' : state.quizMode === 'TYPE' ? '✍️ Ghi từ' : '⚡ Hỗn hợp' }}</span>
+        </p>
+        <div class="diff-breakdown" *ngIf="state.beginnerCount + state.intermediateCount + state.advancedCount > 0">
+          <span class="diff-tag diff-tag--b" *ngIf="state.beginnerCount > 0">
+            🟢 {{ state.beginnerCount }} cơ bản
+            <span class="diff-mode-hint" *ngIf="state.quizMode === 'MIXED'">
+              {{ state.beginnerMode === 'CHOICE' ? '🔤' : state.beginnerMode === 'TYPE' ? '✍️' : '⚡' }}
+            </span>
+          </span>
+          <span class="diff-tag diff-tag--i" *ngIf="state.intermediateCount > 0">
+            🟡 {{ state.intermediateCount }} trung bình
+            <span class="diff-mode-hint" *ngIf="state.quizMode === 'MIXED'">
+              {{ state.intermediateMode === 'CHOICE' ? '🔤' : state.intermediateMode === 'TYPE' ? '✍️' : '⚡' }}
+            </span>
+          </span>
+          <span class="diff-tag diff-tag--a" *ngIf="state.advancedCount > 0">
+            🔴 {{ state.advancedCount }} nâng cao
+            <span class="diff-mode-hint" *ngIf="state.quizMode === 'MIXED'">
+              {{ state.advancedMode === 'CHOICE' ? '🔤' : state.advancedMode === 'TYPE' ? '✍️' : '⚡' }}
+            </span>
+          </span>
+        </div>
 
         <div class="participants-list">
           <div class="participants-title">{{ state.participants.length }} người tham gia</div>
@@ -46,11 +69,24 @@
       </div>
     </ng-container>
 
+    <!-- COUNTDOWN phase -->
+    <div class="countdown-overlay" *ngIf="state.status === 'COUNTDOWN'">
+      <div class="countdown-circle">
+        <span class="countdown-num">{{ state.countdownLeft }}</span>
+      </div>
+      <p class="countdown-label">Chuẩn bị...</p>
+    </div>
+
     <!-- ACTIVE / SHOWING_RESULT phase -->
     <ng-container *ngIf="state.status === 'ACTIVE' || state.status === 'SHOWING_RESULT'">
       <div class="phase-header">
         <span class="progress-text">Câu {{ state.questionIndex + 1 }} / {{ state.totalQuestions }}</span>
-        <span class="answered-badge">{{ state.answeredCount }}/{{ state.participants.length }} đã trả lời</span>
+        <div style="display:flex;align-items:center;gap:0.5rem">
+          <span class="mode-pill-sm" [class.mode-pill-sm--type]="state.currentQuestionMode === 'TYPE'">
+            {{ state.currentQuestionMode === 'TYPE' ? '✍️ Ghi' : '🔤 Chọn' }}
+          </span>
+          <span class="answered-badge">{{ state.answeredCount }}/{{ state.participants.length }} đã trả lời</span>
+        </div>
       </div>
       <div class="progress-bar">
         <div class="progress-fill" [style.width.%]="((state.questionIndex + 1) / state.totalQuestions) * 100"></div>
@@ -69,25 +105,88 @@
       </div>
 
       <div class="quiz-card" *ngIf="state.currentQuestion">
-        <div class="quiz-word">
-          {{ state.currentQuestion.word }}
-          <button class="btn-speak-sm" (click)="speech.speak(state.currentQuestion.word)">🔊</button>
-        </div>
-        <div class="quiz-meta">
-          <span class="quiz-pos" *ngIf="state.currentQuestion.partOfSpeech">{{ state.currentQuestion.partOfSpeech }}</span>
-          <span class="quiz-pron" *ngIf="state.currentQuestion.pronunciation">{{ state.currentQuestion.pronunciation }}</span>
-        </div>
-        <p class="quiz-prompt">Chọn nghĩa đúng:</p>
-        <div class="options">
-          <button
-            *ngFor="let opt of state.currentQuestion.options; let i = index"
-            class="option-btn"
-            [class]="getOptionClass(i)"
-            (click)="selectOption(i)"
-            [disabled]="state.myAnswer !== null || state.status === 'SHOWING_RESULT'">
-            {{ opt }}
-          </button>
-        </div>
+
+        <!-- CHOICE MODE -->
+        <ng-container *ngIf="state.currentQuestionMode === 'CHOICE'">
+          <div class="quiz-word">
+            <span class="protected-word" [attr.aria-label]="state.currentQuestion.word">
+              <span *ngFor="let ch of choiceWordLetters" class="pw-char">{{ ch }}</span>
+            </span>
+            <button class="btn-speak-sm" (click)="speech.speak(state.currentQuestion.word)">🔊</button>
+          </div>
+          <div class="quiz-meta">
+            <span class="quiz-pos" *ngIf="state.currentQuestion.partOfSpeech">{{ state.currentQuestion.partOfSpeech }}</span>
+            <span class="quiz-pron protected-word" *ngIf="state.currentQuestion.pronunciation"
+                  [attr.aria-label]="state.currentQuestion.pronunciation">
+              <span *ngFor="let ch of (state.currentQuestion.pronunciation.split(''))" class="pw-char">{{ ch }}</span>
+            </span>
+          </div>
+          <p class="quiz-prompt">Chọn nghĩa đúng:</p>
+          <div class="options">
+            <button
+              *ngFor="let opt of state.currentQuestion.options; let i = index"
+              class="option-btn"
+              [class]="getOptionClass(i)"
+              (click)="selectOption(i)"
+              [disabled]="state.myAnswer !== null || state.status === 'SHOWING_RESULT'">
+              {{ opt }}
+            </button>
+          </div>
+        </ng-container>
+
+        <!-- TYPING MODE -->
+        <ng-container *ngIf="state.currentQuestionMode === 'TYPE'">
+          <div class="quiz-meaning">{{ state.correctMeaning }}</div>
+          <div class="type-meta" *ngIf="state.currentQuestion">
+            <span class="quiz-pos" *ngIf="state.currentQuestion.partOfSpeech">{{ state.currentQuestion.partOfSpeech }}</span>
+            <span class="word-length-hint">{{ state.currentQuestion.word.length }} chữ cái</span>
+          </div>
+          <div class="word-hint-boxes" *ngIf="state.status === 'ACTIVE' && state.myAnswer === null">
+            <ng-container *ngFor="let box of wordHintBoxes">
+              <span *ngIf="box.char !== ' ' && box.char !== '-'" class="hint-box" [class.hint-first]="!box.blank">{{ box.char }}</span>
+              <span *ngIf="box.char === ' '" class="hint-space"></span>
+              <span *ngIf="box.char === '-'" class="hint-box hint-dash">-</span>
+            </ng-container>
+          </div>
+          <p class="quiz-prompt">Gõ từ tiếng Anh tương ứng:</p>
+
+          <!-- Already answered correctly -->
+          <div class="type-answered" *ngIf="state.myAnswer === 0 && state.status === 'ACTIVE'">
+            <span class="type-answered-icon">✓</span> Đúng rồi! Đang chờ người khác...
+          </div>
+          <!-- Answered wrong -->
+          <div class="type-answered type-answered--wrong" *ngIf="state.myAnswer === -1 && state.status === 'ACTIVE'">
+            <span class="type-answered-icon">✗</span> Sai rồi! Đang chờ người khác...
+          </div>
+
+          <!-- Result shown -->
+          <div class="type-result-reveal" *ngIf="state.status === 'SHOWING_RESULT'">
+            <div class="type-result-word">{{ state.currentQuestion.word }}</div>
+            <div class="quiz-pron-center" *ngIf="state.currentQuestion.pronunciation">{{ state.currentQuestion.pronunciation }}</div>
+          </div>
+
+          <!-- Input area (only when ACTIVE and not yet answered) -->
+          <ng-container *ngIf="state.status === 'ACTIVE' && state.myAnswer === null && !typingLocked()">
+            <div class="type-area">
+              <input
+                #typeInput
+                class="type-input"
+                [class.type-correct]="typeCorrect() === true"
+                [class.type-wrong]="typeCorrect() === false"
+                [(ngModel)]="typedAnswer"
+                (ngModelChange)="onTypedChange()"
+                (keydown.enter)="submitTyped()"
+                placeholder="Gõ từ tiếng Anh..."
+                autocomplete="off"
+                autocorrect="off"
+                spellcheck="false" />
+              <button class="btn-submit-type" (click)="submitTyped()" [disabled]="!typedAnswer.trim()">
+                ✓
+              </button>
+            </div>
+          </ng-container>
+        </ng-container>
+
       </div>
 
       <!-- Live scoreboard -->
@@ -101,7 +200,7 @@
       </div>
 
       <div class="kbd-hint-bar">
-        <span class="kbd-hint" *ngIf="state.status === 'ACTIVE' && state.myAnswer === null">
+        <span class="kbd-hint" *ngIf="state.status === 'ACTIVE' && state.myAnswer === null && state.currentQuestionMode === 'CHOICE'">
           <kbd>1</kbd>–<kbd>4</kbd> Chọn đáp án
         </span>
       </div>
@@ -139,6 +238,39 @@
         <div class="done-actions">
           <a routerLink="/room" class="btn-start">Chơi lại</a>
           <a routerLink="/dashboard" class="btn-ghost">Trang chủ</a>
+        </div>
+
+        <!-- Answer history toggle -->
+        <button class="btn-history-toggle" (click)="showHistory.set(!showHistory())">
+          {{ showHistory() ? '▲ Ẩn đáp án' : '▼ Xem đáp án của tôi' }}
+          <span class="history-score-badge">
+            {{ answerHistory.length > 0 ? correctCount + '/' + answerHistory.length : '' }}
+          </span>
+        </button>
+
+        <div class="answer-history" *ngIf="showHistory()">
+          <div
+            class="history-item"
+            *ngFor="let r of answerHistory; let i = index"
+            [class.history-correct]="r.correct"
+            [class.history-wrong]="!r.correct">
+            <span class="history-icon">{{ r.correct ? '✓' : '✗' }}</span>
+            <div class="history-body">
+              <div class="history-word">
+                {{ r.word }}
+                <span class="history-pos" *ngIf="r.partOfSpeech">{{ r.partOfSpeech }}</span>
+                <span class="history-mode-tag">{{ r.mode === 'TYPE' ? '✍️' : '🔤' }}</span>
+              </div>
+              <div class="history-meaning">{{ r.meaning }}</div>
+              <div class="history-answer" *ngIf="!r.correct">
+                <span class="wrong-choice" *ngIf="r.myChoiceText">Bạn chọn: {{ r.myChoiceText }}</span>
+                <span class="correct-choice">Đáp án: {{ r.correctText }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="history-empty" *ngIf="answerHistory.length === 0">
+            Không có dữ liệu
+          </div>
         </div>
       </div>
     </ng-container>

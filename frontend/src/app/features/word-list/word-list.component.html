@@ -113,6 +113,13 @@
           <span class="badge" *ngIf="getStatus(word.id)" [ngClass]="getStatusClass(getStatus(word.id))">
             {{ getStatusLabel(getStatus(word.id)) }}
           </span>
+          <button
+            class="btn-bookmark"
+            [class.active]="isBookmarked(word.id)"
+            (click)="toggleBookmark(word.id, $event)"
+            [title]="isBookmarked(word.id) ? 'Bỏ yêu thích' : 'Thêm vào yêu thích'">
+            {{ isBookmarked(word.id) ? '★' : '☆' }}
+          </button>
           <span class="expand-icon">{{ expandedWordId === word.id ? '▲' : '▼' }}</span>
         </div>
       </div>

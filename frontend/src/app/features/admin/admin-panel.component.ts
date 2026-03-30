@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AdminService, WordLookupResult, CreateWordPayload } from '../../core/services/admin.service';
 import { AuthService } from '../../core/services/auth.service';
+import { ActivityLogService, ActivityLogEntry, LogPage } from '../../core/services/activity-log.service';
 import { AdminUser } from '../../core/models/user.model';
 
 const DIFFICULTIES = ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'];
@@ -22,7 +23,18 @@ const CATEGORIES = [
   styleUrls: ['./admin-panel.component.scss']
 })
 export class AdminPanelComponent implements OnInit {
-  activeTab: 'users' | 'words' = 'users';
+  activeTab: 'users' | 'words' | 'logs' = 'users';
+
+  // --- logs tab ---
+  logs = signal<ActivityLogEntry[]>([]);
+  logsTotalPages = signal(0);
+  logsTotalElements = signal(0);
+  logsPage = signal(0);
+  logsLoading = signal(false);
+  logsActionFilter = '';
+  logsUsernameFilter = '';
+  readonly ACTION_TYPES = ['LOGIN','REGISTER','STUDY_STARTED','REVIEW_STARTED',
+                           'EXAM_STARTED','PROFILE_UPDATED','ROOM_CREATED','ROOM_JOINED'];
 
   // --- users tab ---
   users = signal<AdminUser[]>([]);
@@ -46,6 +58,7 @@ export class AdminPanelComponent implements OnInit {
 
   constructor(
     private adminService: AdminService,
+    private logService: ActivityLogService,
     readonly authService: AuthService
   ) {}
 
@@ -162,5 +175,43 @@ export class AdminPanelComponent implements OnInit {
 
   private emptyForm(): CreateWordPayload {
     return { word: '', pronunciation: '', meaningVi: '', partOfSpeech: '', difficulty: 'BEGINNER', category: '', exampleSentence: '', exampleTranslation: '' };
+  }
+
+  // --- logs tab ---
+  loadLogs(page = 0): void {
+    this.logsLoading.set(true);
+    this.logsPage.set(page);
+    this.logService.getAll(page, 50, this.logsActionFilter || undefined, this.logsUsernameFilter || undefined)
+      .subscribe({
+        next: (res: LogPage) => {
+          this.logs.set(res.content);
+          this.logsTotalPages.set(res.totalPages);
+          this.logsTotalElements.set(res.totalElements);
+          this.logsLoading.set(false);
+        },
+        error: () => this.logsLoading.set(false)
+      });
+  }
+
+  switchToLogs(): void {
+    this.activeTab = 'logs';
+    if (this.logs().length === 0) this.loadLogs(0);
+  }
+
+  applyLogFilter(): void { this.loadLogs(0); }
+  clearLogFilter(): void { this.logsActionFilter = ''; this.logsUsernameFilter = ''; this.loadLogs(0); }
+
+  actionLabel(type: string): string {
+    const map: Record<string, string> = {
+      LOGIN: 'Đăng nhập', REGISTER: 'Đăng ký',
+      STUDY_STARTED: 'Học từ', REVIEW_STARTED: 'Ôn tập',
+      EXAM_STARTED: 'Kiểm tra', PROFILE_UPDATED: 'Cập nhật hồ sơ',
+      ROOM_CREATED: 'Tạo phòng', ROOM_JOINED: 'Vào phòng'
+    };
+    return map[type] ?? type;
+  }
+
+  formatDatetime(iso: string): string {
+    return new Date(iso).toLocaleString('vi-VN');
   }
 }

@@ -4,6 +4,7 @@
     <div class="tab-bar">
       <button class="tab-btn" [class.active]="activeTab === 'users'" (click)="activeTab = 'users'">Người dùng <span class="tab-count">{{ users().length }}</span></button>
       <button class="tab-btn" [class.active]="activeTab === 'words'" (click)="activeTab = 'words'">Thêm từ vựng</button>
+      <button class="tab-btn" [class.active]="activeTab === 'logs'" (click)="switchToLogs()">Nhật ký <span class="tab-count" *ngIf="logsTotalElements() > 0">{{ logsTotalElements() }}</span></button>
     </div>
   </div>
 
@@ -177,5 +178,69 @@
     </div>
   </ng-container>
   <!-- END WORDS TAB -->
+
+  <!-- LOGS TAB -->
+  <ng-container *ngIf="activeTab === 'logs'">
+    <div class="logs-panel">
+
+      <!-- Filters -->
+      <div class="log-filters">
+        <select class="log-filter-select" [(ngModel)]="logsActionFilter">
+          <option value="">— Tất cả hành động —</option>
+          <option *ngFor="let t of ACTION_TYPES" [value]="t">{{ actionLabel(t) }}</option>
+        </select>
+        <input class="log-filter-input" type="text" [(ngModel)]="logsUsernameFilter" placeholder="Tìm theo username..." />
+        <button class="btn-log-filter" (click)="applyLogFilter()">Lọc</button>
+        <button class="btn-log-clear" (click)="clearLogFilter()" *ngIf="logsActionFilter || logsUsernameFilter">✕ Xóa</button>
+        <span class="log-total" *ngIf="logsTotalElements() > 0">{{ logsTotalElements() }} bản ghi</span>
+      </div>
+
+      <div class="loading-state" *ngIf="logsLoading()">
+        <div class="spinner"></div><p>Đang tải...</p>
+      </div>
+
+      <div class="table-wrapper" *ngIf="!logsLoading()">
+        <table class="log-table">
+          <thead>
+            <tr>
+              <th>Thời gian</th>
+              <th>Người dùng</th>
+              <th>Hành động</th>
+              <th>Chi tiết</th>
+              <th>IP</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of logs()">
+              <td class="log-time">{{ formatDatetime(log.createdAt) }}</td>
+              <td class="log-user">
+                <span class="log-username">{{ log.username }}</span>
+                <span class="log-uid" *ngIf="log.userId">#{{ log.userId }}</span>
+              </td>
+              <td>
+                <span class="log-badge" [class]="'log-' + log.actionType.toLowerCase().replace('_', '-')">
+                  {{ actionLabel(log.actionType) }}
+                </span>
+              </td>
+              <td class="log-desc">{{ log.description }}</td>
+              <td class="log-ip">{{ log.ipAddress || '—' }}</td>
+            </tr>
+            <tr *ngIf="logs().length === 0">
+              <td colspan="5" class="log-empty">Chưa có bản ghi nào</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="log-pagination" *ngIf="logsTotalPages() > 1">
+        <button class="btn-page" (click)="loadLogs(logsPage() - 1)" [disabled]="logsPage() === 0">‹</button>
+        <span class="page-info">Trang {{ logsPage() + 1 }} / {{ logsTotalPages() }}</span>
+        <button class="btn-page" (click)="loadLogs(logsPage() + 1)" [disabled]="logsPage() >= logsTotalPages() - 1">›</button>
+      </div>
+
+    </div>
+  </ng-container>
+  <!-- END LOGS TAB -->
 
 </div>

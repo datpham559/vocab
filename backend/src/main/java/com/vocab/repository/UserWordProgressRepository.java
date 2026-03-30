@@ -48,4 +48,6 @@ public interface UserWordProgressRepository extends JpaRepository<UserWordProgre
 
     @Query("SELECT COUNT(p) FROM UserWordProgress p WHERE p.user.id = :userId AND p.status <> 'NEW'")
     long countLearned(@Param("userId") Long userId);
+
+    List<UserWordProgress> findByUserIdAndBookmarkedTrue(Long userId);
 }

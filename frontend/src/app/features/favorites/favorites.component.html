@@ -1,0 +1,74 @@
+<div class="container page-content">
+  <div class="page-header">
+    <div class="header-left">
+      <h1>⭐ Từ yêu thích</h1>
+      <p>{{ bookmarks().length }} từ đã đánh dấu</p>
+    </div>
+    <div class="header-actions" *ngIf="bookmarks().length > 0">
+      <a [routerLink]="['/study']" [queryParams]="{mode: 'bookmarks'}" class="btn btn-primary">
+        ▶ Học tất cả
+      </a>
+    </div>
+  </div>
+
+  <div class="loading-overlay" *ngIf="loading()">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading() && bookmarks().length === 0">
+    <div class="empty-icon">☆</div>
+    <h3>Chưa có từ yêu thích</h3>
+    <p>Nhấn ★ trên bất kỳ từ nào trong kho từ vựng để thêm vào đây.</p>
+    <a routerLink="/words" class="btn btn-primary">Xem từ vựng</a>
+  </div>
+
+  <div class="word-list" *ngIf="!loading() && bookmarks().length > 0">
+    <div *ngFor="let b of bookmarks()" class="word-card card" (click)="toggleExpand(b.id)">
+      <div class="word-header">
+        <div class="word-main">
+          <span class="word-text">{{ b.word.word }}</span>
+          <button class="btn-speak-sm" (click)="speech.speak(b.word.word); $event.stopPropagation()" title="Nghe phát âm">🔊</button>
+          <span class="word-pron">{{ b.word.pronunciation }}</span>
+          <span class="badge" [ngClass]="'badge-' + b.word.difficulty.toLowerCase()">
+            {{ getDifficultyLabel(b.word.difficulty) }}
+          </span>
+        </div>
+        <div class="word-right">
+          <span class="meaning-preview">{{ b.word.meaningVi }}</span>
+          <span class="badge" [ngClass]="'badge-' + b.status.toLowerCase()">
+            {{ getStatusLabel(b.status) }}
+          </span>
+          <button
+            class="btn-remove"
+            (click)="removeBookmark(b.wordId, $event)"
+            title="Bỏ yêu thích">
+            ★
+          </button>
+          <span class="expand-icon">{{ expandedId === b.id ? '▲' : '▼' }}</span>
+        </div>
+      </div>
+
+      <div class="word-detail" *ngIf="expandedId === b.id">
+        <div class="detail-row" *ngIf="b.word.partOfSpeech">
+          <span class="detail-label">Loại từ:</span>
+          <span class="detail-val">{{ b.word.partOfSpeech }}</span>
+        </div>
+        <div class="detail-row" *ngIf="b.word.category">
+          <span class="detail-label">Chủ đề:</span>
+          <span class="detail-val">{{ b.word.category }}</span>
+        </div>
+        <div class="detail-row" *ngIf="b.word.exampleSentence">
+          <span class="detail-label">Ví dụ:</span>
+          <div>
+            <p class="ex-en">{{ b.word.exampleSentence }}</p>
+            <p class="ex-vi">{{ b.word.exampleTranslation }}</p>
+          </div>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Tiến độ:</span>
+          <span class="detail-val">✓ {{ b.correctCount }} &nbsp; ✗ {{ b.wrongCount }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

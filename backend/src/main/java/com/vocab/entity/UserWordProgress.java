@@ -46,6 +46,10 @@ public class UserWordProgress {
     @Column(name = "next_review")
     private LocalDate nextReview;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean bookmarked = false;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

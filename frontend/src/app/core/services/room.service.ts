@@ -10,8 +10,21 @@ export class RoomService {
 
   constructor(private http: HttpClient) {}
 
-  createRoom(questionCount: number): Observable<{ code: string }> {
-    return this.http.post<{ code: string }>(this.base, { questionCount });
+  createRoom(body: {
+    questionCount?: number;
+    quizMode?: string;
+    beginnerCount?: number;
+    intermediateCount?: number;
+    advancedCount?: number;
+    beginnerMode?: string;
+    intermediateMode?: string;
+    advancedMode?: string;
+  }): Observable<{ code: string }> {
+    return this.http.post<{ code: string }>(this.base, body);
+  }
+
+  submitTypedAnswer(code: string, typedWord: string): Observable<{ correct: boolean }> {
+    return this.http.post<{ correct: boolean }>(`${this.base}/${code}/answer/typed`, { typedWord });
   }
 
   joinRoom(code: string): Observable<void> {

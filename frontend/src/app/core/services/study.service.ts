@@ -41,4 +41,8 @@ export class StudyService {
   getReviewCount(): Observable<{ count: number }> {
     return this.http.get<{ count: number }>(`${this.base}/review/count`);
   }
+
+  getBookmarksSession(): Observable<Word[]> {
+    return this.http.get<Word[]>(`${this.base}/bookmarks`);
+  }
 }

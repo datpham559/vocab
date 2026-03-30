@@ -28,8 +28,18 @@ public class ActiveRoom {
     private final ConcurrentHashMap<Long, Integer> lastEarned = new ConcurrentHashMap<>();
     private volatile ScheduledFuture<?> timer;
     private final AtomicBoolean questionEnded = new AtomicBoolean(false);
+    private volatile int countdownLeft = 0;
     private final LocalDateTime createdAt = LocalDateTime.now();
     private int questionCount = 20;
+    private String quizMode = "CHOICE"; // CHOICE | TYPE | MIXED
+    private List<String> questionModes = new ArrayList<>(); // per-question: "CHOICE" or "TYPE"
+    private int beginnerCount = 0;
+    private int intermediateCount = 0;
+    private int advancedCount = 0;
+    // Per-difficulty question modes (CHOICE / TYPE / MIXED), used when global quizMode = MIXED
+    private String beginnerMode = "MIXED";
+    private String intermediateMode = "MIXED";
+    private String advancedMode = "MIXED";
 
     public ActiveRoom(String code, Long hostId) {
         this.code = code;

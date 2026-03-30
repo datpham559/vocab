@@ -1,0 +1,193 @@
+<div class="profile-page">
+
+  <div class="loading-state" *ngIf="loading()">
+    <div class="spinner"></div>
+    <p>Đang tải...</p>
+  </div>
+
+  <div class="error-state" *ngIf="errorMsg()">
+    <p>{{ errorMsg() }}</p>
+  </div>
+
+  <ng-container *ngIf="!loading() && !errorMsg() && profile() as p">
+
+    <!-- Header card -->
+    <div class="profile-header-card">
+      <div class="avatar">{{ getInitials() }}</div>
+      <div class="header-info">
+        <!-- Display name + edit -->
+        <div class="name-row" *ngIf="!editingName">
+          <h1 class="display-name">{{ p.displayName }}</h1>
+          <button class="btn-edit-name" (click)="startEditName()" title="Đổi tên hiển thị">✏️</button>
+        </div>
+        <div class="name-edit-row" *ngIf="editingName">
+          <input
+            class="name-input"
+            type="text"
+            [(ngModel)]="newDisplayName"
+            (keyup.enter)="saveName()"
+            (keyup.escape)="cancelEditName()"
+            placeholder="Tên hiển thị..."
+            [maxlength]="100"
+            autofocus
+          />
+          <button class="btn-save-name" (click)="saveName()" [disabled]="nameLoading() || !newDisplayName.trim()">
+            {{ nameLoading() ? '...' : '✓' }}
+          </button>
+          <button class="btn-cancel-name" (click)="cancelEditName()">✕</button>
+        </div>
+        <p class="name-error" *ngIf="nameError()">{{ nameError() }}</p>
+        <div class="success-toast" *ngIf="nameSuccess()">✅ Đã cập nhật tên hiển thị!</div>
+
+        <div class="meta-row">
+          <span class="meta-item">@{{ p.username }}</span>
+          <span class="meta-sep">·</span>
+          <span class="meta-item">{{ p.email }}</span>
+          <span class="meta-sep">·</span>
+          <span class="meta-item">Tham gia {{ formatDate(p.createdAt) }}</span>
+        </div>
+        <div class="role-row">
+          <span class="role-badge" [class.admin]="p.role === 'ROLE_ADMIN'">
+            {{ p.role === 'ROLE_ADMIN' ? '👑 Admin' : '👤 Thành viên' }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-value">{{ p.streak }}</div>
+        <div class="stat-label">Streak ngày</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📚</div>
+        <div class="stat-value">{{ p.totalWordsLearned }}</div>
+        <div class="stat-label">Từ đã học</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-value">{{ p.totalDaysStudied }}</div>
+        <div class="stat-label">Ngày học</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-value">{{ p.masteredCount }}</div>
+        <div class="stat-label">Đã thành thạo</div>
+      </div>
+    </div>
+
+    <!-- Word progress breakdown -->
+    <div class="progress-card" *ngIf="totalWords > 0">
+      <h2 class="section-title">Tiến độ từ vựng</h2>
+      <div class="total-words-count">{{ totalWords }} từ trong kho</div>
+
+      <div class="progress-rows">
+        <div class="progress-row">
+          <span class="prog-label new">Mới</span>
+          <div class="prog-bar-wrap">
+            <div class="prog-bar new" [style.width.%]="pct(p.newCount)"></div>
+          </div>
+          <span class="prog-count">{{ p.newCount }}</span>
+          <span class="prog-pct">{{ pct(p.newCount) }}%</span>
+        </div>
+        <div class="progress-row">
+          <span class="prog-label learning">Đang học</span>
+          <div class="prog-bar-wrap">
+            <div class="prog-bar learning" [style.width.%]="pct(p.learningCount)"></div>
+          </div>
+          <span class="prog-count">{{ p.learningCount }}</span>
+          <span class="prog-pct">{{ pct(p.learningCount) }}%</span>
+        </div>
+        <div class="progress-row">
+          <span class="prog-label review">Ôn tập</span>
+          <div class="prog-bar-wrap">
+            <div class="prog-bar review" [style.width.%]="pct(p.reviewCount)"></div>
+          </div>
+          <span class="prog-count">{{ p.reviewCount }}</span>
+          <span class="prog-pct">{{ pct(p.reviewCount) }}%</span>
+        </div>
+        <div class="progress-row">
+          <span class="prog-label mastered">Thành thạo</span>
+          <div class="prog-bar-wrap">
+            <div class="prog-bar mastered" [style.width.%]="pct(p.masteredCount)"></div>
+          </div>
+          <span class="prog-count">{{ p.masteredCount }}</span>
+          <span class="prog-pct">{{ pct(p.masteredCount) }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity history -->
+    <div class="activity-card">
+      <h2 class="section-title">Lịch sử hoạt động</h2>
+      <div class="activity-loading" *ngIf="logsLoading()">Đang tải...</div>
+      <div class="activity-empty" *ngIf="!logsLoading() && myLogs().length === 0">Chưa có hoạt động nào được ghi lại.</div>
+      <div class="activity-list" *ngIf="!logsLoading() && myLogs().length > 0">
+        <div class="activity-row" *ngFor="let log of myLogs()">
+          <span class="act-badge" [class]="'act-' + log.actionType.toLowerCase().replace('_', '-')">{{ actionLabel(log.actionType) }}</span>
+          <span class="act-desc">{{ log.description }}</span>
+          <span class="act-time">{{ formatDatetime(log.createdAt) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account settings -->
+    <div class="settings-card">
+      <h2 class="section-title">Tài khoản</h2>
+
+      <!-- Password success -->
+      <div class="success-toast full-width" *ngIf="pwdSuccess()">
+        🔒 Đổi mật khẩu thành công!
+      </div>
+
+      <button
+        class="btn-toggle-pwd"
+        (click)="showPasswordForm = !showPasswordForm">
+        🔐 {{ showPasswordForm ? 'Ẩn đổi mật khẩu' : 'Đổi mật khẩu' }}
+      </button>
+
+      <div class="password-form" *ngIf="showPasswordForm">
+        <div class="form-group">
+          <label>Mật khẩu hiện tại</label>
+          <input
+            class="form-input"
+            type="password"
+            [(ngModel)]="currentPassword"
+            placeholder="Nhập mật khẩu hiện tại..."
+          />
+        </div>
+        <div class="form-group">
+          <label>Mật khẩu mới</label>
+          <input
+            class="form-input"
+            type="password"
+            [(ngModel)]="newPassword"
+            placeholder="Ít nhất 6 ký tự..."
+          />
+        </div>
+        <div class="form-group">
+          <label>Xác nhận mật khẩu mới</label>
+          <input
+            class="form-input"
+            type="password"
+            [(ngModel)]="confirmPassword"
+            placeholder="Nhập lại mật khẩu mới..."
+          />
+        </div>
+        <p class="pwd-error" *ngIf="pwdError()">{{ pwdError() }}</p>
+        <div class="form-actions">
+          <button
+            class="btn-save-pwd"
+            (click)="savePassword()"
+            [disabled]="pwdLoading() || !currentPassword || !newPassword || !confirmPassword">
+            {{ pwdLoading() ? 'Đang lưu...' : 'Lưu mật khẩu' }}
+          </button>
+          <button class="btn-cancel-pwd" (click)="showPasswordForm = false">Hủy</button>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+</div>

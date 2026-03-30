@@ -23,6 +23,16 @@ public class RoomStateResponse {
     private Integer myLastEarned;
     private int answeredCount;
     private int questionCount;
+    private int countdownLeft;
+    private String quizMode;
+    private String currentQuestionMode; // "CHOICE" or "TYPE" for the current question
+    private String correctMeaning;      // populated only when currentQuestionMode == "TYPE"
+    private int beginnerCount;
+    private int intermediateCount;
+    private int advancedCount;
+    private String beginnerMode;
+    private String intermediateMode;
+    private String advancedMode;
 
     @Data
     @AllArgsConstructor

@@ -70,6 +70,21 @@ export const routes: Routes = [
     loadComponent: () => import('./features/room/room-game/room-game.component').then(m => m.RoomGameComponent)
   },
   {
+    path: 'leaderboard',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/leaderboard/leaderboard.component').then(m => m.LeaderboardComponent)
+  },
+  {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent)
+  },
+  {
+    path: 'favorites',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/favorites/favorites.component').then(m => m.FavoritesComponent)
+  },
+  {
     path: 'admin',
     canActivate: [authGuard, adminGuard],
     loadComponent: () => import('./features/admin/admin-panel.component').then(m => m.AdminPanelComponent)

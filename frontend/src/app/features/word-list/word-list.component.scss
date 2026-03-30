@@ -157,6 +157,19 @@
   }
 
   .expand-icon { color: var(--text-muted); font-size: 12px; }
+
+  .btn-bookmark {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--text-muted);
+    padding: 0 2px;
+    line-height: 1;
+    transition: color 0.15s, transform 0.15s;
+    &:hover { transform: scale(1.2); }
+    &.active { color: #f59e0b; }
+  }
 }
 
 .word-detail {

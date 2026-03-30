@@ -1,10 +1,11 @@
-import { Component, ElementRef, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { StudyService } from '../../../core/services/study.service';
 import { ProgressService } from '../../../core/services/progress.service';
 import { SpeechService } from '../../../core/services/speech.service';
+import { KeyboardShortcutService } from '../../../core/services/keyboard-shortcut.service';
 import { Word } from '../../../core/models/word.model';
 import { QuizQuestion } from '../../../core/models/quiz.model';
 
@@ -36,9 +37,11 @@ export class StudySessionComponent implements OnInit {
   phase = signal<Phase>('select');
   loading = signal(false);
 
-  // Category mode
+  // Category / mode
   activeCategory: string | null = null;
+  bookmarksMode = false;
   get activeCategoryLabel(): string {
+    if (this.bookmarksMode) return 'Từ yêu thích';
     return this.activeCategory ? (CATEGORY_LABELS[this.activeCategory] ?? this.activeCategory) : '';
   }
 
@@ -82,24 +85,65 @@ export class StudySessionComponent implements OnInit {
     private studyService: StudyService,
     private progressService: ProgressService,
     private route: ActivatedRoute,
-    readonly speech: SpeechService
+    readonly speech: SpeechService,
+    readonly kbd: KeyboardShortcutService
   ) {}
+
+  @HostListener('document:keydown', ['$event'])
+  onKey(e: KeyboardEvent): void {
+    // Don't trigger when typing in an input
+    const tag = (e.target as HTMLElement).tagName;
+    const inInput = tag === 'INPUT' || tag === 'TEXTAREA';
+
+    // --- Flashcard phase ---
+    if (this.phase() === 'flashcard' && this.currentWord) {
+      if (!this.flipped()) {
+        // Flip on Space / Enter
+        if ((e.key === ' ' || e.key === 'Enter') && !inInput) {
+          e.preventDefault();
+          this.flip();
+          this.speech.speak(this.currentWord.word);
+        }
+      } else {
+        // Answer buttons visible
+        if (e.key === 'ArrowLeft' || e.key === '1') { e.preventDefault(); this.answer(false); }
+        if (e.key === 'ArrowRight' || e.key === '2') { e.preventDefault(); this.answer(true); }
+        if ((e.key === ' ' || e.key === 'Enter') && !inInput) { e.preventDefault(); this.flip(); }
+      }
+    }
+
+    // --- Quiz phase ---
+    if (this.phase() === 'quiz' && this.currentQuestion) {
+      // Enter when answered → next question
+      if (this.answered() && (e.key === 'Enter' || e.key === ' ') && !inInput) {
+        e.preventDefault();
+        this.nextQuestion();
+      }
+    }
+  }
 
   ngOnInit(): void {
     this.activeCategory = this.route.snapshot.queryParamMap.get('category');
+    this.bookmarksMode = this.route.snapshot.queryParamMap.get('mode') === 'bookmarks';
+    if (this.bookmarksMode) {
+      this.start();
+    }
   }
 
   // --- Select phase ---
   start(): void {
     this.loading.set(true);
-    this.studyService.getSession(this.selectedCount, this.activeCategory ?? undefined).subscribe({
+    const req = this.bookmarksMode
+      ? this.studyService.getBookmarksSession()
+      : this.studyService.getSession(this.selectedCount, this.activeCategory ?? undefined);
+    req.subscribe({
       next: words => {
         this.words.set(words);
         this.cardIndex.set(0);
         this.flipped.set(false);
         this.flashResults = [];
         this.loading.set(false);
-        this.phase.set('flashcard');
+        this.phase.set(words.length > 0 ? 'flashcard' : 'select');
       },
       error: () => this.loading.set(false)
     });

@@ -43,6 +43,7 @@ export class ReviewSessionComponent implements OnInit {
   typedAnswer = '';
   typeResult = signal<TypeResult>(null);
   hintsRevealed = signal(0);
+  private answeredAt = 0;
   @ViewChild('typeInput') typeInput?: ElementRef<HTMLInputElement>;
 
   get wordHintBoxes(): { char: string; blank: boolean }[] {
@@ -80,7 +81,8 @@ export class ReviewSessionComponent implements OnInit {
       }
     } else {
       // reverse/typing mode
-      if ((e.key === 'Enter' || e.key === ' ') && this.answered() && !isTyping) {
+      if ((e.key === 'Enter' || e.key === ' ') && this.answered() && !isTyping
+          && Date.now() - this.answeredAt > 400) {
         e.preventDefault(); this.next();
       } else if (e.key === 'Escape' && this.reviewMode === 'advanced' && !this.answered()) {
         e.preventDefault(); this.giveUp();
@@ -145,6 +147,7 @@ export class ReviewSessionComponent implements OnInit {
     if (correct) {
       this.typeResult.set('correct');
       this.answered.set(true);
+      this.answeredAt = Date.now();
       this.score.set(this.score() + 1);
       this.results.push({ question: q, selectedIndex: -1, correct: true });
       this.progressService.updateProgress(q.wordId, true).subscribe();
@@ -153,18 +156,22 @@ export class ReviewSessionComponent implements OnInit {
       const newHints = Math.min(this.hintsRevealed() + 1, q.word.length);
       this.hintsRevealed.set(newHints);
       this.typeResult.set('wrong');
-      this.typedAnswer = '';
       if (newHints >= q.word.length) {
         // All letters revealed → finalize as wrong
         this.answered.set(true);
+        this.answeredAt = Date.now();
         this.results.push({ question: q, selectedIndex: -1, correct: false });
         this.progressService.updateProgress(q.wordId, false).subscribe();
       } else {
-        setTimeout(() => this.typeInput?.nativeElement.focus(), 50);
+        setTimeout(() => {
+          this.typeInput?.nativeElement.focus();
+          this.typeInput?.nativeElement.select();
+        }, 30);
       }
     } else {
       this.typeResult.set('wrong');
       this.answered.set(true);
+      this.answeredAt = Date.now();
       this.results.push({ question: q, selectedIndex: -1, correct: false });
       this.progressService.updateProgress(q.wordId, false).subscribe();
     }
@@ -176,6 +183,7 @@ export class ReviewSessionComponent implements OnInit {
     this.hintsRevealed.set(q.word.length);
     this.typeResult.set('wrong');
     this.answered.set(true);
+    this.answeredAt = Date.now();
     this.results.push({ question: q, selectedIndex: -1, correct: false });
     this.progressService.updateProgress(q.wordId, false).subscribe();
   }

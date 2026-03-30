@@ -3,15 +3,19 @@
   <!-- PHASE: SELECT -->
   <ng-container *ngIf="phase() === 'select'">
     <div class="select-card">
-      <div class="category-badge" *ngIf="activeCategory">
+      <div class="category-badge" *ngIf="bookmarksMode">
+        <span class="cat-label">⭐ <strong>Từ yêu thích</strong></span>
+        <a routerLink="/favorites" class="cat-change">Xem danh sách</a>
+      </div>
+      <div class="category-badge" *ngIf="activeCategory && !bookmarksMode">
         <span class="cat-label">Chủ đề: <strong>{{ activeCategoryLabel }}</strong></span>
         <a routerLink="/topics" class="cat-change">Đổi chủ đề</a>
       </div>
 
-      <h2>{{ activeCategory ? 'Học chủ đề ' + activeCategoryLabel : 'Học từ vựng' }}</h2>
-      <p class="subtitle">Chọn số lượng từ muốn học trong phiên này</p>
+      <h2>{{ bookmarksMode ? 'Học từ yêu thích' : (activeCategory ? 'Học chủ đề ' + activeCategoryLabel : 'Học từ vựng') }}</h2>
+      <p class="subtitle" *ngIf="!bookmarksMode">Chọn số lượng từ muốn học trong phiên này</p>
 
-      <div class="count-options">
+      <div class="count-options" *ngIf="!bookmarksMode">
         <button
           *ngFor="let n of countOptions"
           class="count-btn"
@@ -26,7 +30,8 @@
         <span *ngIf="loading()">Đang tải...</span>
       </button>
 
-      <a routerLink="/topics" class="review-link" *ngIf="!activeCategory">Học theo chủ đề →</a>
+      <a routerLink="/topics" class="review-link" *ngIf="!activeCategory && !bookmarksMode">Học theo chủ đề →</a>
+      <a routerLink="/favorites" class="review-link" *ngIf="!bookmarksMode">⭐ Học từ yêu thích →</a>
       <a routerLink="/review" class="review-link">Ôn tập từ đã học →</a>
     </div>
   </ng-container>
@@ -58,9 +63,19 @@
       </div>
     </div>
 
-    <div class="answer-btns">
+    <div class="answer-btns" *ngIf="flipped()">
       <button class="btn-wrong" (click)="answer(false)">✗ Chưa nhớ</button>
       <button class="btn-correct" (click)="answer(true)">✓ Đã nhớ</button>
+    </div>
+
+    <div class="kbd-hints" *ngIf="kbd.hintsEnabled()">
+      <ng-container *ngIf="!flipped()">
+        <span class="kbd-hint"><kbd>Space</kbd> lật thẻ</span>
+      </ng-container>
+      <ng-container *ngIf="flipped()">
+        <span class="kbd-hint"><kbd>←</kbd> / <kbd>1</kbd> Chưa nhớ</span>
+        <span class="kbd-hint"><kbd>→</kbd> / <kbd>2</kbd> Đã nhớ</span>
+      </ng-container>
     </div>
   </ng-container>
 
@@ -120,6 +135,15 @@
       <button class="btn-next" *ngIf="answered()" (click)="nextQuestion()">
         {{ quizIndex() + 1 < questions().length ? 'Câu tiếp theo →' : 'Xem kết quả' }}
       </button>
+
+      <div class="kbd-hints" *ngIf="kbd.hintsEnabled()">
+        <ng-container *ngIf="!answered()">
+          <span class="kbd-hint"><kbd>Enter</kbd> kiểm tra</span>
+        </ng-container>
+        <ng-container *ngIf="answered()">
+          <span class="kbd-hint"><kbd>Enter</kbd> câu tiếp theo</span>
+        </ng-container>
+      </div>
     </div>
   </ng-container>
 

@@ -1,5 +1,6 @@
 package com.vocab.service;
 
+import com.vocab.dto.request.CreateRoomRequest;
 import com.vocab.dto.response.QuizQuestionResponse;
 import com.vocab.dto.response.RoomStateResponse;
 import com.vocab.entity.Word;
@@ -28,14 +29,57 @@ public class RoomService {
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(5);
 
-    public ActiveRoom createRoom(Long userId, String userName, int questionCount) {
+    public ActiveRoom createRoom(Long userId, String userName, CreateRoomRequest req) {
         String code = generateCode();
         ActiveRoom room = new ActiveRoom(code, userId);
         room.getParticipants().put(userId, userName);
         room.getScores().put(userId, 0);
-        room.setQuestionCount(Math.max(10, Math.min(30, questionCount)));
+        String mode = (req.getQuizMode() != null && List.of("CHOICE","TYPE","MIXED").contains(req.getQuizMode()))
+            ? req.getQuizMode() : "CHOICE";
+        room.setQuizMode(mode);
+        if (req.getBeginnerCount() != null || req.getIntermediateCount() != null || req.getAdvancedCount() != null) {
+            int b = clamp(req.getBeginnerCount(), 0, 20);
+            int i = clamp(req.getIntermediateCount(), 0, 20);
+            int a = clamp(req.getAdvancedCount(), 0, 20);
+            int total = Math.min(b + i + a, 50);
+            room.setQuestionCount(Math.max(1, total));
+            room.setBeginnerCount(b);
+            room.setIntermediateCount(i);
+            room.setAdvancedCount(a);
+            // Per-difficulty question modes (only meaningful when quizMode=MIXED)
+            room.setBeginnerMode(resolveMode(req.getBeginnerMode()));
+            room.setIntermediateMode(resolveMode(req.getIntermediateMode()));
+            room.setAdvancedMode(resolveMode(req.getAdvancedMode()));
+        } else {
+            room.setQuestionCount(Math.max(10, Math.min(30, req.getQuestionCount())));
+        }
         roomStore.put(code, room);
         return room;
+    }
+
+    private int clamp(Integer val, int min, int max) {
+        if (val == null) return 0;
+        return Math.max(min, Math.min(max, val));
+    }
+
+    private String resolveMode(String mode) {
+        return (mode != null && List.of("CHOICE", "TYPE", "MIXED").contains(mode)) ? mode : "MIXED";
+    }
+
+    /** Determines the final question mode (CHOICE or TYPE) for a single question. */
+    private String resolveQuestionMode(ActiveRoom room, String difficulty, Random rng) {
+        if (!"MIXED".equals(room.getQuizMode())) {
+            return room.getQuizMode(); // CHOICE or TYPE — uniform for all questions
+        }
+        // Global mode is MIXED — check per-difficulty override
+        String diffMode;
+        if ("BEGINNER".equalsIgnoreCase(difficulty)) diffMode = room.getBeginnerMode();
+        else if ("ADVANCED".equalsIgnoreCase(difficulty)) diffMode = room.getAdvancedMode();
+        else diffMode = room.getIntermediateMode();
+
+        if ("CHOICE".equals(diffMode)) return "CHOICE";
+        if ("TYPE".equals(diffMode)) return "TYPE";
+        return rng.nextBoolean() ? "CHOICE" : "TYPE"; // MIXED = random
     }
 
     public void joinRoom(String code, Long userId, String userName) {
@@ -55,9 +99,32 @@ public class RoomService {
         if (room.getStatus() != RoomStatus.WAITING) {
             throw new IllegalStateException("Game already started");
         }
-        List<QuizQuestionResponse> questions = loadQuestions(room.getQuestionCount());
+        List<QuizQuestionResponse> questions = loadQuestions(room);
         room.setQuestions(questions);
-        startQuestion(room, 0);
+        // Assign per-question modes
+        Random rng = new Random();
+        List<String> modes = new ArrayList<>();
+        for (QuizQuestionResponse q : questions) {
+            String effectiveMode = resolveQuestionMode(room, q.getDifficulty(), rng);
+            modes.add(effectiveMode);
+        }
+        room.setQuestionModes(modes);
+        // Start 3-second countdown before first question
+        room.setStatus(RoomStatus.COUNTDOWN);
+        room.setCountdownLeft(3);
+        scheduleCountdown(room);
+    }
+
+    private void scheduleCountdown(ActiveRoom room) {
+        scheduler.schedule(() -> {
+            int remaining = room.getCountdownLeft() - 1;
+            room.setCountdownLeft(remaining);
+            if (remaining <= 0) {
+                startQuestion(room, 0);
+            } else {
+                scheduleCountdown(room);
+            }
+        }, 1, TimeUnit.SECONDS);
     }
 
     private void startQuestion(ActiveRoom room, int index) {
@@ -91,6 +158,28 @@ public class RoomService {
             if (t != null) t.cancel(false);
             onQuestionEnd(room);
         }
+    }
+
+    /** Typing-mode answer submission. Returns true if correct (so frontend can show feedback). */
+    public boolean submitTypedAnswer(String code, Long userId, String typedWord) {
+        ActiveRoom room = getRoom(code);
+        if (room.getStatus() != RoomStatus.ACTIVE) return false;
+        if (!room.getParticipants().containsKey(userId)) return false;
+        if (room.getCurrentAnswers().containsKey(userId)) return false; // already answered correctly
+
+        QuizQuestionResponse q = room.getQuestions().get(room.getCurrentQuestionIndex());
+        boolean correct = typedWord != null && typedWord.trim().equalsIgnoreCase(q.getWord());
+
+        int answerToRecord = correct ? q.getCorrectIndex() : -1;
+        if (room.getCurrentAnswers().putIfAbsent(userId, answerToRecord) == null) {
+            room.getAnswerTimestamps().put(userId, System.currentTimeMillis());
+        }
+        if (room.getCurrentAnswers().size() >= room.getParticipants().size()) {
+            ScheduledFuture<?> t = room.getTimer();
+            if (t != null) t.cancel(false);
+            onQuestionEnd(room);
+        }
+        return correct;
     }
 
     private void onQuestionEnd(ActiveRoom room) {
@@ -141,12 +230,33 @@ public class RoomService {
         Integer correctIndex = null;
         Integer myAnswer = room.getCurrentAnswers().get(userId);
         Integer myLastEarned = room.getLastEarned().get(userId);
+        String currentQuestionMode = "CHOICE";
+        String correctMeaning = null;
 
         if (room.getStatus() == RoomStatus.ACTIVE || room.getStatus() == RoomStatus.SHOWING_RESULT) {
             if (!room.getQuestions().isEmpty() && room.getCurrentQuestionIndex() < room.getQuestions().size()) {
-                currentQ = room.getQuestions().get(room.getCurrentQuestionIndex());
+                QuizQuestionResponse raw = room.getQuestions().get(room.getCurrentQuestionIndex());
+                if (!room.getQuestionModes().isEmpty() && room.getCurrentQuestionIndex() < room.getQuestionModes().size()) {
+                    currentQuestionMode = room.getQuestionModes().get(room.getCurrentQuestionIndex());
+                }
+                if ("TYPE".equals(currentQuestionMode)) {
+                    correctMeaning = raw.getOptions().get(raw.getCorrectIndex());
+                }
                 if (room.getStatus() == RoomStatus.SHOWING_RESULT) {
-                    correctIndex = currentQ.getCorrectIndex();
+                    correctIndex = raw.getCorrectIndex();
+                    currentQ = raw; // reveal full question on result
+                } else {
+                    // ACTIVE: sanitize — never expose correctIndex or the answer word
+                    boolean isType = "TYPE".equals(currentQuestionMode);
+                    currentQ = QuizQuestionResponse.builder()
+                        .wordId(raw.getWordId())
+                        .word(isType ? maskWord(raw.getWord()) : raw.getWord())
+                        .pronunciation(isType ? null : raw.getPronunciation())
+                        .options(isType ? null : raw.getOptions())
+                        .correctIndex(-1)
+                        .partOfSpeech(raw.getPartOfSpeech())
+                        .difficulty(raw.getDifficulty())
+                        .build();
                 }
             }
         }
@@ -165,7 +275,28 @@ public class RoomService {
             .myLastEarned(myLastEarned)
             .answeredCount(room.getCurrentAnswers().size())
             .questionCount(room.getQuestionCount())
+            .countdownLeft(room.getCountdownLeft())
+            .quizMode(room.getQuizMode())
+            .currentQuestionMode(currentQuestionMode)
+            .correctMeaning(correctMeaning)
+            .beginnerCount(room.getBeginnerCount())
+            .intermediateCount(room.getIntermediateCount())
+            .advancedCount(room.getAdvancedCount())
+            .beginnerMode(room.getBeginnerMode())
+            .intermediateMode(room.getIntermediateMode())
+            .advancedMode(room.getAdvancedMode())
             .build();
+    }
+
+    /** Masks a word for TYPE mode during ACTIVE: keeps first letter, spaces, hyphens; replaces rest with '_'. */
+    private String maskWord(String word) {
+        if (word == null || word.isEmpty()) return word;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < word.length(); i++) {
+            char c = word.charAt(i);
+            sb.append((i == 0 || c == ' ' || c == '-') ? c : '_');
+        }
+        return sb.toString();
     }
 
     private ActiveRoom getRoom(String code) {
@@ -173,15 +304,22 @@ public class RoomService {
             .orElseThrow(() -> new ResourceNotFoundException("Room not found: " + code));
     }
 
-    private List<QuizQuestionResponse> loadQuestions(int count) {
-        int bCount = (int) Math.round(count * 0.4);
-        int aCount = (int) Math.round(count * 0.2);
-        int iCount = count - bCount - aCount;
-
+    private List<QuizQuestionResponse> loadQuestions(ActiveRoom room) {
+        int bCount, iCount, aCount;
+        if (room.getBeginnerCount() + room.getIntermediateCount() + room.getAdvancedCount() > 0) {
+            bCount = room.getBeginnerCount();
+            iCount = room.getIntermediateCount();
+            aCount = room.getAdvancedCount();
+        } else {
+            int count = room.getQuestionCount();
+            bCount = (int) Math.round(count * 0.4);
+            aCount = (int) Math.round(count * 0.2);
+            iCount = count - bCount - aCount;
+        }
         List<Word> all = new ArrayList<>();
-        all.addAll(wordRepository.findRandomByDifficulty("BEGINNER", bCount));
-        all.addAll(wordRepository.findRandomByDifficulty("INTERMEDIATE", iCount));
-        all.addAll(wordRepository.findRandomByDifficulty("ADVANCED", aCount));
+        if (bCount > 0) all.addAll(wordRepository.findRandomByDifficulty("BEGINNER", bCount));
+        if (iCount > 0) all.addAll(wordRepository.findRandomByDifficulty("INTERMEDIATE", iCount));
+        if (aCount > 0) all.addAll(wordRepository.findRandomByDifficulty("ADVANCED", aCount));
         Collections.shuffle(all);
         return quizService.generateQuizForWords(all);
     }

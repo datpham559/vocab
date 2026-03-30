@@ -6,8 +6,8 @@
 |---|---|---|---|---|
 | A1 | Bookmark từ yêu thích | Đánh dấu từ khó để ôn riêng, có trang `/favorites` | Thấp | |
 | A2 | Dark mode | CSS variables đã có sẵn, toggle trên navbar | Thấp | 2026-03-27 |
-| A3 | Trang cá nhân `/profile` | Đổi tên hiển thị, xem lịch sử phiên học, thống kê cá nhân | Thấp | |
-| A4 | Bảng xếp hạng | Rank theo streak hoặc số từ đã học — data đã có sẵn | Thấp | |
+| A3 | Trang cá nhân `/profile` | Đổi tên hiển thị, xem lịch sử phiên học, thống kê cá nhân | Thấp | 2026-03-27 |
+| A4 | Bảng xếp hạng | Rank theo streak hoặc số từ đã học — data đã có sẵn | Thấp | 2026-03-27 |
 
 ## Nhóm B — Nâng cao trải nghiệm học
 

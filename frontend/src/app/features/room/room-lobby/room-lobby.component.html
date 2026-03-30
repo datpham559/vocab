@@ -11,19 +11,118 @@
 
     <!-- CREATE -->
     <div class="tab-content" *ngIf="tab === 'create'">
+
+      <!-- Standard / Custom toggle -->
+      <div class="config-toggle">
+        <button class="config-tab" [class.active]="configMode === 'standard'" (click)="configMode = 'standard'">
+          Chuẩn
+        </button>
+        <button class="config-tab" [class.active]="configMode === 'custom'" (click)="configMode = 'custom'">
+          Tùy chỉnh
+        </button>
+      </div>
+
+      <!-- STANDARD -->
+      <ng-container *ngIf="configMode === 'standard'">
+        <div class="field-group">
+          <label class="field-label">Số câu hỏi</label>
+          <div class="count-options">
+            <button *ngFor="let n of countOptions" class="count-btn"
+              [class.active]="questionCount === n" (click)="questionCount = n">
+              {{ n }} câu
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- CUSTOM -->
+      <ng-container *ngIf="configMode === 'custom'">
+        <div class="diff-config">
+          <!-- Beginner row -->
+          <div class="diff-row" [class.diff-row--disabled]="beginnerCount === 0 && quizMode === 'MIXED'">
+            <div class="diff-info">
+              <span class="diff-dot diff-dot--beginner"></span>
+              <div>
+                <div class="diff-name">Cơ bản</div>
+                <div class="diff-mode-btns" *ngIf="quizMode === 'MIXED' && beginnerCount > 0">
+                  <button class="diff-mode-btn" [class.active]="beginnerMode === 'CHOICE'" (click)="beginnerMode = 'CHOICE'" title="Chọn từ">🔤</button>
+                  <button class="diff-mode-btn" [class.active]="beginnerMode === 'TYPE'" (click)="beginnerMode = 'TYPE'" title="Ghi từ">✍️</button>
+                  <button class="diff-mode-btn" [class.active]="beginnerMode === 'MIXED'" (click)="beginnerMode = 'MIXED'" title="Ngẫu nhiên">⚡</button>
+                </div>
+              </div>
+            </div>
+            <div class="diff-stepper">
+              <button class="step-btn" (click)="adjustCount('beginner', -1)" [disabled]="beginnerCount === 0">−</button>
+              <span class="step-val">{{ beginnerCount }}</span>
+              <button class="step-btn" (click)="adjustCount('beginner', 1)" [disabled]="beginnerCount === MAX_PER_DIFF">+</button>
+            </div>
+          </div>
+
+          <!-- Intermediate row -->
+          <div class="diff-row">
+            <div class="diff-info">
+              <span class="diff-dot diff-dot--intermediate"></span>
+              <div>
+                <div class="diff-name">Trung bình</div>
+                <div class="diff-mode-btns" *ngIf="quizMode === 'MIXED' && intermediateCount > 0">
+                  <button class="diff-mode-btn" [class.active]="intermediateMode === 'CHOICE'" (click)="intermediateMode = 'CHOICE'" title="Chọn từ">🔤</button>
+                  <button class="diff-mode-btn" [class.active]="intermediateMode === 'TYPE'" (click)="intermediateMode = 'TYPE'" title="Ghi từ">✍️</button>
+                  <button class="diff-mode-btn" [class.active]="intermediateMode === 'MIXED'" (click)="intermediateMode = 'MIXED'" title="Ngẫu nhiên">⚡</button>
+                </div>
+              </div>
+            </div>
+            <div class="diff-stepper">
+              <button class="step-btn" (click)="adjustCount('intermediate', -1)" [disabled]="intermediateCount === 0">−</button>
+              <span class="step-val">{{ intermediateCount }}</span>
+              <button class="step-btn" (click)="adjustCount('intermediate', 1)" [disabled]="intermediateCount === MAX_PER_DIFF">+</button>
+            </div>
+          </div>
+
+          <!-- Advanced row -->
+          <div class="diff-row">
+            <div class="diff-info">
+              <span class="diff-dot diff-dot--advanced"></span>
+              <div>
+                <div class="diff-name">Nâng cao</div>
+                <div class="diff-mode-btns" *ngIf="quizMode === 'MIXED' && advancedCount > 0">
+                  <button class="diff-mode-btn" [class.active]="advancedMode === 'CHOICE'" (click)="advancedMode = 'CHOICE'" title="Chọn từ">🔤</button>
+                  <button class="diff-mode-btn" [class.active]="advancedMode === 'TYPE'" (click)="advancedMode = 'TYPE'" title="Ghi từ">✍️</button>
+                  <button class="diff-mode-btn" [class.active]="advancedMode === 'MIXED'" (click)="advancedMode = 'MIXED'" title="Ngẫu nhiên">⚡</button>
+                </div>
+              </div>
+            </div>
+            <div class="diff-stepper">
+              <button class="step-btn" (click)="adjustCount('advanced', -1)" [disabled]="advancedCount === 0">−</button>
+              <span class="step-val">{{ advancedCount }}</span>
+              <button class="step-btn" (click)="adjustCount('advanced', 1)" [disabled]="advancedCount === MAX_PER_DIFF">+</button>
+            </div>
+          </div>
+
+          <div class="diff-total" [class.diff-total--warn]="totalCustomCount === 0">
+            Tổng: <strong>{{ totalCustomCount }} câu</strong>
+            <span *ngIf="totalCustomCount === 0" class="diff-warn-msg">Chọn ít nhất 1 câu</span>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Quiz mode (shared) -->
       <div class="field-group">
-        <label class="field-label">Số câu hỏi</label>
+        <label class="field-label">Chế độ câu hỏi</label>
         <div class="count-options">
-          <button
-            *ngFor="let n of countOptions"
-            class="count-btn"
-            [class.active]="questionCount === n"
-            (click)="questionCount = n">
-            {{ n }} câu
+          <button class="count-btn" [class.active]="quizMode === 'CHOICE'" (click)="quizMode = 'CHOICE'">
+            🔤 Chọn từ
+          </button>
+          <button class="count-btn" [class.active]="quizMode === 'TYPE'" (click)="quizMode = 'TYPE'">
+            ✍️ Ghi từ
+          </button>
+          <button class="count-btn" [class.active]="quizMode === 'MIXED'" (click)="quizMode = 'MIXED'">
+            ⚡ Hỗn hợp
           </button>
         </div>
       </div>
-      <button class="btn-start" (click)="createRoom()" [disabled]="loading()">
+
+      <button class="btn-start" (click)="createRoom()"
+        [disabled]="loading() || (configMode === 'custom' && !isCustomValid)">
         {{ loading() ? 'Đang tạo...' : '+ Tạo phòng mới' }}
       </button>
     </div>

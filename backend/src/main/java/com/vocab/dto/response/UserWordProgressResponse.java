@@ -18,6 +18,7 @@ public class UserWordProgressResponse {
     private Integer wrongCount;
     private LocalDateTime lastReviewed;
     private LocalDate nextReview;
+    private Boolean bookmarked;
 
     public static UserWordProgressResponse from(UserWordProgress p) {
         return UserWordProgressResponse.builder()
@@ -29,6 +30,7 @@ public class UserWordProgressResponse {
             .wrongCount(p.getWrongCount())
             .lastReviewed(p.getLastReviewed())
             .nextReview(p.getNextReview())
+            .bookmarked(p.getBookmarked() != null && p.getBookmarked())
             .build();
     }
 }

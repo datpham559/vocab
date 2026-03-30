@@ -1,11 +1,54 @@
 <div class="container page-content">
 
-  <div class="loading-overlay" *ngIf="loading()">
+  <!-- Loading -->
+  <div class="loading-overlay" *ngIf="loading() && phase() === 'intro'">
     <div class="spinner"></div>
   </div>
 
-  <!-- Quiz Done -->
-  <div class="result-screen" *ngIf="done() && !loading()">
+  <!-- INTRO: Mode Selection -->
+  <div class="intro-card card" *ngIf="phase() === 'intro' && !loading()">
+    <div class="intro-icon">🧠</div>
+    <h2>Phòng Quiz hôm nay</h2>
+    <p class="intro-sub">{{ questions().length }} câu hỏi · Chọn chế độ làm bài</p>
+
+    <div class="mode-list">
+      <button class="mode-btn" (click)="startQuiz('choice')">
+        <span class="mode-icon">🔤</span>
+        <div class="mode-info">
+          <div class="mode-name">Chọn đáp án</div>
+          <div class="mode-desc">Chọn nghĩa tiếng Việt đúng cho từ tiếng Anh</div>
+        </div>
+        <span class="mode-arrow">→</span>
+      </button>
+
+      <button class="mode-btn" (click)="startQuiz('type')">
+        <span class="mode-icon">✍️</span>
+        <div class="mode-info">
+          <div class="mode-name">Ghi từ</div>
+          <div class="mode-desc">Đọc nghĩa tiếng Việt, gõ từ tiếng Anh tương ứng</div>
+        </div>
+        <span class="mode-arrow">→</span>
+      </button>
+
+      <button class="mode-btn mode-btn--mixed" (click)="startQuiz('mixed')">
+        <span class="mode-icon">⚡</span>
+        <div class="mode-info">
+          <div class="mode-name">Hỗn hợp</div>
+          <div class="mode-desc">Kết hợp cả hai dạng câu hỏi ngẫu nhiên</div>
+        </div>
+        <span class="mode-arrow">→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading after mode picked -->
+  <div class="loading-overlay" *ngIf="loading() && phase() === 'quiz'">
+    <div class="spinner"></div>
+    <p style="margin-top:1rem;color:var(--text-secondary)">Đang tải câu hỏi...</p>
+  </div>
+
+  <!-- DONE -->
+  <div class="result-screen" *ngIf="phase() === 'done'">
     <div class="result-emoji">
       {{ scorePercent >= 80 ? '🏆' : scorePercent >= 60 ? '👍' : '📚' }}
     </div>
@@ -27,16 +70,21 @@
     </div>
 
     <div class="done-actions">
-      <a routerLink="/dashboard" class="btn btn-primary btn-lg">Về trang chủ</a>
-      <a routerLink="/flashcard" class="btn btn-secondary btn-lg">Học lại</a>
+      <button class="btn btn-primary btn-lg" (click)="phase.set('intro')">Chơi lại</button>
+      <a routerLink="/dashboard" class="btn btn-secondary btn-lg">Về trang chủ</a>
     </div>
   </div>
 
-  <!-- Quiz Session -->
-  <ng-container *ngIf="!done() && !loading() && currentQuestion as q">
+  <!-- QUIZ SESSION -->
+  <ng-container *ngIf="phase() === 'quiz' && !loading() && currentQuestion as q">
     <div class="quiz-header">
-      <a routerLink="/dashboard" class="back-btn">← Quay lại</a>
-      <span class="quiz-progress">{{ currentIndex() + 1 }}/{{ questions().length }}</span>
+      <button class="back-btn" (click)="phase.set('intro')">← Quay lại</button>
+      <div class="quiz-meta">
+        <span class="mode-badge" [class.mode-badge--type]="currentMode === 'type'">
+          {{ currentMode === 'choice' ? '🔤 Chọn' : '✍️ Ghi' }}
+        </span>
+        <span class="quiz-progress">{{ currentIndex() + 1 }}/{{ questions().length }}</span>
+      </div>
     </div>
 
     <div class="quiz-progress-bar">
@@ -44,34 +92,117 @@
         [style.width.%]="((currentIndex()) / questions().length) * 100"></div>
     </div>
 
-    <div class="question-card card">
-      <div class="question-word">{{ q.word }}</div>
-      <div class="question-pron" *ngIf="q.pronunciation">{{ q.pronunciation }}</div>
-      <p class="question-prompt">Nghĩa tiếng Việt là gì?</p>
+    <!-- CHOICE MODE -->
+    <ng-container *ngIf="currentMode === 'choice'">
+      <div class="question-card card">
+        <div class="question-word protected-word" [attr.aria-label]="q.word">
+          <span *ngFor="let ch of wordLetters" class="pw-char">{{ ch }}</span>
+        </div>
+        <div class="question-pron protected-word" *ngIf="q.pronunciation" [attr.aria-label]="q.pronunciation">
+          <span *ngFor="let ch of (q.pronunciation.split(''))" class="pw-char">{{ ch }}</span>
+        </div>
+        <p class="question-prompt">Nghĩa tiếng Việt là gì?</p>
 
-      <div class="options-list">
-        <button
-          *ngFor="let opt of q.options; let i = index"
-          class="option-btn"
-          [class]="getOptionClass(i)"
-          (click)="selectOption(i)"
-          [disabled]="answered()">
-          <span class="option-letter">{{ 'ABCD'[i] }}</span>
-          <span class="option-text">{{ opt }}</span>
+        <div class="options-list">
+          <button
+            *ngFor="let opt of q.options; let i = index"
+            class="option-btn"
+            [class]="getOptionClass(i)"
+            (click)="selectOption(i)"
+            [disabled]="answered()">
+            <span class="option-letter">{{ 'ABCD'[i] }}</span>
+            <span class="option-text">{{ opt }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="next-wrap" *ngIf="answered()">
+        <button class="btn btn-primary btn-lg" (click)="next()">
+          {{ currentIndex() + 1 < questions().length ? 'Câu tiếp theo →' : 'Xem kết quả →' }}
         </button>
       </div>
-    </div>
 
-    <div class="next-wrap" *ngIf="answered()">
-      <button class="btn btn-primary btn-lg" (click)="next()">
-        {{ currentIndex() + 1 < questions().length ? 'Câu tiếp theo →' : 'Xem kết quả →' }}
-      </button>
-    </div>
+      <div class="kbd-hints" *ngIf="kbdService.hintsEnabled()">
+        <span class="kbd-hint" *ngIf="!answered()"><kbd>1</kbd>–<kbd>4</kbd> Chọn đáp án</span>
+        <span class="kbd-hint" *ngIf="answered()"><kbd>Enter</kbd> Tiếp theo</span>
+      </div>
+    </ng-container>
 
-    <div class="kbd-hints" *ngIf="kbdService.hintsEnabled()">
-      <span class="kbd-hint" *ngIf="!answered()"><kbd>1</kbd>–<kbd>4</kbd> Chọn đáp án</span>
-      <span class="kbd-hint" *ngIf="answered()"><kbd>Enter</kbd> Tiếp theo</span>
-    </div>
+    <!-- TYPING MODE -->
+    <ng-container *ngIf="currentMode === 'type'">
+      <div class="question-card card">
+        <div class="question-meaning">{{ q.options[q.correctIndex] }}</div>
+        <div class="question-pron" *ngIf="q.pronunciation && answered()">{{ q.pronunciation }}</div>
+        <p class="question-prompt">Từ tiếng Anh tương ứng là gì?</p>
+
+        <!-- Word hint boxes (first letter + blanks) -->
+        <div class="word-hint-boxes" *ngIf="!answered()">
+          <ng-container *ngFor="let box of wordHintBoxes">
+            <span *ngIf="box.char === ' '" class="hint-space"></span>
+            <span *ngIf="box.char !== ' '" class="hint-box" [class.hint-first]="!box.blank">
+              {{ !box.blank ? box.char : '' }}
+            </span>
+          </ng-container>
+        </div>
+
+        <!-- Hint reveal row (shows after wrong attempts) -->
+        <div class="hint-row" *ngIf="hintsRevealed() > 0 && !answered()">
+          <span class="hint-label">Gợi ý:</span>
+          <div class="hint-boxes">
+            <span *ngFor="let h of hintDisplay" class="hint-char" [class.hint-revealed]="h.revealed">
+              {{ h.char }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Retry feedback -->
+        <p class="retry-feedback" *ngIf="typeResult() === 'wrong' && !answered()">
+          Chưa đúng — thêm một gợi ý đã được mở!
+        </p>
+
+        <!-- Type input -->
+        <div class="type-area" *ngIf="!answered()">
+          <input
+            #typeInput
+            class="type-input"
+            [class.type-wrong]="typeResult() === 'wrong'"
+            [(ngModel)]="typedAnswer"
+            (ngModelChange)="onTypedAnswerChange()"
+            (keydown.enter)="submitTyped()"
+            placeholder="Gõ từ tiếng Anh..."
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false" />
+          <button class="btn-submit-type" (click)="submitTyped()" [disabled]="!typedAnswer.trim()">
+            Kiểm tra
+          </button>
+        </div>
+
+        <button class="btn-give-up" *ngIf="!answered()" (click)="giveUp()">
+          Bỏ qua (Esc)
+        </button>
+
+        <!-- Feedback after answered -->
+        <div class="type-feedback" *ngIf="answered()">
+          <div class="feedback-correct" *ngIf="typeResult() === 'correct'">✓ Chính xác!</div>
+          <div class="feedback-wrong" *ngIf="typeResult() === 'wrong'">✗ Sai rồi</div>
+          <div class="correct-answer">
+            Đáp án: <strong>{{ q.word }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="next-wrap" *ngIf="answered()">
+        <button class="btn btn-primary btn-lg" (click)="next()">
+          {{ currentIndex() + 1 < questions().length ? 'Câu tiếp theo →' : 'Xem kết quả →' }}
+        </button>
+      </div>
+
+      <div class="kbd-hints" *ngIf="kbdService.hintsEnabled()">
+        <span class="kbd-hint" *ngIf="!answered()"><kbd>Esc</kbd> Bỏ qua</span>
+        <span class="kbd-hint" *ngIf="answered()"><kbd>Enter</kbd> Tiếp theo</span>
+      </div>
+    </ng-container>
   </ng-container>
 
 </div>

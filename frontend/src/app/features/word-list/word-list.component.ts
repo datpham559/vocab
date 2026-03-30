@@ -30,6 +30,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 export class WordListComponent implements OnInit {
   words = signal<Word[]>([]);
   progress = signal<Map<number, ProgressStatus>>(new Map());
+  bookmarked = signal<Set<number>>(new Set());
   loading = signal(true);
   totalPages = signal(0);
   currentPage = signal(0);
@@ -64,6 +65,9 @@ export class WordListComponent implements OnInit {
       const map = new Map<number, ProgressStatus>();
       progresses.forEach(p => map.set(p.wordId, p.status));
       this.progress.set(map);
+    });
+    this.progressService.getBookmarks().subscribe(bms => {
+      this.bookmarked.set(new Set(bms.map(b => b.wordId)));
     });
   }
 
@@ -160,6 +164,19 @@ export class WordListComponent implements OnInit {
   getStatusClass(s: ProgressStatus | null): string {
     if (!s) return '';
     return `badge-${s.toLowerCase()}`;
+  }
+
+  isBookmarked(wordId: number): boolean {
+    return this.bookmarked().has(wordId);
+  }
+
+  toggleBookmark(wordId: number, event: Event): void {
+    event.stopPropagation();
+    this.progressService.toggleBookmark(wordId).subscribe(res => {
+      const set = new Set(this.bookmarked());
+      if (res.bookmarked) set.add(wordId); else set.delete(wordId);
+      this.bookmarked.set(set);
+    });
   }
 
   getStatusLabel(s: ProgressStatus | null): string {

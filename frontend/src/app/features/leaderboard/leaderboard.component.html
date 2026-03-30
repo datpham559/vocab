@@ -1,0 +1,95 @@
+<div class="lb-page">
+
+  <div class="lb-header">
+    <h1>Bảng xếp hạng</h1>
+    <p class="lb-subtitle">Top người dùng tích cực nhất</p>
+  </div>
+
+  <!-- Tab switcher -->
+  <div class="mode-tabs">
+    <button class="mode-tab" [class.active]="mode() === 'streak'" (click)="switchMode('streak')">
+      🔥 Streak dài nhất
+    </button>
+    <button class="mode-tab" [class.active]="mode() === 'words'" (click)="switchMode('words')">
+      📚 Từ đã học nhiều nhất
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading()">
+    <div class="spinner"></div>
+    <p>Đang tải...</p>
+  </div>
+
+  <!-- Error -->
+  <div class="error-state" *ngIf="error()">{{ error() }}</div>
+
+  <!-- Table -->
+  <div class="lb-table-wrap" *ngIf="!loading() && !error()">
+
+    <!-- Podium top 3 -->
+    <div class="podium" *ngIf="entries().length >= 3">
+      <div class="podium-slot second" *ngIf="entries()[1] as e">
+        <div class="podium-avatar" [class.is-me]="isMe(e)">{{ getInitials(e.displayName) }}</div>
+        <div class="podium-name">{{ e.displayName }}</div>
+        <div class="podium-value">
+          <span *ngIf="mode() === 'streak'">🔥 {{ e.streak }} ngày</span>
+          <span *ngIf="mode() === 'words'">📚 {{ e.totalWordsLearned }}</span>
+        </div>
+        <div class="podium-block p2">🥈</div>
+      </div>
+      <div class="podium-slot first" *ngIf="entries()[0] as e">
+        <div class="crown">👑</div>
+        <div class="podium-avatar" [class.is-me]="isMe(e)">{{ getInitials(e.displayName) }}</div>
+        <div class="podium-name">{{ e.displayName }}</div>
+        <div class="podium-value">
+          <span *ngIf="mode() === 'streak'">🔥 {{ e.streak }} ngày</span>
+          <span *ngIf="mode() === 'words'">📚 {{ e.totalWordsLearned }}</span>
+        </div>
+        <div class="podium-block p1">🥇</div>
+      </div>
+      <div class="podium-slot third" *ngIf="entries()[2] as e">
+        <div class="podium-avatar" [class.is-me]="isMe(e)">{{ getInitials(e.displayName) }}</div>
+        <div class="podium-name">{{ e.displayName }}</div>
+        <div class="podium-value">
+          <span *ngIf="mode() === 'streak'">🔥 {{ e.streak }} ngày</span>
+          <span *ngIf="mode() === 'words'">📚 {{ e.totalWordsLearned }}</span>
+        </div>
+        <div class="podium-block p3">🥉</div>
+      </div>
+    </div>
+
+    <!-- Full list from #4 -->
+    <div class="lb-list">
+      <div
+        *ngFor="let e of entries()"
+        class="lb-row"
+        [class.is-me]="isMe(e)"
+        [class.top3]="e.rank <= 3">
+
+        <div class="lb-rank" [class]="rankClass(e.rank)">
+          {{ rankEmoji(e.rank) }}
+        </div>
+
+        <div class="lb-avatar">{{ getInitials(e.displayName) }}</div>
+
+        <div class="lb-info">
+          <span class="lb-name">{{ e.displayName }}</span>
+          <span class="lb-username">@{{ e.username }}</span>
+          <span class="me-tag" *ngIf="isMe(e)">bạn</span>
+        </div>
+
+        <div class="lb-stats">
+          <span class="lb-streak" [class.highlight]="mode() === 'streak'">🔥 {{ e.streak }}</span>
+          <span class="lb-sep">·</span>
+          <span class="lb-words" [class.highlight]="mode() === 'words'">📚 {{ e.totalWordsLearned }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="entries().length === 0">
+      Chưa có dữ liệu
+    </div>
+  </div>
+
+</div>

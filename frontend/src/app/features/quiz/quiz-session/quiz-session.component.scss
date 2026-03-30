@@ -1,10 +1,75 @@
+// INTRO
+.intro-card {
+  max-width: 540px;
+  margin: 3rem auto;
+  text-align: center;
+
+  .intro-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+
+  h2 { font-size: 1.75rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.4rem; }
+
+  .intro-sub { color: var(--text-secondary); margin-bottom: 2rem; font-size: 0.95rem; }
+}
+
+.mode-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  width: 100%;
+
+  &:hover {
+    border-color: var(--primary);
+    background: var(--primary-light);
+  }
+
+  &--mixed {
+    border-color: #6366f1;
+    &:hover { background: rgba(99,102,241,0.08); border-color: #6366f1; }
+  }
+
+  .mode-icon { font-size: 1.75rem; flex-shrink: 0; }
+
+  .mode-info { flex: 1; }
+
+  .mode-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem; }
+
+  .mode-desc { font-size: 0.85rem; color: var(--text-secondary); }
+
+  .mode-arrow { font-size: 1.1rem; color: var(--text-muted); flex-shrink: 0; }
+}
+
+// QUIZ HEADER
 .quiz-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
 
-  .back-btn { color: var(--text-secondary); text-decoration: none; font-size: 14px; &:hover { color: var(--primary); } }
+  .back-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-secondary); font-size: 14px;
+    &:hover { color: var(--primary); }
+  }
+
+  .quiz-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
   .quiz-progress { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
 }
 
@@ -39,6 +104,21 @@
     font-size: 16px;
     color: var(--text-secondary);
     margin-bottom: 20px;
+  }
+
+  .protected-word {
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: none;
+
+    .pw-char {
+      display: inline;
+    }
+
+    // Zero-width space between each character — breaks copy+paste dictionary lookup
+    .pw-char + .pw-char::before {
+      content: '\200b';
+    }
   }
 
   .question-prompt {
@@ -162,6 +242,189 @@
   }
 
   .done-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+}
+
+.mode-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: var(--primary-light);
+  color: var(--primary);
+
+  &--type {
+    background: rgba(99,102,241,0.1);
+    color: #6366f1;
+  }
+}
+
+// TYPING MODE
+.question-meaning {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.word-hint-boxes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 1.25rem;
+}
+
+.hint-box {
+  width: 2rem;
+  height: 2.4rem;
+  border-bottom: 2px solid var(--border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: lowercase;
+
+  &.hint-first {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    font-weight: 700;
+  }
+}
+
+.hint-space { width: 1rem; }
+
+.hint-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: #fef9c3;
+  border: 1.5px solid #fde047;
+  border-radius: 10px;
+}
+
+.hint-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #92400e;
+  white-space: nowrap;
+}
+
+.hint-boxes { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+
+.hint-char {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 5px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+
+  &.hint-revealed {
+    border-color: var(--primary);
+    background: var(--primary-light);
+    color: #92400e;
+  }
+}
+
+.retry-feedback {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0.6rem;
+  text-align: center;
+}
+
+.type-area {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.type-input {
+  flex: 1;
+  padding: 0.8rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  background: var(--bg);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+  &:disabled { background: var(--surface); color: var(--text-muted); }
+  &.type-wrong { border-color: var(--danger); background: #FEF2F2; color: #b91c1c; }
+}
+
+[data-theme="dark"] .type-input.type-wrong {
+  background: #2d0707;
+  color: #f87171;
+}
+
+.btn-submit-type {
+  padding: 0.8rem 1.25rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+
+  &:hover:not(:disabled) { opacity: 0.85; }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+.btn-give-up {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  margin-bottom: 0.75rem;
+  transition: all 0.15s;
+  display: block;
+  width: 100%;
+
+  &:hover { border-color: var(--danger); color: var(--danger); }
+}
+
+.type-feedback {
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+
+  .feedback-correct { color: #10B981; font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem; }
+  .feedback-wrong   { color: var(--danger); font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem; }
+
+  .correct-answer {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    strong { color: var(--text-primary); }
+  }
+}
+
+.loading-overlay {
+  text-align: center;
+  padding: 4rem 0;
 }
 
 .spinner {

@@ -34,6 +34,12 @@ frontend/*.log
 *.sw?
 
 # ========================
+# Generated / Runtime
+# ========================
+logs/
+backend/src/main/resources/static/
+
+# ========================
 # OS
 # ========================
 .DS_Store

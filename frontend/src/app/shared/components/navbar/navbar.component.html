@@ -11,35 +11,56 @@
           Dashboard
         </a>
       </li>
-      <li>
-        <a routerLink="/study" routerLinkActive="active">
-          Học từ
-        </a>
-      </li>
-      <li>
-        <a routerLink="/topics" routerLinkActive="active">
-          Chủ đề
-        </a>
-      </li>
-      <li>
-        <a routerLink="/review" routerLinkActive="active" class="nav-review">
-          Ôn tập
+
+      <!-- Học tập dropdown -->
+      <li class="nav-dropdown">
+        <span class="dropdown-trigger"
+          [class.active]="isStudyActive">
+          Học tập <span class="chevron">▾</span>
           <span class="review-badge" *ngIf="reviewCount() > 0">{{ reviewCount() }}</span>
-        </a>
+        </span>
+        <div class="dropdown-menu">
+          <a routerLink="/study" routerLinkActive="active">
+            📖 Học từ mới
+          </a>
+          <a routerLink="/review" routerLinkActive="active" class="dropdown-review">
+            🔄 Ôn tập
+            <span class="review-badge-sm" *ngIf="reviewCount() > 0">{{ reviewCount() }}</span>
+          </a>
+          <a routerLink="/favorites" routerLinkActive="active">
+            ⭐ Yêu thích
+          </a>
+        </div>
       </li>
-      <li>
-        <a routerLink="/words" routerLinkActive="active">
-          Từ vựng
-        </a>
+
+      <!-- Từ vựng dropdown -->
+      <li class="nav-dropdown">
+        <span class="dropdown-trigger" [class.active]="isWordsActive">
+          Từ vựng <span class="chevron">▾</span>
+        </span>
+        <div class="dropdown-menu">
+          <a routerLink="/words" routerLinkActive="active">
+            📚 Kho từ vựng
+          </a>
+          <a routerLink="/topics" routerLinkActive="active">
+            🗂️ Chủ đề
+          </a>
+        </div>
       </li>
+
       <li>
         <a routerLink="/exam" routerLinkActive="active">
-          Kiểm tra trình độ
+          Kiểm tra
         </a>
       </li>
       <li>
         <a routerLink="/room" routerLinkActive="active">
           Phòng Quiz
+        </a>
+      </li>
+      <li>
+        <a routerLink="/leaderboard" routerLinkActive="active">
+          Xếp hạng
         </a>
       </li>
       <li *ngIf="authService.isAdmin()">
@@ -64,7 +85,7 @@
         [class.active]="kbdService.hintsEnabled()">
         ⌨️
       </button>
-      <span class="username">{{ authService.currentUser()?.displayName }}</span>
+      <a routerLink="/profile" class="username" title="Hồ sơ cá nhân">{{ authService.currentUser()?.displayName }}</a>
       <button class="btn btn-sm btn-outline" (click)="logout()">Đăng xuất</button>
     </div>
   </div>

@@ -7,6 +7,7 @@ import { UserWordProgress } from '../models/word.model';
 @Injectable({ providedIn: 'root' })
 export class ProgressService {
   private readonly base = `${environment.apiUrl}/progress`;
+  private readonly bookmarksBase = `${environment.apiUrl}/bookmarks`;
 
   constructor(private http: HttpClient) {}
 
@@ -16,5 +17,13 @@ export class ProgressService {
 
   updateProgress(wordId: number, correct: boolean): Observable<UserWordProgress> {
     return this.http.patch<UserWordProgress>(`${this.base}/${wordId}`, { correct });
+  }
+
+  getBookmarks(): Observable<UserWordProgress[]> {
+    return this.http.get<UserWordProgress[]>(this.bookmarksBase);
+  }
+
+  toggleBookmark(wordId: number): Observable<{ bookmarked: boolean }> {
+    return this.http.post<{ bookmarked: boolean }>(`${this.bookmarksBase}/${wordId}/toggle`, {});
   }
 }

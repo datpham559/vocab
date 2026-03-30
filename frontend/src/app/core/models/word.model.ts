@@ -23,6 +23,7 @@ export interface UserWordProgress {
   wrongCount: number;
   lastReviewed: string;
   nextReview: string;
+  bookmarked: boolean;
 }
 
 export interface PageResponse<T> {

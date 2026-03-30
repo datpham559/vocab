@@ -41,6 +41,14 @@ export class AuthService {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
+  updateDisplayName(displayName: string): void {
+    const user = this._currentUser();
+    if (!user) return;
+    const updated = { ...user, displayName };
+    localStorage.setItem(this.USER_KEY, JSON.stringify(updated));
+    this._currentUser.set(updated);
+  }
+
   private storeAuth(res: AuthResponse): void {
     localStorage.setItem(this.TOKEN_KEY, res.token);
     const user: User = {

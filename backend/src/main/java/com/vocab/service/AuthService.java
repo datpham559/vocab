@@ -24,9 +24,10 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
+    private final ActivityLogService activityLogService;
 
     @Transactional
-    public AuthResponse register(RegisterRequest request) {
+    public AuthResponse register(RegisterRequest request, String ipAddress) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new UserAlreadyExistsException("Username '" + request.getUsername() + "' already taken");
         }
@@ -49,6 +50,9 @@ public class AuthService {
 
         String token = tokenProvider.generateToken(auth);
 
+        activityLogService.log(user.getId(), user.getUsername(), "REGISTER",
+            "Tài khoản mới: " + user.getDisplayName() + " (" + user.getEmail() + ")", ipAddress);
+
         return AuthResponse.builder()
             .token(token)
             .userId(user.getId())
@@ -59,7 +63,7 @@ public class AuthService {
             .build();
     }
 
-    public AuthResponse login(LoginRequest request) {
+    public AuthResponse login(LoginRequest request, String ipAddress) {
         Authentication auth = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
@@ -68,6 +72,8 @@ public class AuthService {
         UserPrincipal principal = (UserPrincipal) auth.getPrincipal();
 
         User user = userRepository.findById(principal.getId()).orElseThrow();
+
+        activityLogService.log(user.getId(), user.getUsername(), "LOGIN", "Đăng nhập thành công", ipAddress);
 
         return AuthResponse.builder()
             .token(token)

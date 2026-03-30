@@ -1,8 +1,9 @@
 --liquibase formatted sql
 
+-- ============================================================
+-- 055 — backfill word categories
+-- ============================================================
 --changeset vocab:055-fix-word-categories
--- Backfill category for all batch-seeded words
-
 UPDATE words SET category = 'Actions' WHERE category IS NULL AND word IN ('eat', 'drink', 'sleep', 'wake', 'cook', 'clean', 'wash', 'open', 'close', 'buy', 'sell', 'pay', 'carry', 'give', 'take', 'put', 'find', 'lose', 'use', 'need', 'talk', 'listen', 'look', 'see', 'hear', 'think', 'know', 'want', 'like', 'love', 'hate', 'feel', 'try', 'start', 'stop', 'wait', 'help', 'work', 'play', 'study', 'accept', 'refuse', 'agree', 'disagree', 'suggest', 'recommend', 'request', 'demand', 'confirm', 'cancel');
 UPDATE words SET category = 'Actions' WHERE category IS NULL AND word IN ('postpone', 'arrange', 'manage', 'control', 'handle', 'solve', 'develop', 'improve', 'maintain', 'achieve', 'come', 'go', 'make', 'do', 'get', 'have', 'say', 'tell', 'ask', 'answer', 'call', 'show', 'bring', 'send', 'receive', 'give up', 'take off', 'put off', 'look up', 'find out', 'break down', 'carry out', 'set up', 'come up with', 'go through', 'turn', 'change', 'choose', 'decide', 'forget', 'remember', 'understand', 'explain', 'meet', 'jump', 'sing', 'dance', 'laugh', 'cry', 'smile');
 UPDATE words SET category = 'Actions' WHERE category IS NULL AND word IN ('anticipate', 'acknowledge', 'distinguish', 'evaluate', 'interpret', 'demonstrate', 'implement', 'incorporate', 'integrate', 'generate', 'transform', 'illustrate', 'examine', 'specify', 'justify', 'reduce', 'reuse', 'recycle', 'conserve', 'sustain', 'compost', 'solar energy', 'wind turbine', 'emission', 'degrade', 'accomplish', 'acquire', 'adapt', 'adopt', 'affect', 'allocate', 'alter', 'assess', 'assume', 'clarify', 'collaborate', 'communicate', 'compensate', 'concentrate', 'consent', 'coordinate', 'criticize', 'dedicate', 'differentiate', 'distribute', 'emphasize', 'exceed', 'execute', 'facilitate', 'maximize');
@@ -80,4 +81,3 @@ UPDATE words SET category = 'Transport' WHERE category IS NULL AND word IN ('car
 UPDATE words SET category = 'Travel' WHERE category IS NULL AND word IN ('hotel', 'reservation', 'passport', 'visa', 'luggage', 'destination', 'tourism', 'tourist', 'currency', 'culture', 'tradition', 'landmark', 'souvenir', 'guided tour', 'accommodation', 'explore', 'discover', 'navigate', 'picturesque', 'exotic', 'abroad', 'airline', 'backpack', 'cruise', 'excursion', 'guidebook', 'itinerary', 'terminal');
 
 UPDATE words SET category = 'Work' WHERE category IS NULL AND word IN ('delegate', 'accountability', 'transparency', 'integrity', 'initiative', 'scalable', 'sustainable', 'optimize', 'facilitate', 'leverage', 'doctor', 'nurse', 'engineer', 'lawyer', 'police officer', 'firefighter', 'chef', 'pilot', 'farmer', 'artist', 'singer', 'driver', 'soldier', 'dentist', 'accountant', 'programmer', 'architect', 'scientist', 'journalist', 'athlete', 'agenda', 'appraisal', 'bonus', 'colleague', 'contractor', 'freelance', 'hierarchy', 'layoff', 'overtime', 'payroll', 'probation', 'promotion', 'recruitment', 'resignation', 'retire');
-

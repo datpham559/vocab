@@ -1,0 +1,256 @@
+.lb-page {
+  max-width: 680px;
+  margin: 2rem auto;
+  padding: 0 1.25rem;
+}
+
+// ---- Header ----
+.lb-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin: 0 0 0.25rem;
+  }
+}
+
+.lb-subtitle {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+// ---- Mode tabs ----
+.mode-tabs {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.75rem;
+}
+
+.mode-tab {
+  padding: 0.55rem 1.4rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { border-color: #6366f1; color: #6366f1; }
+  &.active {
+    background: #6366f1;
+    border-color: #6366f1;
+    color: #fff;
+  }
+}
+
+// ---- Loading / error ----
+.loading-state {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-state, .empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+// ---- Podium ----
+.podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+
+.podium-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  flex: 1;
+  max-width: 160px;
+}
+
+.podium-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.is-me {
+    background: linear-gradient(135deg, #059669, #10b981);
+    box-shadow: 0 0 0 3px #34d399;
+  }
+
+  .first & { width: 56px; height: 56px; font-size: 1.1rem; }
+}
+
+.crown {
+  font-size: 1.4rem;
+  line-height: 1;
+  margin-bottom: 0.1rem;
+}
+
+.podium-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: center;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.podium-value {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.podium-block {
+  width: 100%;
+  border-radius: 10px 10px 0 0;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0;
+
+  &.p1 { background: linear-gradient(135deg, #fef3c7, #fde68a); height: 72px; }
+  &.p2 { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); height: 52px; }
+  &.p3 { background: linear-gradient(135deg, #fef0e6, #fcd9bd); height: 40px; }
+}
+
+// ---- Full list ----
+.lb-table-wrap {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  overflow: hidden;
+}
+
+.lb-list {
+  padding: 0.5rem 0;
+}
+
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background 0.12s;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: #f8fafc; }
+
+  &.is-me { background: #f0fdf4; }
+  &.top3 { display: none; }
+}
+
+.lb-rank {
+  font-size: 1.1rem;
+  font-weight: 800;
+  min-width: 32px;
+  text-align: center;
+  color: #94a3b8;
+
+  &.gold   { color: #d97706; }
+  &.silver { color: #64748b; }
+  &.bronze { color: #b45309; }
+}
+
+.lb-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.lb-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.lb-name {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.lb-username {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.me-tag {
+  background: #dcfce7;
+  color: #16a34a;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+}
+
+.lb-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: #64748b;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.lb-sep { color: #cbd5e1; }
+
+.lb-streak, .lb-words {
+  font-weight: 600;
+  &.highlight { color: #1e293b; font-size: 0.9rem; }
+}
