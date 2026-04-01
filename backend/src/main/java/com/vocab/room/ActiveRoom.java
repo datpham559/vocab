@@ -22,6 +22,7 @@ public class ActiveRoom {
     private volatile long questionStartTime = 0;
     private final int timePerQuestion = 15;
     private final ConcurrentHashMap<Long, String> participants = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, String> spectators = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, Integer> scores = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, Integer> currentAnswers = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, Long> answerTimestamps = new ConcurrentHashMap<>();

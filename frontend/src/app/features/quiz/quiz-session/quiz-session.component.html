@@ -131,7 +131,9 @@
     <!-- TYPING MODE -->
     <ng-container *ngIf="currentMode === 'type'">
       <div class="question-card card">
-        <div class="question-meaning">{{ q.options[q.correctIndex] }}</div>
+        <div class="question-meaning protected-word" [attr.aria-label]="q.options[q.correctIndex]">
+          <span *ngFor="let ch of meaningLetters" class="pw-char">{{ ch }}</span>
+        </div>
         <div class="question-pron" *ngIf="q.pronunciation && answered()">{{ q.pronunciation }}</div>
         <p class="question-prompt">Từ tiếng Anh tương ứng là gì?</p>
 

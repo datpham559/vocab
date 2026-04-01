@@ -66,6 +66,15 @@
           <div class="spinner-sm"></div>
           Đang chờ host bắt đầu...
         </div>
+
+        <button class="btn-spectate-switch"
+                *ngIf="!state.spectator"
+                (click)="becomeSpectator()">
+          👁 Chuyển sang khán giả
+        </button>
+        <div class="spectator-badge" *ngIf="state.spectator">
+          👁 Bạn đang xem với tư cách khán giả
+        </div>
       </div>
     </ng-container>
 
@@ -122,7 +131,7 @@
             </span>
           </div>
           <p class="quiz-prompt">Chọn nghĩa đúng:</p>
-          <div class="options">
+          <div class="options" *ngIf="!state.spectator">
             <button
               *ngFor="let opt of state.currentQuestion.options; let i = index"
               class="option-btn"
@@ -132,11 +141,14 @@
               {{ opt }}
             </button>
           </div>
+          <div class="spectator-watching" *ngIf="state.spectator">👁 Đang xem...</div>
         </ng-container>
 
         <!-- TYPING MODE -->
         <ng-container *ngIf="state.currentQuestionMode === 'TYPE'">
-          <div class="quiz-meaning">{{ state.correctMeaning }}</div>
+          <div class="quiz-meaning protected-word" [attr.aria-label]="state.correctMeaning">
+            <span *ngFor="let ch of meaningLetters" class="pw-char">{{ ch }}</span>
+          </div>
           <div class="type-meta" *ngIf="state.currentQuestion">
             <span class="quiz-pos" *ngIf="state.currentQuestion.partOfSpeech">{{ state.currentQuestion.partOfSpeech }}</span>
             <span class="word-length-hint">{{ state.currentQuestion.word.length }} chữ cái</span>
@@ -151,13 +163,15 @@
           <p class="quiz-prompt">Gõ từ tiếng Anh tương ứng:</p>
 
           <!-- Already answered correctly -->
-          <div class="type-answered" *ngIf="state.myAnswer === 0 && state.status === 'ACTIVE'">
+          <div class="type-answered" *ngIf="!state.spectator && state.myAnswer === 0 && state.status === 'ACTIVE'">
             <span class="type-answered-icon">✓</span> Đúng rồi! Đang chờ người khác...
           </div>
           <!-- Answered wrong -->
-          <div class="type-answered type-answered--wrong" *ngIf="state.myAnswer === -1 && state.status === 'ACTIVE'">
+          <div class="type-answered type-answered--wrong" *ngIf="!state.spectator && state.myAnswer === -1 && state.status === 'ACTIVE'">
             <span class="type-answered-icon">✗</span> Sai rồi! Đang chờ người khác...
           </div>
+          <!-- Spectator watching -->
+          <div class="spectator-watching" *ngIf="state.spectator && state.status === 'ACTIVE'">👁 Đang xem...</div>
 
           <!-- Result shown -->
           <div class="type-result-reveal" *ngIf="state.status === 'SHOWING_RESULT'">
@@ -165,8 +179,8 @@
             <div class="quiz-pron-center" *ngIf="state.currentQuestion.pronunciation">{{ state.currentQuestion.pronunciation }}</div>
           </div>
 
-          <!-- Input area (only when ACTIVE and not yet answered) -->
-          <ng-container *ngIf="state.status === 'ACTIVE' && state.myAnswer === null && !typingLocked()">
+          <!-- Input area (only when ACTIVE, not yet answered, not spectator) -->
+          <ng-container *ngIf="!state.spectator && state.status === 'ACTIVE' && state.myAnswer === null && !typingLocked()">
             <div class="type-area">
               <input
                 #typeInput
@@ -276,4 +290,45 @@
     </ng-container>
 
   </ng-container>
+
+  <!-- Floating Reactions -->
+  <div class="floating-reaction"
+       *ngFor="let r of floatingReactions"
+       [style.left.%]="r.x">
+    <span class="float-emoji">{{ r.emoji }}</span>
+    <span class="float-user">{{ r.username }}</span>
+  </div>
+
+  <!-- Reaction Bar -->
+  <div class="reaction-bar" *ngIf="state && !loading()">
+    <button class="react-btn" *ngFor="let e of REACTIONS" (click)="sendReact(e)" [title]="e">{{ e }}</button>
+    <button class="chat-toggle-btn" (click)="toggleChat()">
+      💬
+      <span class="unread-badge" *ngIf="unreadCount() > 0">{{ unreadCount() }}</span>
+    </button>
+  </div>
+
+  <!-- Chat Panel -->
+  <div class="chat-panel" [class.chat-open]="showChat()">
+    <div class="chat-header">
+      <span>💬 Chat phòng</span>
+      <button class="chat-close" (click)="toggleChat()">✕</button>
+    </div>
+    <div class="chat-body" #chatBody>
+      <div class="chat-empty" *ngIf="chatMessages.length === 0">Chưa có tin nhắn nào...</div>
+      <div class="chat-msg" *ngFor="let m of chatMessages" [class.chat-msg--me]="m.userId === myUserId">
+        <span class="chat-username">
+          {{ m.username }}
+          <span class="spectator-tag" *ngIf="m.spectator">👁</span>
+        </span>
+        <span class="chat-text">{{ m.text }}</span>
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-input" [(ngModel)]="chatInput" placeholder="Nhập tin nhắn..."
+             (keydown.enter)="sendChat()" maxlength="200" />
+      <button class="chat-send" (click)="sendChat()">➤</button>
+    </div>
+  </div>
+
 </div>

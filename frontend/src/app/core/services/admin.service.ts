@@ -53,4 +53,8 @@ export class AdminService {
   createWord(payload: CreateWordPayload): Observable<unknown> {
     return this.http.post(`${this.wordsBase}`, payload);
   }
+
+  getWordStats(): Observable<{ total: number; beginner: number; intermediate: number; advanced: number; byCategory: Record<string, number> }> {
+    return this.http.get<any>(`${this.base}/words/stats`);
+  }
 }

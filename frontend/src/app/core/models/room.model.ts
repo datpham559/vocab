@@ -24,6 +24,26 @@ export interface RoomState {
   beginnerMode: string;
   intermediateMode: string;
   advancedMode: string;
+  spectators: ParticipantScore[];
+  spectator: boolean;
+}
+
+export interface RoomEvent {
+  type: 'CHAT' | 'REACT';
+  userId: number;
+  username: string;
+  text?: string;
+  emoji?: string;
+  timestamp: number;
+  spectator: boolean;
+}
+
+export interface ChatMessage {
+  userId: number;
+  username: string;
+  text: string;
+  timestamp: number;
+  spectator: boolean;
 }
 
 export interface ParticipantScore {

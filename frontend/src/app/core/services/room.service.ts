@@ -31,6 +31,10 @@ export class RoomService {
     return this.http.post<void>(`${this.base}/${code}/join`, {});
   }
 
+  spectateRoom(code: string): Observable<void> {
+    return this.http.post<void>(`${this.base}/${code}/spectate`, {});
+  }
+
   startGame(code: string): Observable<void> {
     return this.http.post<void>(`${this.base}/${code}/start`, {});
   }

@@ -1,0 +1,127 @@
+--liquibase formatted sql
+
+--changeset vocab:056-seed-words-batch48
+INSERT INTO words (word, pronunciation, meaning_vi, part_of_speech, difficulty, category, example_sentence, example_translation)
+SELECT v.word, v.pronunciation, v.meaning_vi, v.part_of_speech, v.difficulty, v.category, v.example_sentence, v.example_translation
+FROM (VALUES
+-- Food & Taste
+(N'delicious', N'/dɪˈlɪʃəs/', N'ngon / thơm ngon', N'adjective', N'BEGINNER', N'Food', N'This soup is absolutely delicious.', N'Bát canh này thật tuyệt vời.'),
+(N'tasty', N'/ˈteɪsti/', N'ngon miệng', N'adjective', N'BEGINNER', N'Food', N'The pizza was very tasty.', N'Chiếc pizza rất ngon miệng.'),
+(N'spicy', N'/ˈspaɪsi/', N'cay', N'adjective', N'BEGINNER', N'Food', N'I cannot eat very spicy food.', N'Tôi không thể ăn đồ ăn quá cay.'),
+(N'fresh', N'/freʃ/', N'tươi / mới', N'adjective', N'BEGINNER', N'Food', N'Buy fresh vegetables every morning.', N'Mua rau tươi mỗi buổi sáng.'),
+(N'frozen', N'/ˈfroʊzən/', N'đông lạnh', N'adjective', N'BEGINNER', N'Food', N'Frozen food is convenient but less healthy.', N'Đồ ăn đông lạnh tiện lợi nhưng ít lành mạnh hơn.'),
+(N'raw', N'/rɔː/', N'sống / chưa nấu chín', N'adjective', N'BEGINNER', N'Food', N'Do not eat raw chicken.', N'Đừng ăn gà sống.'),
+(N'flavor', N'/ˈfleɪvər/', N'hương vị', N'noun', N'BEGINNER', N'Food', N'This ice cream has a unique flavor.', N'Kem này có hương vị độc đáo.'),
+(N'diet', N'/ˈdaɪɪt/', N'chế độ ăn / ăn kiêng', N'noun', N'INTERMEDIATE', N'Food', N'Follow a healthy diet for a better life.', N'Duy trì chế độ ăn lành mạnh để có cuộc sống tốt hơn.'),
+(N'serve', N'/sɜːrv/', N'phục vụ / dọn ăn', N'verb', N'BEGINNER', N'Food', N'Dinner is served at seven o clock.', N'Bữa tối được dọn lên lúc bảy giờ.'),
+-- Money & Spending
+(N'price', N'/praɪs/', N'giá cả / giá tiền', N'noun', N'BEGINNER', N'Shopping', N'The price of this jacket is too high.', N'Giá của chiếc áo khoác này quá cao.'),
+(N'expensive', N'/ɪkˈspensɪv/', N'đắt tiền', N'adjective', N'BEGINNER', N'Shopping', N'That restaurant is too expensive for me.', N'Nhà hàng đó quá đắt so với tôi.'),
+(N'cheap', N'/tʃiːp/', N'rẻ / tiết kiệm', N'adjective', N'BEGINNER', N'Shopping', N'I found a cheap hotel near the beach.', N'Tôi tìm được một khách sạn rẻ gần bãi biển.'),
+(N'afford', N'/əˈfɔːrd/', N'có đủ tiền / có khả năng', N'verb', N'INTERMEDIATE', N'Shopping', N'I cannot afford a new car right now.', N'Tôi không đủ tiền mua xe mới lúc này.'),
+(N'spend', N'/spend/', N'tiêu tiền / dành thời gian', N'verb', N'BEGINNER', N'Shopping', N'Spend wisely and save regularly.', N'Tiêu tiền khôn ngoan và tiết kiệm đều đặn.'),
+(N'earn', N'/ɜːrn/', N'kiếm tiền / thu nhập', N'verb', N'BEGINNER', N'Work', N'She earns a good salary at her job.', N'Cô ấy kiếm được mức lương tốt ở công việc của mình.'),
+(N'income', N'/ˈɪnkʌm/', N'thu nhập', N'noun', N'INTERMEDIATE', N'Work', N'Their monthly income is quite stable.', N'Thu nhập hàng tháng của họ khá ổn định.'),
+(N'savings', N'/ˈseɪvɪŋz/', N'tiền tiết kiệm', N'noun', N'INTERMEDIATE', N'Shopping', N'Use your savings wisely.', N'Hãy sử dụng tiền tiết kiệm một cách khôn ngoan.'),
+-- Emotions (adjectives)
+(N'proud', N'/praʊd/', N'tự hào', N'adjective', N'BEGINNER', N'Emotions', N'She is proud of her son''s achievement.', N'Cô ấy tự hào về thành tích của con trai.'),
+(N'ashamed', N'/əˈʃeɪmd/', N'xấu hổ / hổ thẹn', N'adjective', N'INTERMEDIATE', N'Emotions', N'He felt ashamed of his behavior.', N'Anh ấy cảm thấy xấu hổ về hành vi của mình.'),
+(N'embarrassed', N'/ɪmˈbærəst/', N'bối rối / ngại ngùng', N'adjective', N'INTERMEDIATE', N'Emotions', N'She was embarrassed when she forgot his name.', N'Cô ấy bối rối khi quên tên anh ấy.'),
+(N'relieved', N'/rɪˈliːvd/', N'nhẹ nhõm / an lòng', N'adjective', N'INTERMEDIATE', N'Emotions', N'I felt relieved when the exam was over.', N'Tôi cảm thấy nhẹ nhõm khi kỳ thi kết thúc.'),
+(N'disappointed', N'/ˌdɪsəˈpɔɪntɪd/', N'thất vọng', N'adjective', N'INTERMEDIATE', N'Emotions', N'He was disappointed with the test result.', N'Anh ấy thất vọng với kết quả bài kiểm tra.'),
+(N'hopeful', N'/ˈhoʊpfəl/', N'đầy hy vọng', N'adjective', N'BEGINNER', N'Emotions', N'Stay hopeful even in hard times.', N'Hãy giữ hy vọng dù trong hoàn cảnh khó khăn.'),
+(N'confused', N'/kənˈfjuːzd/', N'bối rối / lẫn lộn', N'adjective', N'BEGINNER', N'Emotions', N'The instructions were confusing and he got confused.', N'Hướng dẫn khó hiểu khiến anh ấy bối rối.'),
+(N'curious', N'/ˈkjʊəriəs/', N'tò mò', N'adjective', N'BEGINNER', N'Emotions', N'Children are naturally curious about the world.', N'Trẻ em tự nhiên rất tò mò về thế giới.'),
+(N'lonely', N'/ˈloʊnli/', N'cô đơn', N'adjective', N'BEGINNER', N'Emotions', N'Living alone can make you feel lonely.', N'Sống một mình có thể khiến bạn cảm thấy cô đơn.'),
+(N'jealous', N'/ˈdʒeləs/', N'ghen tị / đố kỵ', N'adjective', N'BEGINNER', N'Emotions', N'She was jealous of her classmate''s success.', N'Cô ấy ghen tị với thành công của bạn cùng lớp.'),
+-- Technology
+(N'app', N'/æp/', N'ứng dụng', N'noun', N'BEGINNER', N'Technology', N'Download the app on your phone.', N'Tải ứng dụng về điện thoại của bạn.'),
+(N'data', N'/ˈdeɪtə/', N'dữ liệu', N'noun', N'BEGINNER', N'Technology', N'Back up your data regularly.', N'Sao lưu dữ liệu thường xuyên.'),
+(N'stream', N'/striːm/', N'phát trực tuyến / luồng dữ liệu', N'verb', N'INTERMEDIATE', N'Technology', N'You can stream the concert live online.', N'Bạn có thể xem hòa nhạc trực tiếp trực tuyến.'),
+(N'post', N'/poʊst/', N'đăng bài / bài đăng', N'verb', N'BEGINNER', N'Technology', N'Post a photo on your social media.', N'Đăng ảnh lên mạng xã hội của bạn.'),
+(N'comment', N'/ˈkɒment/', N'bình luận / nhận xét', N'noun', N'BEGINNER', N'Technology', N'Leave a comment below the video.', N'Để lại bình luận bên dưới video.'),
+(N'follow', N'/ˈfɒloʊ/', N'theo dõi / làm theo', N'verb', N'BEGINNER', N'Technology', N'Follow us on social media for updates.', N'Theo dõi chúng tôi trên mạng xã hội để cập nhật.'),
+(N'share', N'/ʃeər/', N'chia sẻ', N'verb', N'BEGINNER', N'Technology', N'Share the article with your friends.', N'Chia sẻ bài viết với bạn bè của bạn.'),
+(N'notification', N'/ˌnoʊtɪfɪˈkeɪʃən/', N'thông báo', N'noun', N'INTERMEDIATE', N'Technology', N'Turn off notifications at night.', N'Tắt thông báo vào ban đêm.'),
+-- Nature
+(N'humid', N'/ˈhjuːmɪd/', N'ẩm ướt / nồm', N'adjective', N'INTERMEDIATE', N'Nature', N'The weather is very humid in summer.', N'Thời tiết rất ẩm ướt vào mùa hè.'),
+(N'flood', N'/flʌd/', N'lũ lụt', N'noun', N'BEGINNER', N'Nature', N'The flood destroyed many homes.', N'Lũ lụt đã phá hủy nhiều ngôi nhà.'),
+(N'shade', N'/ʃeɪd/', N'bóng râm / bóng mát', N'noun', N'BEGINNER', N'Nature', N'Rest in the shade of the tree.', N'Nghỉ ngơi trong bóng râm của cây.'),
+(N'wave', N'/weɪv/', N'sóng biển / vẫy tay', N'noun', N'BEGINNER', N'Nature', N'Big waves are fun for surfing.', N'Sóng lớn rất vui khi lướt sóng.'),
+-- Education / Language
+(N'subject', N'/ˈsʌbdʒɪkt/', N'môn học / chủ đề', N'noun', N'BEGINNER', N'Education', N'Math is my favourite subject.', N'Toán là môn học yêu thích của tôi.'),
+(N'quiz', N'/kwɪz/', N'bài kiểm tra nhanh / câu đố', N'noun', N'BEGINNER', N'Education', N'We have a short quiz every Friday.', N'Chúng tôi có bài kiểm tra nhanh mỗi thứ Sáu.'),
+(N'certificate', N'/səˈtɪfɪkɪt/', N'chứng chỉ / bằng cấp', N'noun', N'INTERMEDIATE', N'Education', N'She received a certificate after completing the course.', N'Cô ấy nhận được chứng chỉ sau khi hoàn thành khóa học.'),
+(N'absent', N'/ˈæbsənt/', N'vắng mặt', N'adjective', N'BEGINNER', N'Education', N'He was absent from class yesterday.', N'Anh ấy vắng mặt ở lớp học ngày hôm qua.'),
+(N'vocabulary', N'/vəˈkæbjʊleri/', N'từ vựng', N'noun', N'BEGINNER', N'Education', N'Expand your vocabulary by reading every day.', N'Mở rộng vốn từ vựng bằng cách đọc mỗi ngày.'),
+(N'grammar', N'/ˈɡræmər/', N'ngữ pháp', N'noun', N'BEGINNER', N'Education', N'Good grammar helps you communicate clearly.', N'Ngữ pháp tốt giúp bạn giao tiếp rõ ràng.'),
+(N'pronunciation', N'/prəˌnʌnsiˈeɪʃən/', N'cách phát âm', N'noun', N'INTERMEDIATE', N'Education', N'Work on your pronunciation to sound more natural.', N'Luyện tập cách phát âm để nghe tự nhiên hơn.'),
+(N'accent', N'/ˈæksent/', N'giọng / trọng âm', N'noun', N'INTERMEDIATE', N'Education', N'She has a strong British accent.', N'Cô ấy có giọng Anh rất rõ.'),
+-- Home / Daily life
+(N'tidy', N'/ˈtaɪdi/', N'gọn gàng / ngăn nắp', N'adjective', N'BEGINNER', N'Home', N'Keep your room tidy at all times.', N'Giữ phòng của bạn luôn gọn gàng.'),
+(N'decorate', N'/ˈdekəreɪt/', N'trang trí', N'verb', N'BEGINNER', N'Home', N'We decorate the house for the holidays.', N'Chúng tôi trang trí nhà cho dịp lễ.'),
+(N'repair', N'/rɪˈpɛər/', N'sửa chữa', N'verb', N'INTERMEDIATE', N'Home', N'He repaired the broken fence himself.', N'Anh ấy tự sửa hàng rào bị hỏng.'),
+(N'dust', N'/dʌst/', N'bụi / phủi bụi', N'noun', N'BEGINNER', N'Home', N'Wipe the dust off the shelves.', N'Lau bụi trên các kệ sách.'),
+(N'broom', N'/bruːm/', N'cái chổi', N'noun', N'BEGINNER', N'Home', N'Sweep the floor with a broom.', N'Quét sàn bằng chổi.'),
+(N'fridge', N'/frɪdʒ/', N'tủ lạnh', N'noun', N'BEGINNER', N'Home', N'Put the leftovers in the fridge.', N'Cho thức ăn thừa vào tủ lạnh.'),
+-- Travel / Transport
+(N'baggage', N'/ˈbæɡɪdʒ/', N'hành lý', N'noun', N'INTERMEDIATE', N'Travel', N'Check your baggage at the counter.', N'Ký gửi hành lý tại quầy.'),
+(N'depart', N'/dɪˈpɑːrt/', N'khởi hành / rời đi', N'verb', N'INTERMEDIATE', N'Travel', N'The train departs at nine in the morning.', N'Tàu khởi hành lúc chín giờ sáng.'),
+(N'boarding', N'/ˈbɔːrdɪŋ/', N'lên tàu / lên máy bay', N'noun', N'INTERMEDIATE', N'Travel', N'Boarding starts thirty minutes before departure.', N'Lên máy bay bắt đầu ba mươi phút trước khi khởi hành.'),
+(N'delay', N'/dɪˈleɪ/', N'trì hoãn / sự chậm trễ', N'noun', N'INTERMEDIATE', N'Travel', N'The flight has a two-hour delay.', N'Chuyến bay bị trễ hai tiếng.'),
+(N'schedule', N'/ˈʃedjuːl/', N'lịch trình / thời gian biểu', N'noun', N'INTERMEDIATE', N'Travel', N'Check the schedule before you leave.', N'Kiểm tra lịch trình trước khi bạn đi.'),
+(N'fare', N'/fɛər/', N'giá vé / cước phí', N'noun', N'INTERMEDIATE', N'Travel', N'The bus fare increased this month.', N'Giá vé xe buýt tăng tháng này.'),
+-- Work
+(N'task', N'/tɑːsk/', N'nhiệm vụ / công việc cụ thể', N'noun', N'BEGINNER', N'Work', N'Finish the task before the meeting.', N'Hoàn thành nhiệm vụ trước cuộc họp.'),
+(N'hire', N'/haɪər/', N'thuê / tuyển dụng', N'verb', N'INTERMEDIATE', N'Work', N'The company hired ten new staff.', N'Công ty tuyển dụng mười nhân viên mới.'),
+(N'workload', N'/ˈwɜːrkloʊd/', N'khối lượng công việc', N'noun', N'INTERMEDIATE', N'Work', N'Her workload has doubled this quarter.', N'Khối lượng công việc của cô ấy tăng gấp đôi quý này.'),
+(N'remote', N'/rɪˈmoʊt/', N'từ xa / làm việc từ xa', N'adjective', N'INTERMEDIATE', N'Work', N'Many employees prefer remote work.', N'Nhiều nhân viên thích làm việc từ xa.'),
+-- Actions
+(N'warn', N'/wɔːrn/', N'cảnh báo / nhắc nhở', N'verb', N'INTERMEDIATE', N'Actions', N'Warn others before the storm arrives.', N'Cảnh báo mọi người trước khi bão đến.'),
+(N'remind', N'/rɪˈmaɪnd/', N'nhắc nhở / gợi nhớ', N'verb', N'BEGINNER', N'Actions', N'Remind me to call her tomorrow.', N'Nhắc tôi gọi cho cô ấy ngày mai.'),
+(N'propose', N'/prəˈpoʊz/', N'đề xuất / cầu hôn', N'verb', N'INTERMEDIATE', N'Actions', N'He proposed a new solution to the team.', N'Anh ấy đề xuất một giải pháp mới cho nhóm.'),
+(N'admit', N'/ədˈmɪt/', N'thừa nhận / để vào', N'verb', N'INTERMEDIATE', N'Actions', N'He admitted making a mistake.', N'Anh ấy thừa nhận đã mắc sai lầm.'),
+(N'borrow', N'/ˈbɒroʊ/', N'mượn', N'verb', N'BEGINNER', N'Actions', N'Can I borrow your pen?', N'Tôi có thể mượn bút của bạn không?'),
+(N'lend', N'/lend/', N'cho mượn', N'verb', N'BEGINNER', N'Actions', N'She lent me her umbrella.', N'Cô ấy cho tôi mượn ô.'),
+(N'fix', N'/fɪks/', N'sửa / khắc phục', N'verb', N'BEGINNER', N'Actions', N'Can you fix this problem?', N'Bạn có thể khắc phục vấn đề này không?'),
+(N'review', N'/rɪˈvjuː/', N'xem lại / ôn tập / đánh giá', N'verb', N'INTERMEDIATE', N'Actions', N'Review your notes before the exam.', N'Xem lại ghi chú trước kỳ thi.'),
+(N'notice', N'/ˈnoʊtɪs/', N'chú ý / nhận ra', N'verb', N'BEGINNER', N'Actions', N'Did you notice anything strange?', N'Bạn có chú ý điều gì lạ không?'),
+(N'miss', N'/mɪs/', N'nhớ / bỏ lỡ', N'verb', N'BEGINNER', N'Actions', N'I miss my hometown so much.', N'Tôi rất nhớ quê hương.'),
+(N'mention', N'/ˈmenʃən/', N'đề cập / nhắc đến', N'verb', N'INTERMEDIATE', N'Actions', N'He did not mention the problem.', N'Anh ấy không đề cập đến vấn đề đó.'),
+(N'collect', N'/kəˈlekt/', N'thu thập / sưu tập', N'verb', N'BEGINNER', N'Actions', N'She collects stamps as a hobby.', N'Cô ấy sưu tập tem như một sở thích.'),
+(N'deliver', N'/dɪˈlɪvər/', N'giao hàng / trình bày', N'verb', N'INTERMEDIATE', N'Actions', N'The package was delivered this morning.', N'Gói hàng được giao sáng nay.'),
+-- Descriptive
+(N'popular', N'/ˈpɒpjʊlər/', N'phổ biến / được yêu thích', N'adjective', N'BEGINNER', N'Descriptive', N'This song is very popular right now.', N'Bài hát này rất phổ biến hiện nay.'),
+(N'common', N'/ˈkɒmən/', N'phổ biến / thông thường', N'adjective', N'BEGINNER', N'Descriptive', N'The cold is a very common illness.', N'Cảm lạnh là bệnh rất phổ biến.'),
+(N'typical', N'/ˈtɪpɪkəl/', N'điển hình / tiêu biểu', N'adjective', N'INTERMEDIATE', N'Descriptive', N'This is a typical example of bad planning.', N'Đây là ví dụ điển hình của lập kế hoạch kém.'),
+(N'rare', N'/rɛər/', N'hiếm / ít gặp', N'adjective', N'INTERMEDIATE', N'Descriptive', N'Snow is rare in this region.', N'Tuyết rơi hiếm gặp ở vùng này.'),
+(N'unique', N'/juːˈniːk/', N'độc đáo / duy nhất', N'adjective', N'INTERMEDIATE', N'Descriptive', N'Everyone has a unique personality.', N'Mỗi người đều có cá tính độc đáo.'),
+(N'average', N'/ˈævərɪdʒ/', N'trung bình', N'adjective', N'BEGINNER', N'Descriptive', N'The average temperature in summer is 35 degrees.', N'Nhiệt độ trung bình vào mùa hè là 35 độ.'),
+(N'familiar', N'/fəˈmɪliər/', N'quen thuộc', N'adjective', N'INTERMEDIATE', N'Descriptive', N'That face looks familiar to me.', N'Khuôn mặt đó trông quen thuộc với tôi.'),
+(N'worth', N'/wɜːrθ/', N'đáng giá / có giá trị', N'adjective', N'INTERMEDIATE', N'Descriptive', N'This book is worth reading.', N'Quyển sách này đáng để đọc.'),
+(N'extra', N'/ˈekstrə/', N'thêm / phụ trội', N'adjective', N'BEGINNER', N'Descriptive', N'Would you like extra sauce?', N'Bạn có muốn thêm nước sốt không?'),
+-- General
+(N'option', N'/ˈɒpʃən/', N'lựa chọn / tùy chọn', N'noun', N'INTERMEDIATE', N'General', N'You have two options: stay or leave.', N'Bạn có hai lựa chọn: ở lại hoặc rời đi.'),
+(N'example', N'/ɪɡˈzɑːmpəl/', N'ví dụ / mẫu', N'noun', N'BEGINNER', N'General', N'Give me an example of what you mean.', N'Hãy cho tôi một ví dụ về ý của bạn.'),
+(N'difference', N'/ˈdɪfrəns/', N'sự khác biệt', N'noun', N'BEGINNER', N'General', N'What is the difference between the two?', N'Sự khác biệt giữa hai cái là gì?'),
+(N'similar', N'/ˈsɪmɪlər/', N'tương tự / giống nhau', N'adjective', N'BEGINNER', N'General', N'Their ideas are very similar.', N'Ý tưởng của họ rất giống nhau.'),
+(N'instead', N'/ɪnˈsted/', N'thay vào đó / thay thế', N'adverb', N'BEGINNER', N'General', N'Have water instead of soda.', N'Uống nước thay vì nước ngọt.'),
+(N'simple', N'/ˈsɪmpəl/', N'đơn giản', N'adjective', N'BEGINNER', N'General', N'The solution is actually quite simple.', N'Giải pháp thực ra khá đơn giản.'),
+(N'possible', N'/ˈpɒsɪbəl/', N'có thể / khả thi', N'adjective', N'BEGINNER', N'General', N'Is it possible to finish by Friday?', N'Có thể hoàn thành trước thứ Sáu không?'),
+(N'impossible', N'/ɪmˈpɒsɪbəl/', N'không thể', N'adjective', N'BEGINNER', N'General', N'Nothing is impossible if you try hard.', N'Không có gì là không thể nếu bạn cố gắng.'),
+(N'necessary', N'/ˈnesɪseri/', N'cần thiết', N'adjective', N'INTERMEDIATE', N'General', N'Is it necessary to bring an ID?', N'Có cần thiết phải mang theo chứng minh thư không?'),
+(N'main', N'/meɪn/', N'chính / chủ yếu', N'adjective', N'BEGINNER', N'General', N'What is the main idea of this paragraph?', N'Ý chính của đoạn văn này là gì?'),
+(N'local', N'/ˈloʊkəl/', N'địa phương / tại chỗ', N'adjective', N'BEGINNER', N'General', N'Visit the local market for fresh produce.', N'Ghé chợ địa phương để mua sản phẩm tươi.'),
+(N'official', N'/əˈfɪʃəl/', N'chính thức / quan chức', N'adjective', N'INTERMEDIATE', N'General', N'This is an official document.', N'Đây là tài liệu chính thức.'),
+(N'phrase', N'/freɪz/', N'cụm từ / câu ngắn', N'noun', N'INTERMEDIATE', N'General', N'Learn useful phrases for daily conversation.', N'Học các cụm từ hữu ích cho hội thoại hàng ngày.'),
+(N'address', N'/ˈædres/', N'địa chỉ', N'noun', N'BEGINNER', N'General', N'Write your address on the form.', N'Viết địa chỉ của bạn vào mẫu.'),
+(N'list', N'/lɪst/', N'danh sách', N'noun', N'BEGINNER', N'General', N'Make a list of things to buy.', N'Lập danh sách những thứ cần mua.'),
+-- People / Social
+(N'stranger', N'/ˈstreɪndʒər/', N'người lạ', N'noun', N'BEGINNER', N'People', N'Do not talk to strangers online.', N'Đừng nói chuyện với người lạ trực tuyến.'),
+(N'guest', N'/ɡest/', N'khách / khách mời', N'noun', N'BEGINNER', N'People', N'We had many guests at the party.', N'Chúng tôi có nhiều khách ở bữa tiệc.'),
+(N'host', N'/hoʊst/', N'chủ nhà / người tổ chức', N'noun', N'INTERMEDIATE', N'People', N'The host greeted each guest warmly.', N'Chủ nhà chào đón từng vị khách nồng nhiệt.'),
+(N'audience', N'/ˈɔːdiəns/', N'khán giả / người xem', N'noun', N'INTERMEDIATE', N'People', N'The audience clapped after the performance.', N'Khán giả vỗ tay sau buổi biểu diễn.')
+) AS v(word, pronunciation, meaning_vi, part_of_speech, difficulty, category, example_sentence, example_translation)
+WHERE NOT EXISTS (SELECT 1 FROM words w WHERE w.word = v.word);
+
+--rollback DELETE FROM words WHERE word IN ('delicious','tasty','spicy','fresh','frozen','raw','flavor','diet','serve','price','expensive','cheap','afford','spend','earn','income','savings','proud','ashamed','embarrassed','relieved','disappointed','hopeful','confused','curious','lonely','jealous','app','data','stream','post','comment','follow','share','notification','humid','flood','shade','wave','subject','quiz','certificate','absent','vocabulary','grammar','pronunciation','accent','tidy','decorate','repair','dust','broom','fridge','baggage','depart','boarding','delay','schedule','fare','task','hire','workload','remote','warn','remind','propose','admit','borrow','lend','fix','review','notice','miss','mention','collect','deliver','popular','common','typical','rare','unique','average','familiar','worth','extra','option','example','difference','similar','instead','simple','possible','impossible','necessary','main','local','official','phrase','address','list','stranger','guest','host','audience');

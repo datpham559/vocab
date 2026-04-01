@@ -88,4 +88,15 @@ export class RoomLobbyComponent {
       error: () => { this.error.set('Không tìm thấy phòng hoặc phòng đã kết thúc.'); this.loading.set(false); }
     });
   }
+
+  spectateRoom(): void {
+    const code = this.joinCode.trim().toUpperCase();
+    if (!code) return;
+    this.loading.set(true);
+    this.error.set('');
+    this.roomService.spectateRoom(code).subscribe({
+      next: () => this.router.navigate(['/room', code], { queryParams: { spectator: '1' } }),
+      error: () => { this.error.set('Không tìm thấy phòng hoặc phòng đã kết thúc.'); this.loading.set(false); }
+    });
+  }
 }

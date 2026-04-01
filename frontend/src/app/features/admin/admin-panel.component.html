@@ -78,6 +78,32 @@
 
   <!-- WORDS TAB -->
   <ng-container *ngIf="activeTab === 'words'">
+
+    <!-- Word Stats -->
+    <div class="word-stats-bar" *ngIf="wordStats()">
+      <div class="stat-chip stat-chip--total">
+        <span class="stat-num">{{ wordStats()!.total }}</span>
+        <span class="stat-label">Tổng</span>
+      </div>
+      <div class="stat-chip stat-chip--b">
+        <span class="stat-num">{{ wordStats()!.beginner }}</span>
+        <span class="stat-label">Cơ bản</span>
+      </div>
+      <div class="stat-chip stat-chip--i">
+        <span class="stat-num">{{ wordStats()!.intermediate }}</span>
+        <span class="stat-label">Trung bình</span>
+      </div>
+      <div class="stat-chip stat-chip--a">
+        <span class="stat-num">{{ wordStats()!.advanced }}</span>
+        <span class="stat-label">Nâng cao</span>
+      </div>
+      <div class="stat-categories">
+        <span class="cat-tag" *ngFor="let c of categoryEntries">
+          {{ c.name }} <b>{{ c.count }}</b>
+        </span>
+      </div>
+    </div>
+
     <div class="word-add-panel">
 
       <!-- Lookup section -->

@@ -47,6 +47,17 @@ public class RoomController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{code}/spectate")
+    public ResponseEntity<Void> spectateRoom(
+            @PathVariable String code,
+            @AuthenticationPrincipal UserPrincipal principal,
+            HttpServletRequest request) {
+        roomService.spectateRoom(code, principal.getId(), principal.getUsername());
+        activityLogService.log(principal.getId(), principal.getUsername(), "ROOM_SPECTATE",
+            "Xem phòng quiz #" + code, IpUtils.getIp(request));
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/{code}/start")
     public ResponseEntity<Void> startGame(
             @PathVariable String code,

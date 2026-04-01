@@ -33,6 +33,8 @@ public class RoomStateResponse {
     private String beginnerMode;
     private String intermediateMode;
     private String advancedMode;
+    private List<ParticipantScore> spectators;
+    private boolean spectator;
 
     @Data
     @AllArgsConstructor

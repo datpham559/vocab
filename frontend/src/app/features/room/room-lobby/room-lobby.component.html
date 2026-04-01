@@ -141,9 +141,14 @@
           autocomplete="off"
         />
       </div>
-      <button class="btn-start" (click)="joinRoom()" [disabled]="loading() || !joinCode.trim()">
-        {{ loading() ? 'Đang vào...' : '→ Vào phòng' }}
-      </button>
+      <div class="join-actions">
+        <button class="btn-start" (click)="joinRoom()" [disabled]="loading() || !joinCode.trim()">
+          {{ loading() ? 'Đang vào...' : '→ Vào phòng' }}
+        </button>
+        <button class="btn-spectate" (click)="spectateRoom()" [disabled]="loading() || !joinCode.trim()">
+          👁 Xem
+        </button>
+      </div>
     </div>
 
     <div class="error-msg" *ngIf="error()">{{ error() }}</div>

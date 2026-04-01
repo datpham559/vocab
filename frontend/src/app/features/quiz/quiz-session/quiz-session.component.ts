@@ -136,6 +136,12 @@ export class QuizSessionComponent implements OnInit {
     return this.currentQuestion?.word.split('') ?? [];
   }
 
+  get meaningLetters(): string[] {
+    const q = this.currentQuestion;
+    if (!q) return [];
+    return (q.options[q.correctIndex] ?? '').split('');
+  }
+
   selectOption(index: number): void {
     if (this.answered()) return;
     this.selectedIndex.set(index);

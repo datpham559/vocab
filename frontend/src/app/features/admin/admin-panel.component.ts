@@ -45,6 +45,8 @@ export class AdminPanelComponent implements OnInit {
   readonly difficulties = DIFFICULTIES;
   readonly categories = CATEGORIES;
 
+  wordStats = signal<{ total: number; beginner: number; intermediate: number; advanced: number; byCategory: Record<string, number> } | null>(null);
+
   lookupTerm = '';
   lookupLoading = signal(false);
   lookupResult = signal<WordLookupResult | null>(null);
@@ -64,6 +66,22 @@ export class AdminPanelComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
+    this.loadWordStats();
+  }
+
+  loadWordStats(): void {
+    this.adminService.getWordStats().subscribe({
+      next: stats => this.wordStats.set(stats),
+      error: () => {}
+    });
+  }
+
+  get categoryEntries(): { name: string; count: number }[] {
+    const s = this.wordStats();
+    if (!s) return [];
+    return Object.entries(s.byCategory)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
   }
 
   loadUsers(): void {

@@ -5,9 +5,11 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { interval, Subject } from 'rxjs';
 import { startWith, switchMap, takeUntil } from 'rxjs/operators';
 import { RoomService } from '../../../core/services/room.service';
-import { RoomState } from '../../../core/models/room.model';
+import { RoomWebSocketService } from '../../../core/services/room-websocket.service';
+import { ChatMessage, RoomState } from '../../../core/models/room.model';
 import { SpeechService } from '../../../core/services/speech.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { AudioService } from '../../../core/services/audio.service';
 
 interface AnswerRecord {
   word: string;
@@ -45,13 +47,32 @@ export class RoomGameComponent implements OnInit, OnDestroy {
   showHistory = signal(false);
   private lastRecordedIndex = -1;
 
+  // Chat
+  chatMessages: ChatMessage[] = [];
+  chatInput = '';
+  showChat = signal(false);
+  unreadCount = signal(0);
+  @ViewChild('chatBody') chatBody?: ElementRef<HTMLDivElement>;
+
+  // Reactions
+  readonly REACTIONS = ['❤️', '😂', '🔥', '👏', '😮', '💀'];
+  floatingReactions: { id: number; emoji: string; username: string; x: number }[] = [];
+  private reactionCounter = 0;
+
   private destroy$ = new Subject<void>();
+
+  private prevStatus = '';
+  private prevCountdown = -1;
+  private prevTimeLeft = -1;
+  private resultSoundPlayed = false;
 
   constructor(
     private route: ActivatedRoute,
     private roomService: RoomService,
+    private wsService: RoomWebSocketService,
     readonly speech: SpeechService,
-    readonly authService: AuthService
+    readonly authService: AuthService,
+    private audio: AudioService
   ) {}
 
   @HostListener('window:keydown', ['$event'])
@@ -76,18 +97,100 @@ export class RoomGameComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.code = this.route.snapshot.paramMap.get('code')!;
-    this.roomService.joinRoom(this.code).subscribe({
-      next: () => this.startPolling(),
-      error: err => {
-        this.error.set(err?.error?.message || 'Không tìm thấy phòng.');
-        this.loading.set(false);
-      }
-    });
+    const isSpectator = this.route.snapshot.queryParamMap.get('spectator') === '1';
+    if (isSpectator) {
+      // Already registered as spectator in lobby — skip joinRoom
+      this.startPolling();
+      this.connectWs();
+    } else {
+      this.roomService.joinRoom(this.code).subscribe({
+        next: () => {
+          this.startPolling();
+          this.connectWs();
+        },
+        error: err => {
+          this.error.set(err?.error?.message || 'Không tìm thấy phòng.');
+          this.loading.set(false);
+        }
+      });
+    }
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.wsService.disconnect();
+  }
+
+  private connectWs(): void {
+    this.wsService.connect(this.code).pipe(takeUntil(this.destroy$)).subscribe(event => {
+      if (event.type === 'CHAT') {
+        if (event.userId === this.myUserId) return; // already shown locally
+        this.chatMessages.push({
+          userId: event.userId,
+          username: event.username,
+          text: event.text!,
+          timestamp: event.timestamp,
+          spectator: event.spectator
+        });
+        if (!this.showChat()) this.unreadCount.update(n => n + 1);
+        setTimeout(() => {
+          if (this.chatBody) {
+            this.chatBody.nativeElement.scrollTop = this.chatBody.nativeElement.scrollHeight;
+          }
+        }, 50);
+      } else if (event.type === 'REACT') {
+        // Skip own reactions — already shown immediately on click
+        if (event.userId !== this.myUserId) {
+          this.addFloatingReaction(event.emoji!, event.username);
+        }
+      }
+    });
+  }
+
+  private addFloatingReaction(emoji: string, username: string): void {
+    const id = this.reactionCounter++;
+    const x = 5 + Math.random() * 70;
+    this.floatingReactions.push({ id, emoji, username, x });
+    setTimeout(() => {
+      this.floatingReactions = this.floatingReactions.filter(r => r.id !== id);
+    }, 2500);
+  }
+
+  toggleChat(): void {
+    this.showChat.update(v => !v);
+    if (this.showChat()) {
+      this.unreadCount.set(0);
+      setTimeout(() => {
+        if (this.chatBody) {
+          this.chatBody.nativeElement.scrollTop = this.chatBody.nativeElement.scrollHeight;
+        }
+      }, 50);
+    }
+  }
+
+  sendChat(): void {
+    const text = this.chatInput.trim();
+    if (!text) return;
+    const me = this.authService.currentUser();
+    this.chatMessages.push({
+      userId: this.myUserId,
+      username: me?.username ?? 'Bạn',
+      text,
+      timestamp: Date.now(),
+      spectator: this.state?.spectator ?? false
+    });
+    this.wsService.sendChat(text);
+    this.chatInput = '';
+    setTimeout(() => {
+      if (this.chatBody) this.chatBody.nativeElement.scrollTop = this.chatBody.nativeElement.scrollHeight;
+    }, 50);
+  }
+
+  sendReact(emoji: string): void {
+    const myName = this.authService.currentUser()?.username ?? 'Bạn';
+    this.addFloatingReaction(emoji, myName);
+    this.wsService.sendReact(emoji);
   }
 
   private startPolling(): void {
@@ -102,9 +205,7 @@ export class RoomGameComponent implements OnInit, OnDestroy {
         if (state.status === 'SHOWING_RESULT' && state.questionIndex !== this.lastRecordedIndex && state.currentQuestion) {
           this.lastRecordedIndex = state.questionIndex;
           const q = state.currentQuestion;
-          const correct = state.currentQuestionMode === 'TYPE'
-            ? state.myAnswer === 0
-            : state.myAnswer === state.correctIndex;
+          const correct = state.myAnswer !== null && state.myAnswer >= 0 && state.myAnswer === state.correctIndex;
           this.answerHistory.push({
             word: q.word,
             meaning: state.correctMeaning ?? '',
@@ -126,6 +227,49 @@ export class RoomGameComponent implements OnInit, OnDestroy {
           this.typingLocked.set(false);
           setTimeout(() => this.typeInput?.nativeElement?.focus(), 100);
         }
+
+        // --- Sound triggers ---
+        const status = state.status;
+
+        // Countdown ticks (3-2-1)
+        if (status === 'COUNTDOWN' && state.countdownLeft !== this.prevCountdown) {
+          this.prevCountdown = state.countdownLeft;
+          if (state.countdownLeft === 1) this.audio.tickFinal();
+          else if (state.countdownLeft > 0) this.audio.tick();
+        }
+
+        // New question revealed
+        if (status === 'ACTIVE' && this.prevStatus !== 'ACTIVE') {
+          if (this.prevStatus === 'COUNTDOWN' && state.questionIndex === 0) {
+            this.audio.gameStart();
+          } else {
+            this.audio.questionReveal();
+          }
+          this.resultSoundPlayed = false;
+        }
+
+        // Timer ticking last 5s
+        if (status === 'ACTIVE' && state.timeLeft <= 5 && state.timeLeft > 0
+            && state.timeLeft !== this.prevTimeLeft) {
+          this.audio.timerTick();
+        }
+
+        // Result sound (correct / wrong) — once per question
+        if (status === 'SHOWING_RESULT' && !this.resultSoundPlayed && state.myAnswer !== null) {
+          this.resultSoundPlayed = true;
+          const correct = state.myAnswer >= 0 && state.myAnswer === state.correctIndex;
+          if (!state.spectator) correct ? this.audio.correct() : this.audio.wrong();
+        }
+
+        // Game done
+        if (status === 'DONE' && this.prevStatus !== 'DONE') {
+          this.audio.victory();
+        }
+
+        this.prevStatus = status;
+        this.prevTimeLeft = state.timeLeft;
+        // --- End sounds ---
+
         this.state = state;
       },
       error: () => {}
@@ -134,6 +278,10 @@ export class RoomGameComponent implements OnInit, OnDestroy {
 
   get choiceWordLetters(): string[] {
     return this.state?.currentQuestion?.word.split('') ?? [];
+  }
+
+  get meaningLetters(): string[] {
+    return this.state?.correctMeaning?.split('') ?? [];
   }
 
   get wordHintBoxes(): { char: string; blank: boolean }[] {
@@ -164,6 +312,13 @@ export class RoomGameComponent implements OnInit, OnDestroy {
     if (pct > 60) return '#22c55e';
     if (pct > 30) return '#f59e0b';
     return '#ef4444';
+  }
+
+  becomeSpectator(): void {
+    this.roomService.spectateRoom(this.code).subscribe({
+      next: () => {},
+      error: err => { this.error.set(err?.error?.message || 'Không thể chuyển sang khán giả.'); }
+    });
   }
 
   startGame(): void {

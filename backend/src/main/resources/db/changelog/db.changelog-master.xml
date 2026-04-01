@@ -55,5 +55,10 @@
     <include file="db/changelog/052-seed-words-batch45.sql"/>
     <include file="db/changelog/053-seed-words-batch46.sql"/>
     <include file="db/changelog/054-alter-tables.sql"/>
+    <include file="db/changelog/055-seed-words-batch47.sql"/>
+    <include file="db/changelog/056-seed-words-batch48.sql"/>
+    <include file="db/changelog/057-seed-words-batch49.sql"/>
+    <include file="db/changelog/058-seed-words-batch50.sql"/>
+    <include file="db/changelog/059-seed-words-batch51.sql"/>
 
 </databaseChangeLog>

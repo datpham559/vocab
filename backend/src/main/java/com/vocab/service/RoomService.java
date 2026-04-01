@@ -91,6 +91,17 @@ public class RoomService {
         room.getScores().putIfAbsent(userId, 0);
     }
 
+    public void spectateRoom(String code, Long userId, String userName) {
+        ActiveRoom room = getRoom(code);
+        if (room.getStatus() == RoomStatus.DONE) {
+            throw new IllegalStateException("Game already ended");
+        }
+        // Remove from players if they somehow joined before
+        room.getParticipants().remove(userId);
+        room.getScores().remove(userId);
+        room.getSpectators().putIfAbsent(userId, userName);
+    }
+
     public void startGame(String code, Long userId) {
         ActiveRoom room = getRoom(code);
         if (!room.getHostId().equals(userId)) {
@@ -215,6 +226,16 @@ public class RoomService {
 
     public RoomStateResponse getState(String code, Long userId) {
         ActiveRoom room = getRoom(code);
+        // Allow spectators to poll state too
+        boolean isSpectator = room.getSpectators().containsKey(userId);
+        if (!isSpectator && !room.getParticipants().containsKey(userId)) {
+            // Auto-add as spectator if game already started
+            if (room.getStatus() != RoomStatus.WAITING) {
+                room.getSpectators().putIfAbsent(userId,
+                    room.getSpectators().getOrDefault(userId, "Unknown"));
+                isSpectator = true;
+            }
+        }
 
         List<RoomStateResponse.ParticipantScore> participants = room.getParticipants().entrySet().stream()
             .map(e -> new RoomStateResponse.ParticipantScore(
@@ -261,11 +282,17 @@ public class RoomService {
             }
         }
 
+        List<RoomStateResponse.ParticipantScore> spectatorList = room.getSpectators().entrySet().stream()
+            .map(e -> new RoomStateResponse.ParticipantScore(e.getKey(), e.getValue(), 0, false))
+            .collect(Collectors.toList());
+
         return RoomStateResponse.builder()
             .code(code)
             .status(room.getStatus().name())
             .hostId(room.getHostId())
             .participants(participants)
+            .spectators(spectatorList)
+            .spectator(isSpectator)
             .currentQuestion(currentQ)
             .questionIndex(room.getCurrentQuestionIndex())
             .totalQuestions(room.getQuestions().size())
