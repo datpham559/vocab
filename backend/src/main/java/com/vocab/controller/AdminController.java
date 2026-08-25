@@ -47,6 +47,14 @@ public class AdminController {
         return ResponseEntity.ok(adminService.updateRole(id, role));
     }
 
+    @PostMapping("/users/{id}/reset-password")
+    public ResponseEntity<Void> resetPassword(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        adminService.resetPassword(id, principal.getId());
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/users/{id}")
     public ResponseEntity<Void> deleteUser(
             @PathVariable Long id,

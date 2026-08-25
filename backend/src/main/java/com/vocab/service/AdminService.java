@@ -4,6 +4,7 @@ import com.vocab.dto.response.AdminUserResponse;
 import com.vocab.exception.ResourceNotFoundException;
 import com.vocab.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 public class AdminService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<AdminUserResponse> getAllUsers() {
         return userRepository.findAll().stream()
@@ -26,6 +28,17 @@ public class AdminService {
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setRole(role);
         return AdminUserResponse.from(userRepository.save(user));
+    }
+
+    @Transactional
+    public void resetPassword(Long userId, Long requesterId) {
+        if (userId.equals(requesterId)) {
+            throw new IllegalArgumentException("Cannot reset your own password here");
+        }
+        var user = userRepository.findById(userId)
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        user.setPassword(passwordEncoder.encode("66668888"));
+        userRepository.save(user);
     }
 
     @Transactional

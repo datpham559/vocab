@@ -58,25 +58,16 @@ public interface WordRepository extends JpaRepository<Word, Long> {
            nativeQuery = true)
     List<Word> findNewWordsForUser(@Param("userId") Long userId, @Param("limit") int limit);
 
-    @Query(value = "SELECT TOP (:limit) * FROM words " +
-                   "WHERE difficulty = :difficulty AND id != :excludeId " +
-                   "ORDER BY NEWID()",
-           nativeQuery = true)
-    List<Word> findDistractors(@Param("difficulty") String difficulty,
-                               @Param("excludeId") Long excludeId,
-                               @Param("limit") int limit);
-
-    @Query(value = "SELECT TOP (:limit) * FROM words " +
-                   "WHERE part_of_speech = :pos AND id != :excludeId " +
-                   "ORDER BY NEWID()",
-           nativeQuery = true)
-    List<Word> findDistractorsByPos(@Param("pos") String partOfSpeech,
-                                    @Param("excludeId") Long excludeId,
-                                    @Param("limit") int limit);
-
     @Query(value = "SELECT TOP (:limit) * FROM words WHERE difficulty = :difficulty ORDER BY NEWID()",
            nativeQuery = true)
     List<Word> findRandomByDifficulty(@Param("difficulty") String difficulty, @Param("limit") int limit);
+
+    // Plain (non-random) pool fetches, indexed on difficulty/part_of_speech.
+    // Callers sample randomly in memory instead of paying an ORDER BY NEWID() sort per call —
+    // these are meant to be fetched ONCE per batch and reused across many questions.
+    List<Word> findAllByPartOfSpeechIgnoreCase(String partOfSpeech);
+
+    List<Word> findAllByDifficulty(WordDifficulty difficulty);
 
     @Query("SELECT w.category, COUNT(w) FROM Word w WHERE w.category IS NOT NULL GROUP BY w.category ORDER BY w.category")
     List<Object[]> countByCategory();

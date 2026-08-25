@@ -87,6 +87,10 @@ public class RoomService {
         if (room.getStatus() == RoomStatus.DONE) {
             throw new IllegalStateException("Game already ended");
         }
+        if (room.getStatus() != RoomStatus.WAITING) {
+            throw new IllegalStateException("Game already started");
+        }
+        room.getSpectators().remove(userId);
         room.getParticipants().putIfAbsent(userId, userName);
         room.getScores().putIfAbsent(userId, 0);
     }
@@ -100,6 +104,53 @@ public class RoomService {
         room.getParticipants().remove(userId);
         room.getScores().remove(userId);
         room.getSpectators().putIfAbsent(userId, userName);
+    }
+
+    public void setPlayer(String code, Long hostId, Long targetId) {
+        ActiveRoom room = getRoom(code);
+        if (!room.getHostId().equals(hostId)) {
+            throw new IllegalStateException("Only host can change player roles");
+        }
+        if (room.getStatus() != RoomStatus.WAITING) {
+            throw new IllegalStateException("Cannot change roles after game started");
+        }
+        String name = room.getSpectators().getOrDefault(targetId, "Unknown");
+        room.getSpectators().remove(targetId);
+        room.getParticipants().putIfAbsent(targetId, name);
+        room.getScores().putIfAbsent(targetId, 0);
+    }
+
+    public void setSpectator(String code, Long hostId, Long targetId) {
+        ActiveRoom room = getRoom(code);
+        if (!room.getHostId().equals(hostId)) {
+            throw new IllegalStateException("Only host can change player roles");
+        }
+        if (room.getStatus() != RoomStatus.WAITING) {
+            throw new IllegalStateException("Cannot change roles after game started");
+        }
+        if (hostId.equals(targetId)) {
+            throw new IllegalStateException("Host cannot change their own role");
+        }
+        String name = room.getParticipants().getOrDefault(targetId, "Unknown");
+        room.getParticipants().remove(targetId);
+        room.getScores().remove(targetId);
+        room.getSpectators().putIfAbsent(targetId, name);
+    }
+
+    public void kickPlayer(String code, Long hostId, Long targetId) {
+        ActiveRoom room = getRoom(code);
+        if (!room.getHostId().equals(hostId)) {
+            throw new IllegalStateException("Only host can kick players");
+        }
+        if (room.getStatus() != RoomStatus.WAITING) {
+            throw new IllegalStateException("Cannot kick after game started");
+        }
+        if (hostId.equals(targetId)) {
+            throw new IllegalStateException("Host cannot kick themselves");
+        }
+        room.getParticipants().remove(targetId);
+        room.getScores().remove(targetId);
+        room.getSpectators().remove(targetId);
     }
 
     public void startGame(String code, Long userId) {
@@ -267,10 +318,10 @@ public class RoomService {
                     correctIndex = raw.getCorrectIndex();
                     currentQ = raw; // reveal full question on result
                 } else {
-                    // ACTIVE: sanitize — never expose correctIndex or the answer word
+                    // ACTIVE: sanitize — never expose wordId, correctIndex, or the answer
                     boolean isType = "TYPE".equals(currentQuestionMode);
                     currentQ = QuizQuestionResponse.builder()
-                        .wordId(raw.getWordId())
+                        .wordId(null)
                         .word(isType ? maskWord(raw.getWord()) : raw.getWord())
                         .pronunciation(isType ? null : raw.getPronunciation())
                         .options(isType ? null : raw.getOptions())

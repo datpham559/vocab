@@ -60,5 +60,13 @@
     <include file="db/changelog/057-seed-words-batch49.sql"/>
     <include file="db/changelog/058-seed-words-batch50.sql"/>
     <include file="db/changelog/059-seed-words-batch51.sql"/>
+    <include file="db/changelog/060-seed-words-batch52.sql"/>
+    <include file="db/changelog/061-seed-words-batch53.sql"/>
+    <include file="db/changelog/062-seed-words-batch54.sql"/>
+    <include file="db/changelog/063-seed-words-batch55.sql"/>
+    <include file="db/changelog/064-seed-words-batch56.sql"/>
+    <include file="db/changelog/065-seed-words-batch57.sql"/>
+    <include file="db/changelog/066-seed-words-batch58.sql"/>
+    <include file="db/changelog/067-add-words-indexes.sql"/>
 
 </databaseChangeLog>

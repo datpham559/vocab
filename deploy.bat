@@ -20,25 +20,28 @@ echo   Vocab App - Deploy
 echo ========================================
 echo.
 
-echo [1/5] Stopping service...
-net stop VocabApp >nul 2>&1
-taskkill /F /IM java.exe >nul 2>&1
-timeout /t 2 /nobreak >nul
-
-echo [2/5] Building frontend...
+echo [1/5] Building frontend...
 cd /d "%FRONTEND%"
 call npm install --silent
 if %errorlevel% neq 0 ( echo [ERROR] npm install failed & pause & exit /b 1 )
 call ng build --configuration production
 if %errorlevel% neq 0 ( echo [ERROR] Angular build failed & pause & exit /b 1 )
 
-echo [3/5] Copying frontend to backend...
+echo [2/5] Copying frontend to backend static...
 if exist "%STATIC%" rmdir /s /q "%STATIC%"
 mkdir "%STATIC%"
 xcopy /e /i /q "%FRONTEND%\dist\vocab-frontend\browser\*" "%STATIC%\" >nul 2>&1
 if %errorlevel% neq 0 (
     xcopy /e /i /q "%FRONTEND%\dist\vocab-frontend\*" "%STATIC%\" >nul 2>&1
 )
+
+echo [3/5] Stopping service...
+net stop VocabApp >nul 2>&1
+timeout /t 3 /nobreak >nul
+taskkill /F /IM java.exe >nul 2>&1
+timeout /t 3 /nobreak >nul
+if exist "%JAR%" del /f /q "%JAR%" >nul 2>&1
+if exist "%JAR%.original" del /f /q "%JAR%.original" >nul 2>&1
 
 echo [4/5] Building backend...
 cd /d "%BACKEND%"
@@ -59,7 +62,7 @@ net stop VocabApp >nul 2>&1
 net start VocabApp
 
 echo.
-timeout /t 8 /nobreak >nul
+timeout /t 8 /nobreak >nul 
 sc query VocabApp | findstr STATE
 
 echo.

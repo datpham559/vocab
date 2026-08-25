@@ -29,7 +29,7 @@ public class RoomController {
             @RequestBody CreateRoomRequest req,
             @AuthenticationPrincipal UserPrincipal principal,
             HttpServletRequest request) {
-        ActiveRoom room = roomService.createRoom(principal.getId(), principal.getUsername(), req);
+        ActiveRoom room = roomService.createRoom(principal.getId(), principal.getEffectiveName(), req);
         activityLogService.log(principal.getId(), principal.getUsername(), "ROOM_CREATED",
             "Tạo phòng quiz #" + room.getCode() + " (" + req.getQuestionCount() + " câu)",
             IpUtils.getIp(request));
@@ -41,7 +41,7 @@ public class RoomController {
             @PathVariable String code,
             @AuthenticationPrincipal UserPrincipal principal,
             HttpServletRequest request) {
-        roomService.joinRoom(code, principal.getId(), principal.getUsername());
+        roomService.joinRoom(code, principal.getId(), principal.getEffectiveName());
         activityLogService.log(principal.getId(), principal.getUsername(), "ROOM_JOINED",
             "Vào phòng quiz #" + code, IpUtils.getIp(request));
         return ResponseEntity.ok().build();
@@ -52,9 +52,36 @@ public class RoomController {
             @PathVariable String code,
             @AuthenticationPrincipal UserPrincipal principal,
             HttpServletRequest request) {
-        roomService.spectateRoom(code, principal.getId(), principal.getUsername());
+        roomService.spectateRoom(code, principal.getId(), principal.getEffectiveName());
         activityLogService.log(principal.getId(), principal.getUsername(), "ROOM_SPECTATE",
             "Xem phòng quiz #" + code, IpUtils.getIp(request));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{code}/set-player/{targetId}")
+    public ResponseEntity<Void> setPlayer(
+            @PathVariable String code,
+            @PathVariable Long targetId,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        roomService.setPlayer(code, principal.getId(), targetId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{code}/set-spectator/{targetId}")
+    public ResponseEntity<Void> setSpectator(
+            @PathVariable String code,
+            @PathVariable Long targetId,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        roomService.setSpectator(code, principal.getId(), targetId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{code}/kick/{targetId}")
+    public ResponseEntity<Void> kickPlayer(
+            @PathVariable String code,
+            @PathVariable Long targetId,
+            @AuthenticationPrincipal UserPrincipal principal) {
+        roomService.kickPlayer(code, principal.getId(), targetId);
         return ResponseEntity.ok().build();
     }
 

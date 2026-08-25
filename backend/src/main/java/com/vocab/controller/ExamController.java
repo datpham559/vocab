@@ -45,9 +45,7 @@ public class ExamController {
         all.addAll(wordRepository.findRandomByDifficulty("ADVANCED",     aCount));
         Collections.shuffle(all);
 
-        List<QuizQuestionResponse> questions = all.stream()
-            .map(quizService::buildQuestion)
-            .toList();
+        List<QuizQuestionResponse> questions = quizService.generateQuizForWords(all);
 
         Long userId = principal != null ? principal.getId() : null;
         String username = principal != null ? principal.getUsername() : "Khách";
