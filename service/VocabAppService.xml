@@ -1,0 +1,27 @@
+<service>
+  <id>VocabApp</id>
+  <name>Vocab App - Backend</name>
+  <description>Spring Boot backend cho Vocab learning app (chạy từ vocab-backend-0.0.1-SNAPSHOT.jar), port 8899.</description>
+
+  <executable>C:\Program Files\Java\jdk-17.0.12\bin\java.exe</executable>
+  <arguments>-jar "c:\Users\Admin\Desktop\project\vocab\backend\target\vocab-backend-0.0.1-SNAPSHOT.jar" --server.port=8899</arguments>
+
+  <!-- Working directory = backend project root, giống lúc chạy tay bằng mvnw spring-boot:run,
+       để mọi đường dẫn tương đối (vd logging.file.name) trỏ đúng chỗ cũ. -->
+  <workingdirectory>c:\Users\Admin\Desktop\project\vocab\backend</workingdirectory>
+
+  <startmode>Automatic</startmode>
+
+  <!-- Log riêng của WinSW (stdout/stderr + wrapper events), tách khỏi log của chính app,
+       chỉ dùng để chẩn đoán lúc service không khởi động được.
+       mode="reset": xoá sạch log cũ mỗi lần service start lại, không giữ lịch sử. -->
+  <logpath>c:\Users\Admin\Desktop\project\vocab\service\logs</logpath>
+  <log mode="reset"/>
+
+  <!-- Tự khởi động lại nếu crash, chờ 10s giữa các lần thử. -->
+  <onfailure action="restart" delay="10 sec"/>
+  <resetfailure>1 hour</resetfailure>
+
+  <!-- Cho java.exe đủ thời gian tắt êm (đóng kết nối DB/scheduler) trước khi WinSW ép kill. -->
+  <stoptimeout>30 sec</stoptimeout>
+</service>

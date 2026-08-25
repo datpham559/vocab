@@ -1,0 +1,23 @@
+<service>
+  <id>VocabTunnel</id>
+  <name>Vocab App - Cloudflare Tunnel</name>
+  <description>Cloudflare quick tunnel, expose VocabApp (localhost:8899) ra internet.</description>
+
+  <executable>C:\Program Files (x86)\cloudflared\cloudflared.exe</executable>
+  <arguments>tunnel --url http://localhost:8899</arguments>
+
+  <workingdirectory>c:\Users\Admin\Desktop\project\vocab</workingdirectory>
+
+  <startmode>Automatic</startmode>
+  <!-- Chỉ khởi động sau khi VocabApp đã chạy. -->
+  <depend>VocabApp</depend>
+
+  <!-- mode="reset": xoá sạch log cũ mỗi lần service start lại, không giữ lịch sử. -->
+  <logpath>c:\Users\Admin\Desktop\project\vocab\service\logs</logpath>
+  <log mode="reset"/>
+
+  <onfailure action="restart" delay="10 sec"/>
+  <resetfailure>1 hour</resetfailure>
+
+  <stoptimeout>15 sec</stoptimeout>
+</service>
