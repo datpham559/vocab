@@ -53,7 +53,8 @@
             </div>
             <div class="diff-stepper">
               <button class="step-btn" (click)="adjustCount('beginner', -1)" [disabled]="beginnerCount === 0">−</button>
-              <span class="step-val">{{ beginnerCount }}</span>
+              <input class="step-input" type="number" min="0" [max]="MAX_PER_DIFF"
+                     [(ngModel)]="beginnerCount" (change)="clampInput('beginner')">
               <button class="step-btn" (click)="adjustCount('beginner', 1)" [disabled]="beginnerCount === MAX_PER_DIFF">+</button>
             </div>
           </div>
@@ -73,7 +74,8 @@
             </div>
             <div class="diff-stepper">
               <button class="step-btn" (click)="adjustCount('intermediate', -1)" [disabled]="intermediateCount === 0">−</button>
-              <span class="step-val">{{ intermediateCount }}</span>
+              <input class="step-input" type="number" min="0" [max]="MAX_PER_DIFF"
+                     [(ngModel)]="intermediateCount" (change)="clampInput('intermediate')">
               <button class="step-btn" (click)="adjustCount('intermediate', 1)" [disabled]="intermediateCount === MAX_PER_DIFF">+</button>
             </div>
           </div>
@@ -93,7 +95,8 @@
             </div>
             <div class="diff-stepper">
               <button class="step-btn" (click)="adjustCount('advanced', -1)" [disabled]="advancedCount === 0">−</button>
-              <span class="step-val">{{ advancedCount }}</span>
+              <input class="step-input" type="number" min="0" [max]="MAX_PER_DIFF"
+                     [(ngModel)]="advancedCount" (change)="clampInput('advanced')">
               <button class="step-btn" (click)="adjustCount('advanced', 1)" [disabled]="advancedCount === MAX_PER_DIFF">+</button>
             </div>
           </div>

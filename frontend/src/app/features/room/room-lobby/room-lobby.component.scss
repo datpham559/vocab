@@ -276,6 +276,26 @@ h1 {
   color: var(--text-primary);
 }
 
+.step-input {
+  width: 48px;
+  height: 28px;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 0;
+  outline: none;
+  transition: border-color 0.12s;
+  &:focus { border-color: #6366f1; }
+  // Hide browser spin arrows
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  -moz-appearance: textfield;
+}
+
 .diff-total {
   padding: 0.65rem 1rem;
   font-size: 0.88rem;

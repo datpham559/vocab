@@ -101,6 +101,14 @@ export class AdminPanelComponent implements OnInit {
     });
   }
 
+  resetPassword(user: AdminUser): void {
+    if (!confirm(`Đặt lại mật khẩu của "${user.username}" về "66668888"?`)) return;
+    this.adminService.resetPassword(user.id).subscribe({
+      next: () => alert(`Đã đặt lại mật khẩu cho "${user.username}" thành công.`),
+      error: () => this.errorMsg.set('Không thể đặt lại mật khẩu.')
+    });
+  }
+
   deleteUser(user: AdminUser): void {
     if (!confirm(`Xóa tài khoản "${user.username}"? Hành động này không thể hoàn tác.`)) return;
     this.adminService.deleteUser(user.id).subscribe({

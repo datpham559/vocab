@@ -35,6 +35,18 @@ export class RoomService {
     return this.http.post<void>(`${this.base}/${code}/spectate`, {});
   }
 
+  kickPlayer(code: string, targetId: number): Observable<void> {
+    return this.http.post<void>(`${this.base}/${code}/kick/${targetId}`, {});
+  }
+
+  setSpectator(code: string, targetId: number): Observable<void> {
+    return this.http.post<void>(`${this.base}/${code}/set-spectator/${targetId}`, {});
+  }
+
+  setPlayer(code: string, targetId: number): Observable<void> {
+    return this.http.post<void>(`${this.base}/${code}/set-player/${targetId}`, {});
+  }
+
   startGame(code: string): Observable<void> {
     return this.http.post<void>(`${this.base}/${code}/start`, {});
   }

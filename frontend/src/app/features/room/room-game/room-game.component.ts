@@ -175,7 +175,7 @@ export class RoomGameComponent implements OnInit, OnDestroy {
     const me = this.authService.currentUser();
     this.chatMessages.push({
       userId: this.myUserId,
-      username: me?.username ?? 'Bạn',
+      username: me?.displayName || me?.username || 'Bạn',
       text,
       timestamp: Date.now(),
       spectator: this.state?.spectator ?? false
@@ -188,7 +188,8 @@ export class RoomGameComponent implements OnInit, OnDestroy {
   }
 
   sendReact(emoji: string): void {
-    const myName = this.authService.currentUser()?.username ?? 'Bạn';
+    const me = this.authService.currentUser();
+    const myName = me?.displayName || me?.username || 'Bạn';
     this.addFloatingReaction(emoji, myName);
     this.wsService.sendReact(emoji);
   }
@@ -314,10 +315,35 @@ export class RoomGameComponent implements OnInit, OnDestroy {
     return '#ef4444';
   }
 
+  kickPlayer(targetId: number): void {
+    this.roomService.kickPlayer(this.code, targetId).subscribe({
+      error: err => { this.error.set(err?.error?.message || 'Không thể kick người chơi.'); }
+    });
+  }
+
+  setPlayerAsSpectator(targetId: number): void {
+    this.roomService.setSpectator(this.code, targetId).subscribe({
+      error: err => { this.error.set(err?.error?.message || 'Không thể chuyển sang khán giả.'); }
+    });
+  }
+
+  setSpectatorAsPlayer(targetId: number): void {
+    this.roomService.setPlayer(this.code, targetId).subscribe({
+      error: err => { this.error.set(err?.error?.message || 'Không thể chuyển sang người chơi.'); }
+    });
+  }
+
   becomeSpectator(): void {
     this.roomService.spectateRoom(this.code).subscribe({
       next: () => {},
       error: err => { this.error.set(err?.error?.message || 'Không thể chuyển sang khán giả.'); }
+    });
+  }
+
+  becomePlayer(): void {
+    this.roomService.joinRoom(this.code).subscribe({
+      next: () => {},
+      error: err => { this.error.set(err?.error?.message || 'Không thể chuyển sang người chơi.'); }
     });
   }
 

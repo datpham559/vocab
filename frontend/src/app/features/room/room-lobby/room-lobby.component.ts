@@ -46,6 +46,16 @@ export class RoomLobbyComponent {
     return this.totalCustomCount >= 1 && this.totalCustomCount <= 50;
   }
 
+  clampInput(diff: 'beginner' | 'intermediate' | 'advanced'): void {
+    if (diff === 'beginner') {
+      this.beginnerCount = Math.max(0, Math.min(this.MAX_PER_DIFF, Math.floor(this.beginnerCount) || 0));
+    } else if (diff === 'intermediate') {
+      this.intermediateCount = Math.max(0, Math.min(this.MAX_PER_DIFF, Math.floor(this.intermediateCount) || 0));
+    } else {
+      this.advancedCount = Math.max(0, Math.min(this.MAX_PER_DIFF, Math.floor(this.advancedCount) || 0));
+    }
+  }
+
   adjustCount(diff: 'beginner' | 'intermediate' | 'advanced', delta: number): void {
     if (diff === 'beginner') {
       this.beginnerCount = Math.max(0, Math.min(this.MAX_PER_DIFF, this.beginnerCount + delta));

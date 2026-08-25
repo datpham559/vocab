@@ -245,17 +245,17 @@
 
 .actions {
   display: flex;
-  gap: 0.5rem;
-  white-space: nowrap;
+  flex-wrap: wrap;
+  gap: 0.35rem;
 }
 
 .btn-role {
-  padding: 0.3rem 0.75rem;
+  padding: 0.25rem 0.5rem;
   border-radius: 6px;
   border: 1px solid #6366f1;
   background: transparent;
   color: #6366f1;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   cursor: pointer;
   transition: all 0.15s;
 
@@ -515,8 +515,22 @@ label {
   &:hover { background: #e2e8f0; }
 }
 
+.btn-reset-pw {
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #f59e0b;
+  background: transparent;
+  color: #f59e0b;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover:not(:disabled) { background: #f59e0b; color: #fff; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
 .btn-delete {
-  padding: 0.3rem 0.75rem;
+  padding: 0.25rem 0.5rem;
   border-radius: 6px;
   border: 1px solid #ef4444;
   background: transparent;

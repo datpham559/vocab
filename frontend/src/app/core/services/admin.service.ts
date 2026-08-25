@@ -46,6 +46,10 @@ export class AdminService {
     return this.http.delete<void>(`${this.base}/users/${userId}`);
   }
 
+  resetPassword(userId: number): Observable<void> {
+    return this.http.post<void>(`${this.base}/users/${userId}/reset-password`, {});
+  }
+
   lookupWord(word: string): Observable<WordLookupResult> {
     return this.http.get<WordLookupResult>(`${this.wordsBase}/lookup`, { params: { word } });
   }

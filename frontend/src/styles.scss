@@ -409,11 +409,20 @@ body {
     background: #1a2236 !important;
     color: var(--text-secondary) !important;
   }
+  .spectator-count { color: #818cf8 !important; }
   .participant-item {
     border-top-color: var(--border) !important;
     color: var(--text-primary) !important;
   }
   .participant-you { color: var(--primary) !important; }
+  .spectators-list { border-color: rgba(99,102,241,0.25) !important; }
+  .spectators-title { background: rgba(99,102,241,0.1) !important; }
+  .spectator-item { border-top-color: rgba(99,102,241,0.15) !important; }
+  .spectator-name { color: var(--text-secondary) !important; }
+  .spectator-you  { color: var(--primary) !important; }
+  .btn-to-player  { &:hover { background: rgba(99,102,241,0.2) !important; } }
+  .btn-to-spectator { &:hover { background: rgba(99,102,241,0.2) !important; } }
+  .btn-kick { color: #475569 !important; &:hover { color: #f87171 !important; background: #450a0a !important; } }
   .waiting-msg { color: var(--text-secondary) !important; }
   .spinner-sm { border-color: var(--border) !important; border-top-color: var(--primary) !important; }
 
@@ -456,6 +465,23 @@ body {
 
   // Done / leaderboard
   .done-card { background: var(--surface) !important; }
+
+  // Answer history
+  .history-item {
+    &.history-correct {
+      background: #052e16 !important;
+      border-color: #166534 !important;
+    }
+    &.history-wrong {
+      background: #2d0707 !important;
+      border-color: #7f1d1d !important;
+    }
+  }
+  .history-word   { color: var(--text-primary) !important; }
+  .history-meaning { color: var(--text-secondary) !important; }
+  .wrong-choice   { color: #f87171 !important; }
+  .correct-choice { color: #4ade80 !important; }
+  .history-empty  { color: var(--text-muted) !important; }
   .leaderboard { border-color: var(--border) !important; }
   .lb-header {
     background: #1a2236 !important;

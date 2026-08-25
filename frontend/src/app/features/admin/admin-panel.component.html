@@ -61,6 +61,13 @@
               {{ user.role === 'ROLE_ADMIN' ? '↓ User' : '↑ Admin' }}
             </button>
             <button
+              class="btn-reset-pw"
+              (click)="resetPassword(user)"
+              [disabled]="isCurrentUser(user)"
+              title="Đặt lại mật khẩu về 66668888">
+              Reset PW
+            </button>
+            <button
               class="btn-delete"
               (click)="deleteUser(user)"
               [disabled]="isCurrentUser(user)"

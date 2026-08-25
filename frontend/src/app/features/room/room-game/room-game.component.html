@@ -49,11 +49,31 @@
         </div>
 
         <div class="participants-list">
-          <div class="participants-title">{{ state.participants.length }} người tham gia</div>
+          <div class="participants-title">
+            {{ state.participants.length }} người tham gia
+            <span class="spectator-count" *ngIf="state.spectators.length > 0">
+              · 👁 {{ state.spectators.length }} khán giả
+            </span>
+          </div>
           <div class="participant-item" *ngFor="let p of state.participants">
             <span class="participant-crown" *ngIf="p.host">👑</span>
             <span class="participant-name">{{ p.name }}</span>
             <span class="participant-you" *ngIf="p.userId === myUserId">(Bạn)</span>
+            <button class="btn-to-spectator" *ngIf="isHost && p.userId !== myUserId"
+                    (click)="setPlayerAsSpectator(p.userId)" title="Chuyển sang khán giả">👁</button>
+            <button class="btn-kick" *ngIf="isHost && p.userId !== myUserId"
+                    (click)="kickPlayer(p.userId)" title="Kick">✕</button>
+          </div>
+        </div>
+
+        <!-- Spectator list -->
+        <div class="spectators-list" *ngIf="state.spectators.length > 0">
+          <div class="spectators-title">👁 {{ state.spectators.length }} khán giả</div>
+          <div class="spectator-item" *ngFor="let s of state.spectators">
+            <span class="spectator-name">{{ s.name }}</span>
+            <span class="spectator-you" *ngIf="s.userId === myUserId">(Bạn)</span>
+            <button class="btn-to-player" *ngIf="isHost"
+                    (click)="setSpectatorAsPlayer(s.userId)" title="Chuyển thành người chơi">🎮</button>
           </div>
         </div>
 
@@ -74,6 +94,7 @@
         </button>
         <div class="spectator-badge" *ngIf="state.spectator">
           👁 Bạn đang xem với tư cách khán giả
+          <button class="btn-become-player" (click)="becomePlayer()">🎮 Trở thành người chơi</button>
         </div>
       </div>
     </ng-container>
@@ -131,17 +152,17 @@
             </span>
           </div>
           <p class="quiz-prompt">Chọn nghĩa đúng:</p>
-          <div class="options" *ngIf="!state.spectator">
+          <div class="options">
             <button
               *ngFor="let opt of state.currentQuestion.options; let i = index"
               class="option-btn"
               [class]="getOptionClass(i)"
-              (click)="selectOption(i)"
-              [disabled]="state.myAnswer !== null || state.status === 'SHOWING_RESULT'">
+              (click)="!state.spectator && selectOption(i)"
+              [disabled]="state.spectator || state.myAnswer !== null || state.status === 'SHOWING_RESULT'"
+              [class.spectator-option]="state.spectator">
               {{ opt }}
             </button>
           </div>
-          <div class="spectator-watching" *ngIf="state.spectator">👁 Đang xem...</div>
         </ng-container>
 
         <!-- TYPING MODE -->
@@ -171,7 +192,9 @@
             <span class="type-answered-icon">✗</span> Sai rồi! Đang chờ người khác...
           </div>
           <!-- Spectator watching -->
-          <div class="spectator-watching" *ngIf="state.spectator && state.status === 'ACTIVE'">👁 Đang xem...</div>
+          <div class="spectator-watching spectator-type-hint" *ngIf="state.spectator && state.status === 'ACTIVE'">
+            👁 Khán giả — từ đang bị ẩn
+          </div>
 
           <!-- Result shown -->
           <div class="type-result-reveal" *ngIf="state.status === 'SHOWING_RESULT'">
