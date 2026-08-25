@@ -21,7 +21,16 @@ public class RoomStore {
 
     @Scheduled(fixedDelay = 300_000)
     public void cleanup() {
-        LocalDateTime cutoff = LocalDateTime.now().minusHours(2);
-        rooms.entrySet().removeIf(e -> e.getValue().getCreatedAt().isBefore(cutoff));
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime staleCutoff = now.minusHours(2);       // safety net for abandoned WAITING/ACTIVE rooms
+        LocalDateTime finishedCutoff = now.minusMinutes(5);  // grace period for clients to see final results
+        rooms.entrySet().removeIf(e -> {
+            ActiveRoom room = e.getValue();
+            if (room.getStatus() == RoomStatus.DONE) {
+                LocalDateTime finishedAt = room.getFinishedAt();
+                return finishedAt == null || finishedAt.isBefore(finishedCutoff);
+            }
+            return room.getCreatedAt().isBefore(staleCutoff);
+        });
     }
 }

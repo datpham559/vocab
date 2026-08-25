@@ -1,6 +1,7 @@
 package com.vocab.repository;
 
 import com.vocab.entity.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,9 +15,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
 
+    // Pageable bounds the result at the DB level (e.g. PageRequest.of(0, limit)) instead of
+    // loading every user and truncating in Java.
     @Query("SELECT u FROM User u ORDER BY u.streak DESC, u.totalWordsLearned DESC")
-    List<User> findTopByStreak();
+    List<User> findTopByStreak(Pageable pageable);
 
     @Query("SELECT u FROM User u ORDER BY u.totalWordsLearned DESC, u.streak DESC")
-    List<User> findTopByWords();
+    List<User> findTopByWords(Pageable pageable);
 }

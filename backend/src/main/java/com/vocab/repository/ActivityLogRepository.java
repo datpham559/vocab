@@ -14,7 +14,10 @@ public interface ActivityLogRepository extends JpaRepository<ActivityLog, Long> 
 
     Page<ActivityLog> findByActionTypeOrderByCreatedAtDesc(String actionType, Pageable pageable);
 
-    List<ActivityLog> findByUserIdOrderByCreatedAtDesc(Long userId);
+    // "My activity" feed only ever displays the most recent entries — bounded at the DB level
+    // instead of loading a user's entire activity history (which only grows over an account's
+    // lifetime) just to show the first few.
+    List<ActivityLog> findTop30ByUserIdOrderByCreatedAtDesc(Long userId);
 
     Page<ActivityLog> findByUsernameContainingIgnoreCaseOrderByCreatedAtDesc(String username, Pageable pageable);
 }

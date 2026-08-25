@@ -61,11 +61,10 @@ public class DailyWordSetService {
         // If still not enough, pick any remaining words not already selected
         if (selectedWords.size() < DAILY_WORD_COUNT) {
             int remaining = DAILY_WORD_COUNT - selectedWords.size();
-            List<Long> excludeIds = selectedWords.stream().map(Word::getId).toList();
-            List<Word> extraWords = wordRepository.findAll().stream()
-                .filter(w -> !excludeIds.contains(w.getId()))
-                .limit(remaining)
-                .toList();
+            List<Long> excludeIds = selectedWords.isEmpty()
+                ? List.of(-1L) // sentinel: "NOT IN (-1)" matches every real word id
+                : selectedWords.stream().map(Word::getId).toList();
+            List<Word> extraWords = wordRepository.findRandomExcludingIds(excludeIds, remaining);
             selectedWords.addAll(extraWords);
         }
 

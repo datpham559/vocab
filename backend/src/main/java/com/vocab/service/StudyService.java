@@ -12,6 +12,9 @@ import com.vocab.repository.UserRepository;
 import com.vocab.repository.UserWordProgressRepository;
 import com.vocab.repository.WordRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,7 +71,8 @@ public class StudyService {
     }
 
     public List<QuizQuestionResponse> getReviewQuiz(Long userId, int count) {
-        List<UserWordProgress> batch = progressRepository.findForReviewCycle(userId, count);
+        Pageable pageable = PageRequest.of(0, count, Sort.by("lastReviewed").ascending());
+        List<UserWordProgress> batch = progressRepository.findForReviewCycle(userId, pageable);
         List<Word> words = batch.stream().map(UserWordProgress::getWord).toList();
         return quizService.generateQuizForWords(words);
     }

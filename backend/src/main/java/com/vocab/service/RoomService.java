@@ -12,6 +12,7 @@ import com.vocab.room.RoomStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -27,7 +28,10 @@ public class RoomService {
     private final WordRepository wordRepository;
     private final QuizService quizService;
 
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(5);
+    // Shared across all rooms' countdown/question-timer/result-transition tasks. 5 was too small —
+    // more than 5 rooms with timers due at overlapping instants would queue up and delay every
+    // concurrent game's question transitions.
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(20);
 
     public ActiveRoom createRoom(Long userId, String userName, CreateRoomRequest req) {
         String code = generateCode();
@@ -269,6 +273,7 @@ public class RoomService {
             int next = room.getCurrentQuestionIndex() + 1;
             if (next >= room.getQuestions().size()) {
                 room.setStatus(RoomStatus.DONE);
+                room.setFinishedAt(LocalDateTime.now());
             } else {
                 startQuestion(room, next);
             }

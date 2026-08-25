@@ -80,4 +80,10 @@ public interface WordRepository extends JpaRepository<Word, Long> {
     List<Word> findNewWordsForUserByCategory(@Param("userId") Long userId,
                                              @Param("category") String category,
                                              @Param("limit") int limit);
+
+    // Bounded random pick excluding specific ids — used as a last-resort filler instead of
+    // loading the entire words table into memory and filtering in Java.
+    @Query(value = "SELECT TOP (:limit) * FROM words WHERE id NOT IN (:excludeIds) ORDER BY NEWID()",
+           nativeQuery = true)
+    List<Word> findRandomExcludingIds(@Param("excludeIds") List<Long> excludeIds, @Param("limit") int limit);
 }

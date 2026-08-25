@@ -9,8 +9,13 @@
   <workingdirectory>c:\Users\Admin\Desktop\project\vocab</workingdirectory>
 
   <startmode>Automatic</startmode>
-  <!-- Chỉ khởi động sau khi VocabApp đã chạy. -->
-  <depend>VocabApp</depend>
+  <!-- KHÔNG dùng <depend>VocabApp</depend>: Windows SCM sẽ cascade-stop VocabTunnel mỗi khi
+       VocabApp bị stop (vd. mỗi lần build.bat redeploy) — nhưng build.bat chỉ start lại
+       VocabApp, không start lại VocabTunnel, nên tunnel bị "chết" sau mỗi lần build.
+       cloudflared tự retry kết nối tới localhost:8899 khi chưa sẵn sàng, không cần
+       dependency cứng để chạy đúng thứ tự lúc boot. -->
+
+
 
   <!-- mode="reset": xoá sạch log cũ mỗi lần service start lại, không giữ lịch sử. -->
   <logpath>c:\Users\Admin\Desktop\project\vocab\service\logs</logpath>

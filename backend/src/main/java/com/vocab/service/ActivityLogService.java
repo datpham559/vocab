@@ -38,6 +38,6 @@ public class ActivityLogService {
     }
 
     public List<ActivityLog> getByUser(Long userId) {
-        return repository.findByUserIdOrderByCreatedAtDesc(userId);
+        return repository.findTop30ByUserIdOrderByCreatedAtDesc(userId);
     }
 }

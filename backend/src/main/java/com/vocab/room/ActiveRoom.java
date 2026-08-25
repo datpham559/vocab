@@ -31,6 +31,7 @@ public class ActiveRoom {
     private final AtomicBoolean questionEnded = new AtomicBoolean(false);
     private volatile int countdownLeft = 0;
     private final LocalDateTime createdAt = LocalDateTime.now();
+    private volatile LocalDateTime finishedAt; // set when status transitions to DONE
     private int questionCount = 20;
     private String quizMode = "CHOICE"; // CHOICE | TYPE | MIXED
     private List<String> questionModes = new ArrayList<>(); // per-question: "CHOICE" or "TYPE"
