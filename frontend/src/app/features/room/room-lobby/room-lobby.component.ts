@@ -22,10 +22,10 @@ export class RoomLobbyComponent {
   countOptions = [10, 20, 30];
   quizMode: 'CHOICE' | 'TYPE' | 'MIXED' = 'CHOICE';
 
-  // Create — custom difficulty counts (matches standard 20q ratio: 40/40/20)
-  beginnerCount = 8;
-  intermediateCount = 8;
-  advancedCount = 4;
+  // Create — custom difficulty counts
+  beginnerCount = 10;
+  intermediateCount = 15;
+  advancedCount = 5;
   readonly MAX_PER_DIFF = 20;
 
   // Per-difficulty question modes (only used when quizMode=MIXED + configMode=custom)

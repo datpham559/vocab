@@ -146,8 +146,8 @@ public class RoomService {
         if (!room.getHostId().equals(hostId)) {
             throw new IllegalStateException("Only host can kick players");
         }
-        if (room.getStatus() != RoomStatus.WAITING) {
-            throw new IllegalStateException("Cannot kick after game started");
+        if (room.getStatus() == RoomStatus.DONE) {
+            throw new IllegalStateException("Cannot kick after game finished");
         }
         if (hostId.equals(targetId)) {
             throw new IllegalStateException("Host cannot kick themselves");
@@ -155,6 +155,11 @@ public class RoomService {
         room.getParticipants().remove(targetId);
         room.getScores().remove(targetId);
         room.getSpectators().remove(targetId);
+        // Also drop any in-flight answer for the current question so a kicked
+        // player never counts toward "answeredCount" once removed.
+        room.getCurrentAnswers().remove(targetId);
+        room.getAnswerTimestamps().remove(targetId);
+        room.getLastEarned().remove(targetId);
     }
 
     public void startGame(String code, Long userId) {
@@ -306,6 +311,7 @@ public class RoomService {
         QuizQuestionResponse currentQ = null;
         Integer correctIndex = null;
         Integer myAnswer = room.getCurrentAnswers().get(userId);
+        Boolean myAnswerCorrect = null;
         Integer myLastEarned = room.getLastEarned().get(userId);
         String currentQuestionMode = "CHOICE";
         String correctMeaning = null;
@@ -318,6 +324,9 @@ public class RoomService {
                 }
                 if ("TYPE".equals(currentQuestionMode)) {
                     correctMeaning = raw.getOptions().get(raw.getCorrectIndex());
+                }
+                if (myAnswer != null) {
+                    myAnswerCorrect = myAnswer.equals(raw.getCorrectIndex());
                 }
                 if (room.getStatus() == RoomStatus.SHOWING_RESULT) {
                     correctIndex = raw.getCorrectIndex();
@@ -355,6 +364,7 @@ public class RoomService {
             .timeLeft(room.getTimeLeft())
             .correctIndex(correctIndex)
             .myAnswer(myAnswer)
+            .myAnswerCorrect(myAnswerCorrect)
             .myLastEarned(myLastEarned)
             .answeredCount(room.getCurrentAnswers().size())
             .questionCount(room.getQuestionCount())

@@ -20,6 +20,7 @@ public class RoomStateResponse {
     private int timeLeft;
     private Integer correctIndex;
     private Integer myAnswer;
+    private Boolean myAnswerCorrect; // for TYPE mode: whether myAnswer matches the real correct index (null = not answered yet)
     private Integer myLastEarned;
     private int answeredCount;
     private int questionCount;

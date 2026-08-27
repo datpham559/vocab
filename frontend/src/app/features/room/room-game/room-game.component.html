@@ -184,12 +184,12 @@
           <p class="quiz-prompt">Gõ từ tiếng Anh tương ứng:</p>
 
           <!-- Already answered correctly -->
-          <div class="type-answered" *ngIf="!state.spectator && state.myAnswer === 0 && state.status === 'ACTIVE'">
+          <div class="type-answered" *ngIf="!state.spectator && state.myAnswerCorrect === true && state.status === 'ACTIVE'">
             <span class="type-answered-icon">✓</span>
             <span>Bạn gõ "<strong>{{ lastSubmittedAnswer }}</strong>" — đúng rồi! Đang chờ người khác...</span>
           </div>
           <!-- Answered wrong -->
-          <div class="type-answered type-answered--wrong" *ngIf="!state.spectator && state.myAnswer === -1 && state.status === 'ACTIVE'">
+          <div class="type-answered type-answered--wrong" *ngIf="!state.spectator && state.myAnswerCorrect === false && state.status === 'ACTIVE'">
             <span class="type-answered-icon">✗</span>
             <span>Bạn gõ "<strong>{{ lastSubmittedAnswer }}</strong>" — sai rồi! Đang chờ người khác...</span>
           </div>
@@ -235,6 +235,8 @@
           <span class="score-rank">{{ i + 1 }}</span>
           <span class="score-name">{{ p.name }} <span class="score-you" *ngIf="p.userId === myUserId">(Bạn)</span></span>
           <span class="score-pts">{{ p.score }}</span>
+          <button class="btn-kick" *ngIf="isHost && p.userId !== myUserId"
+                  (click)="kickPlayer(p.userId)" title="Kick khỏi phòng">✕</button>
         </div>
       </div>
 

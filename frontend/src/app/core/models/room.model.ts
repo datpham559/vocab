@@ -11,6 +11,7 @@ export interface RoomState {
   timeLeft: number;
   correctIndex: number | null;
   myAnswer: number | null;
+  myAnswerCorrect: boolean | null;
   myLastEarned: number | null;
   answeredCount: number;
   questionCount: number;
