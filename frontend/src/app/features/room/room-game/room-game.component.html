@@ -55,7 +55,7 @@
               · 👁 {{ state.spectators.length }} khán giả
             </span>
           </div>
-          <div class="participant-item" *ngFor="let p of state.participants">
+          <div class="participant-item" *ngFor="let p of state.participants; trackBy: trackByIndex">
             <span class="participant-crown" *ngIf="p.host">👑</span>
             <span class="participant-name">{{ p.name }}</span>
             <span class="participant-you" *ngIf="p.userId === myUserId">(Bạn)</span>
@@ -69,7 +69,7 @@
         <!-- Spectator list -->
         <div class="spectators-list" *ngIf="state.spectators.length > 0">
           <div class="spectators-title">👁 {{ state.spectators.length }} khán giả</div>
-          <div class="spectator-item" *ngFor="let s of state.spectators">
+          <div class="spectator-item" *ngFor="let s of state.spectators; trackBy: trackByIndex">
             <span class="spectator-name">{{ s.name }}</span>
             <span class="spectator-you" *ngIf="s.userId === myUserId">(Bạn)</span>
             <button class="btn-to-player" *ngIf="isHost"
@@ -126,7 +126,7 @@
         <div class="timer-bar-wrap">
           <div class="timer-bar-fill" [style.width.%]="timerPercent" [style.background]="timerColor"></div>
         </div>
-        <span class="timer-num" [style.color]="timerColor">{{ state.timeLeft }}s</span>
+        <span class="timer-num" [style.color]="timerColor">{{ displayTimeLeft() }}s</span>
       </div>
       <div class="result-banner" *ngIf="state.status === 'SHOWING_RESULT'">
         <span>✅ Kết quả câu {{ state.questionIndex + 1 }}</span>
@@ -140,7 +140,7 @@
         <ng-container *ngIf="state.currentQuestionMode === 'CHOICE'">
           <div class="quiz-word">
             <span class="protected-word" [attr.aria-label]="state.currentQuestion.word">
-              <span *ngFor="let ch of choiceWordLetters" class="pw-char">{{ ch }}</span>
+              <span *ngFor="let ch of choiceWordLetters; trackBy: trackByIndex" class="pw-char">{{ ch }}</span>
             </span>
             <button class="btn-speak-sm" (click)="speech.speak(state.currentQuestion.word)">🔊</button>
           </div>
@@ -148,13 +148,13 @@
             <span class="quiz-pos" *ngIf="state.currentQuestion.partOfSpeech">{{ state.currentQuestion.partOfSpeech }}</span>
             <span class="quiz-pron protected-word" *ngIf="state.currentQuestion.pronunciation"
                   [attr.aria-label]="state.currentQuestion.pronunciation">
-              <span *ngFor="let ch of (state.currentQuestion.pronunciation.split(''))" class="pw-char">{{ ch }}</span>
+              <span *ngFor="let ch of state.currentQuestion.pronunciation.split(''); trackBy: trackByIndex" class="pw-char">{{ ch }}</span>
             </span>
           </div>
           <p class="quiz-prompt">Chọn nghĩa đúng:</p>
           <div class="options">
             <button
-              *ngFor="let opt of state.currentQuestion.options; let i = index"
+              *ngFor="let opt of state.currentQuestion.options; let i = index; trackBy: trackByIndex"
               class="option-btn"
               [class]="getOptionClass(i)"
               (click)="!state.spectator && selectOption(i)"
@@ -168,14 +168,14 @@
         <!-- TYPING MODE -->
         <ng-container *ngIf="state.currentQuestionMode === 'TYPE'">
           <div class="quiz-meaning protected-word" [attr.aria-label]="state.correctMeaning">
-            <span *ngFor="let ch of meaningLetters" class="pw-char">{{ ch }}</span>
+            <span *ngFor="let ch of meaningLetters; trackBy: trackByIndex" class="pw-char">{{ ch }}</span>
           </div>
           <div class="type-meta" *ngIf="state.currentQuestion">
             <span class="quiz-pos" *ngIf="state.currentQuestion.partOfSpeech">{{ state.currentQuestion.partOfSpeech }}</span>
             <span class="word-length-hint">{{ state.currentQuestion.word.length }} chữ cái</span>
           </div>
           <div class="word-hint-boxes" *ngIf="state.status === 'ACTIVE' && state.myAnswer === null">
-            <ng-container *ngFor="let box of wordHintBoxes">
+            <ng-container *ngFor="let box of wordHintBoxes; trackBy: trackByIndex">
               <span *ngIf="box.char !== ' ' && box.char !== '-'" class="hint-box" [class.hint-first]="!box.blank">{{ box.char }}</span>
               <span *ngIf="box.char === ' '" class="hint-space"></span>
               <span *ngIf="box.char === '-'" class="hint-box hint-dash">-</span>
@@ -185,11 +185,13 @@
 
           <!-- Already answered correctly -->
           <div class="type-answered" *ngIf="!state.spectator && state.myAnswer === 0 && state.status === 'ACTIVE'">
-            <span class="type-answered-icon">✓</span> Đúng rồi! Đang chờ người khác...
+            <span class="type-answered-icon">✓</span>
+            <span>Bạn gõ "<strong>{{ lastSubmittedAnswer }}</strong>" — đúng rồi! Đang chờ người khác...</span>
           </div>
           <!-- Answered wrong -->
           <div class="type-answered type-answered--wrong" *ngIf="!state.spectator && state.myAnswer === -1 && state.status === 'ACTIVE'">
-            <span class="type-answered-icon">✗</span> Sai rồi! Đang chờ người khác...
+            <span class="type-answered-icon">✗</span>
+            <span>Bạn gõ "<strong>{{ lastSubmittedAnswer }}</strong>" — sai rồi! Đang chờ người khác...</span>
           </div>
           <!-- Spectator watching -->
           <div class="spectator-watching spectator-type-hint" *ngIf="state.spectator && state.status === 'ACTIVE'">
@@ -229,7 +231,7 @@
       <!-- Live scoreboard -->
       <div class="live-scores">
         <div class="live-scores-title">Bảng điểm</div>
-        <div class="score-row" *ngFor="let p of state.participants; let i = index">
+        <div class="score-row" *ngFor="let p of state.participants; let i = index; trackBy: trackByIndex">
           <span class="score-rank">{{ i + 1 }}</span>
           <span class="score-name">{{ p.name }} <span class="score-you" *ngIf="p.userId === myUserId">(Bạn)</span></span>
           <span class="score-pts">{{ p.score }}</span>
@@ -257,7 +259,7 @@
           </div>
           <div
             class="lb-row"
-            *ngFor="let p of state.participants; let i = index"
+            *ngFor="let p of state.participants; let i = index; trackBy: trackByIndex"
             [class.lb-me]="p.userId === myUserId"
             [class.lb-first]="i === 0">
             <span class="lb-rank">
@@ -288,7 +290,7 @@
         <div class="answer-history" *ngIf="showHistory()">
           <div
             class="history-item"
-            *ngFor="let r of answerHistory; let i = index"
+            *ngFor="let r of answerHistory; let i = index; trackBy: trackByIndex"
             [class.history-correct]="r.correct"
             [class.history-wrong]="!r.correct">
             <span class="history-icon">{{ r.correct ? '✓' : '✗' }}</span>
@@ -316,7 +318,7 @@
 
   <!-- Floating Reactions -->
   <div class="floating-reaction"
-       *ngFor="let r of floatingReactions"
+       *ngFor="let r of floatingReactions; trackBy: trackByIndex"
        [style.left.%]="r.x">
     <span class="float-emoji">{{ r.emoji }}</span>
     <span class="float-user">{{ r.username }}</span>

@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, OnInit, computed, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -31,7 +31,8 @@ const CATEGORY_LABELS: Record<string, string> = {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './study-session.component.html',
-  styleUrls: ['./study-session.component.scss']
+  styleUrls: ['./study-session.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StudySessionComponent implements OnInit {
   phase = signal<Phase>('select');
@@ -72,13 +73,17 @@ export class StudySessionComponent implements OnInit {
   typeResult = signal<TypeResult>(null);
   @ViewChild('typeInput') typeInput?: ElementRef<HTMLInputElement>;
 
-  get wordHintBoxes(): { char: string; blank: boolean }[] {
+  readonly wordHintBoxes = computed<{ char: string; blank: boolean }[]>(() => {
     const q = this.currentQuestion;
     if (!q) return [];
     return q.word.split('').map((ch, i) => ({
       char: (i === 0 || ch === ' ' || ch === '-') ? ch : '_',
       blank: i !== 0 && ch !== ' ' && ch !== '-'
     }));
+  });
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   constructor(

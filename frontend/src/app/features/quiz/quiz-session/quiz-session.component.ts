@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, OnInit, computed, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -17,7 +17,8 @@ type TypeResult = 'correct' | 'wrong' | null;
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './quiz-session.component.html',
-  styleUrls: ['./quiz-session.component.scss']
+  styleUrls: ['./quiz-session.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class QuizSessionComponent implements OnInit {
   phase = signal<Phase>('intro');
@@ -40,20 +41,24 @@ export class QuizSessionComponent implements OnInit {
   private answeredAt = 0;
   @ViewChild('typeInput') typeInput?: ElementRef<HTMLInputElement>;
 
-  get wordHintBoxes(): { char: string; blank: boolean }[] {
+  readonly wordHintBoxes = computed<{ char: string; blank: boolean }[]>(() => {
     const q = this.currentQuestion;
     if (!q) return [];
     return q.word.split('').map((ch, i) => ({
       char: (i === 0 || ch === ' ' || ch === '-') ? ch : '_',
       blank: i !== 0 && ch !== ' ' && ch !== '-'
     }));
-  }
+  });
 
-  get hintDisplay(): { char: string; revealed: boolean }[] {
+  readonly hintDisplay = computed<{ char: string; revealed: boolean }[]>(() => {
     const q = this.currentQuestion;
     if (!q) return [];
     const revealed = this.hintsRevealed();
     return q.word.toLowerCase().split('').map((ch, i) => ({ char: i < revealed ? ch : '_', revealed: i < revealed }));
+  });
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   constructor(
@@ -132,15 +137,13 @@ export class QuizSessionComponent implements OnInit {
     return this.questions()[this.currentIndex()] || null;
   }
 
-  get wordLetters(): string[] {
-    return this.currentQuestion?.word.split('') ?? [];
-  }
+  readonly wordLetters = computed<string[]>(() => this.currentQuestion?.word.split('') ?? []);
 
-  get meaningLetters(): string[] {
+  readonly meaningLetters = computed<string[]>(() => {
     const q = this.currentQuestion;
     if (!q) return [];
     return (q.options[q.correctIndex] ?? '').split('');
-  }
+  });
 
   selectOption(index: number): void {
     if (this.answered()) return;

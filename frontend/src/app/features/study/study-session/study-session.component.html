@@ -97,7 +97,7 @@
       <div class="quiz-meaning-vi">{{ currentQuestion.options[currentQuestion.correctIndex] }}</div>
 
       <div class="word-hint-boxes">
-        <ng-container *ngFor="let h of wordHintBoxes">
+        <ng-container *ngFor="let h of wordHintBoxes(); trackBy: trackByIndex">
           <span *ngIf="h.char === ' '" class="hint-space"></span>
           <span *ngIf="h.char !== ' '" class="hint-box" [class.hint-first]="!h.blank">{{ h.char }}</span>
         </ng-container>

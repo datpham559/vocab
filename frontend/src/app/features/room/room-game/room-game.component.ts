@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { interval, Subject } from 'rxjs';
-import { startWith, switchMap, takeUntil } from 'rxjs/operators';
+import { exhaustMap, startWith, takeUntil } from 'rxjs/operators';
 import { RoomService } from '../../../core/services/room.service';
 import { RoomWebSocketService } from '../../../core/services/room-websocket.service';
 import { ChatMessage, RoomState } from '../../../core/models/room.model';
@@ -37,6 +37,7 @@ export class RoomGameComponent implements OnInit, OnDestroy {
 
   // Typing mode state
   typedAnswer = '';
+  lastSubmittedAnswer = '';
   typeCorrect = signal<boolean | null>(null);
   typingLocked = signal(false);
   private lastQuestionIndex = -1;
@@ -65,6 +66,13 @@ export class RoomGameComponent implements OnInit, OnDestroy {
   private prevCountdown = -1;
   private prevTimeLeft = -1;
   private resultSoundPlayed = false;
+
+  // Smooth local countdown, resynced from the server on every successful poll instead of
+  // being redrawn only when a poll happens to land — so a slow/delayed poll response
+  // doesn't make the displayed timer freeze then jump.
+  displayTimeLeft = signal(0);
+  private timeLeftSyncedAt = 0;
+  private timeLeftSyncedValue = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -196,12 +204,21 @@ export class RoomGameComponent implements OnInit, OnDestroy {
 
   private startPolling(): void {
     this.loading.set(false);
+    // exhaustMap (not switchMap): if a poll response is slow (e.g. backend under load),
+    // don't cancel it and fire another — that pile-up of cancelled requests is exactly
+    // what made the timer freeze then jump on a slow backend. exhaustMap just skips
+    // ticks until the in-flight request resolves.
     interval(1000).pipe(
       startWith(0),
-      switchMap(() => this.roomService.getState(this.code)),
+      exhaustMap(() => this.roomService.getState(this.code)),
       takeUntil(this.destroy$)
     ).subscribe({
       next: state => {
+        // Resync the local smooth countdown to the server's authoritative value.
+        this.timeLeftSyncedAt = Date.now();
+        this.timeLeftSyncedValue = state.timeLeft;
+        this.displayTimeLeft.set(state.timeLeft);
+
         // Record answer history when result is shown (once per question)
         if (state.status === 'SHOWING_RESULT' && state.questionIndex !== this.lastRecordedIndex && state.currentQuestion) {
           this.lastRecordedIndex = state.questionIndex;
@@ -224,9 +241,19 @@ export class RoomGameComponent implements OnInit, OnDestroy {
         if (state.questionIndex !== this.lastQuestionIndex) {
           this.lastQuestionIndex = state.questionIndex;
           this.typedAnswer = '';
+          this.lastSubmittedAnswer = '';
           this.typeCorrect.set(null);
           this.typingLocked.set(false);
-          setTimeout(() => this.typeInput?.nativeElement?.focus(), 100);
+          // Don't steal focus from the chat box (or any other input) the user is
+          // currently typing in — otherwise their next Enter submits the quiz
+          // answer instead of sending their chat message.
+          setTimeout(() => {
+            const active = document.activeElement;
+            const typingElsewhere = active instanceof HTMLInputElement && active !== this.typeInput?.nativeElement;
+            if (!typingElsewhere) {
+              this.typeInput?.nativeElement?.focus();
+            }
+          }, 100);
         }
 
         // --- Sound triggers ---
@@ -275,6 +302,14 @@ export class RoomGameComponent implements OnInit, OnDestroy {
       },
       error: () => {}
     });
+
+    // Local 1s ticker for the displayed countdown, independent of poll arrival timing —
+    // resynced to the server's value on every poll above, so drift never accumulates.
+    interval(1000).pipe(takeUntil(this.destroy$)).subscribe(() => {
+      if (this.state?.status !== 'ACTIVE') return;
+      const elapsedSec = Math.floor((Date.now() - this.timeLeftSyncedAt) / 1000);
+      this.displayTimeLeft.set(Math.max(0, this.timeLeftSyncedValue - elapsedSec));
+    });
   }
 
   get choiceWordLetters(): string[] {
@@ -303,9 +338,13 @@ export class RoomGameComponent implements OnInit, OnDestroy {
     return this.state?.hostId === this.myUserId;
   }
 
+  trackByIndex(index: number): number {
+    return index;
+  }
+
   get timerPercent(): number {
     if (!this.state) return 100;
-    return (this.state.timeLeft / 15) * 100;
+    return (this.displayTimeLeft() / 15) * 100;
   }
 
   get timerColor(): string {
@@ -369,6 +408,7 @@ export class RoomGameComponent implements OnInit, OnDestroy {
 
     this.typingLocked.set(true);
     const word = this.typedAnswer.trim();
+    this.lastSubmittedAnswer = word;
     this.roomService.submitTypedAnswer(this.code, word).subscribe({
       next: res => {
         this.typeCorrect.set(res.correct ? true : false);

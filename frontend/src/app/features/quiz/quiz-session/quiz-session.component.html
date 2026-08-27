@@ -62,7 +62,7 @@
     <p class="score-msg" *ngIf="scorePercent < 60">Cần ôn luyện thêm! Hãy thử lại sau.</p>
 
     <div class="result-review">
-      <div *ngFor="let r of results" class="review-item" [class.review-correct]="r.correct" [class.review-wrong]="!r.correct">
+      <div *ngFor="let r of results; trackBy: trackByIndex" class="review-item" [class.review-correct]="r.correct" [class.review-wrong]="!r.correct">
         <span class="review-icon">{{ r.correct ? '✓' : '✗' }}</span>
         <span class="review-word">{{ r.question.word }}</span>
         <span class="review-answer">{{ r.question.options[r.question.correctIndex] }}</span>
@@ -96,16 +96,16 @@
     <ng-container *ngIf="currentMode === 'choice'">
       <div class="question-card card">
         <div class="question-word protected-word" [attr.aria-label]="q.word">
-          <span *ngFor="let ch of wordLetters" class="pw-char">{{ ch }}</span>
+          <span *ngFor="let ch of wordLetters(); trackBy: trackByIndex" class="pw-char">{{ ch }}</span>
         </div>
         <div class="question-pron protected-word" *ngIf="q.pronunciation" [attr.aria-label]="q.pronunciation">
-          <span *ngFor="let ch of (q.pronunciation.split(''))" class="pw-char">{{ ch }}</span>
+          <span *ngFor="let ch of q.pronunciation.split(''); trackBy: trackByIndex" class="pw-char">{{ ch }}</span>
         </div>
         <p class="question-prompt">Nghĩa tiếng Việt là gì?</p>
 
         <div class="options-list">
           <button
-            *ngFor="let opt of q.options; let i = index"
+            *ngFor="let opt of q.options; let i = index; trackBy: trackByIndex"
             class="option-btn"
             [class]="getOptionClass(i)"
             (click)="selectOption(i)"
@@ -132,14 +132,14 @@
     <ng-container *ngIf="currentMode === 'type'">
       <div class="question-card card">
         <div class="question-meaning protected-word" [attr.aria-label]="q.options[q.correctIndex]">
-          <span *ngFor="let ch of meaningLetters" class="pw-char">{{ ch }}</span>
+          <span *ngFor="let ch of meaningLetters(); trackBy: trackByIndex" class="pw-char">{{ ch }}</span>
         </div>
         <div class="question-pron" *ngIf="q.pronunciation && answered()">{{ q.pronunciation }}</div>
         <p class="question-prompt">Từ tiếng Anh tương ứng là gì?</p>
 
         <!-- Word hint boxes (first letter + blanks) -->
         <div class="word-hint-boxes" *ngIf="!answered()">
-          <ng-container *ngFor="let box of wordHintBoxes">
+          <ng-container *ngFor="let box of wordHintBoxes(); trackBy: trackByIndex">
             <span *ngIf="box.char === ' '" class="hint-space"></span>
             <span *ngIf="box.char !== ' '" class="hint-box" [class.hint-first]="!box.blank">
               {{ !box.blank ? box.char : '' }}
@@ -151,7 +151,7 @@
         <div class="hint-row" *ngIf="hintsRevealed() > 0 && !answered()">
           <span class="hint-label">Gợi ý:</span>
           <div class="hint-boxes">
-            <span *ngFor="let h of hintDisplay" class="hint-char" [class.hint-revealed]="h.revealed">
+            <span *ngFor="let h of hintDisplay(); trackBy: trackByIndex" class="hint-char" [class.hint-revealed]="h.revealed">
               {{ h.char }}
             </span>
           </div>

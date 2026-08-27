@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, OnDestroy, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, OnDestroy, computed, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -34,7 +34,8 @@ const TIME_PER_QUESTION = 15;
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './level-exam.component.html',
-  styleUrls: ['./level-exam.component.scss']
+  styleUrls: ['./level-exam.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LevelExamComponent implements OnDestroy {
   phase = signal<Phase>('intro');
@@ -60,13 +61,17 @@ export class LevelExamComponent implements OnDestroy {
   typeResult = signal<TypeResult>(null);
   @ViewChild('typeInput') typeInput?: ElementRef<HTMLInputElement>;
 
-  get wordHintBoxes(): { char: string; blank: boolean }[] {
+  readonly wordHintBoxes = computed<{ char: string; blank: boolean }[]>(() => {
     const q = this.currentQuestion;
     if (!q) return [];
     return q.word.split('').map((ch, i) => ({
       char: (i === 0 || ch === ' ' || ch === '-') ? ch : '_',
       blank: i !== 0 && ch !== ' ' && ch !== '-'
     }));
+  });
+
+  trackByIndex(index: number): number {
+    return index;
   }
 
   result: LevelResult | null = null;

@@ -73,7 +73,7 @@
 
         <div class="options">
           <button
-            *ngFor="let opt of currentQuestion.options; let i = index"
+            *ngFor="let opt of currentQuestion.options; let i = index; trackBy: trackByIndex"
             class="option-btn"
             [class]="getOptionClass(i)"
             (click)="selectOption(i)">
@@ -89,7 +89,7 @@
 
         <!-- Static hint boxes: first letter + blank squares -->
         <div class="word-hint-boxes" *ngIf="!answered() && hintsRevealed() === 0">
-          <ng-container *ngFor="let h of wordHintBoxes">
+          <ng-container *ngFor="let h of wordHintBoxes(); trackBy: trackByIndex">
             <span *ngIf="h.char === ' '" class="hint-space"></span>
             <span *ngIf="h.char !== ' '" class="hint-box" [class.hint-first]="!h.blank">{{ h.char }}</span>
           </ng-container>
@@ -99,7 +99,7 @@
         <div class="hint-row" *ngIf="reviewMode === 'advanced' && hintsRevealed() > 0 && !answered()">
           <span class="hint-label">Gợi ý:</span>
           <div class="hint-boxes">
-            <span *ngFor="let h of hintDisplay" class="hint-char" [class.hint-revealed]="h.revealed">{{ h.char }}</span>
+            <span *ngFor="let h of hintDisplay(); trackBy: trackByIndex" class="hint-char" [class.hint-revealed]="h.revealed">{{ h.char }}</span>
           </div>
         </div>
 
